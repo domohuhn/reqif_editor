@@ -7,8 +7,18 @@ on:
     branches: [ main ]
 
 jobs:
- build:
-   runs-on: ubuntu-latest
+  build:
+   runs-on: ${{ matrix.os }}
+   strategy:
+      matrix:
+        name: [ubuntu-20.04, ubuntu-22.04]
+
+        include:
+          - name: ubuntu-20.04
+            os: ubuntu-20.04
+          - name: ubuntu-22.04
+            os: ubuntu-22.04
+
    steps:
      - uses: actions/checkout@v3
      - uses: subosito/flutter-action@v2
@@ -23,10 +33,14 @@ jobs:
      - name: Run tests
        run: flutter test
      - name: Build executable
-       run: flutter build linux --release
-     - name: Create Package
        run: |
+          flutter build linux --release
           mkdir -p release
+          ls 
+          ls build
+          ls build/linux
+          ls build/linux/release/
+          ls build/linux/release/bundle/
           pushd build/linux/release/bundle/
           tar -czvf reqif_editor_ubuntu_x86-64.tar.gz .
           popd
