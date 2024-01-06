@@ -11,5 +11,6 @@ You can contribute to this repository using the following workflow:
 ## Contributor License Agreement
 
 By contributing to this repository (e.g. by submitting a pull request):
+
 - You warrant that you have the right to contribute the material.
-- You confirm that your work is licensed under the same license as the other code in this repository (see LICENSE).
+- You confirm that your work is licensed with the same license as the other code in this repository (see LICENSE).

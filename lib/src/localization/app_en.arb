@@ -1,0 +1,183 @@
+{
+  "@@locale": "en",
+  "appTitle": "ReqIf Editor",
+  "@appTitle": {
+    "description": "The title of the application"
+  },
+  "file": "File",
+  "@file": {
+    "description": "Main menu item"
+  },
+  "about": "About",
+  "@about": {
+    "description": "Text for a menu entry to see information about the application"
+  },
+  "help": "Help",
+  "@help": {
+    "description": "Text for a menu entry to see a help page"
+  },
+  "openFile": "Open File...",
+  "@openFile": {
+    "description": "Text for a menu entry to open a new file"
+  },
+  "save": "Save",
+  "@save": {
+    "description": "Text for a menu entry to save the file"
+  },
+  "saveAs": "Save as...",
+  "@saveAs": {
+    "description": "Text for a menu entry to save the file as"
+  },
+  "exit": "Exit",
+  "@exit": {
+    "description": "Text for a menu entry to quit the application"
+  },
+  "settings": "Settings",
+  "@settings": {
+    "description": "Text for a menu entry to get to the settings"
+  },
+  "lightTheme": "Light Theme",
+  "@lightTheme": {
+    "description": "Text for a menu entry to select the light theme"
+  },
+  "darkTheme": "Dark Theme",
+  "@darkTheme": {
+    "description": "Text for a menu entry to select the dark theme"
+  },
+  "systemTheme": "System Theme",
+  "@systemTheme": {
+    "description": "Text for a menu entry to select the automatic theme"
+  },
+  "themeSelection": "Theme:",
+  "@themeSelection": {
+    "description": "Text for a menu entry to select the theme"
+  },
+  "generalSettings": "General",
+  "@generalSettings": {
+    "description": "Heading for the general settings block"
+  },
+  "appearance": "Appearance",
+  "@appearance": {
+    "description": "Heading for the appearance"
+  },
+  "settingsSave": "Save",
+  "@settingsSave": {
+    "description": "Heading for the save section"
+  },
+  "settingsSaveUpdateUUID": "Update the documents UUID when saving",
+  "@settingsSaveUpdateUUID": {
+    "description": "Description for a settings checkbox"
+  },
+  "settingsSaveUpdateTime": "Update the documents creation time when saving",
+  "@settingsSaveUpdateTime": {
+    "description": "Description for a settings checkbox"
+  },
+  "settingsSaveUpdateTool": "Update the tool ID when saving",
+  "@settingsSaveUpdateTool": {
+    "description": "Description for a settings checkbox"
+  },
+  "settingsLineEndings": "Select the line endings to use:",
+  "@settingsLineEndings": {
+    "description": "Description for a settings combobox"
+  },
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Text for a cancel button"
+  },
+  "saveAndExit": "Save and quit",
+  "@saveAndExit": {
+    "description": "Text for a save button"
+  },
+  "quitWithoutSaving": "Quit without saving",
+  "@quitWithoutSaving": {
+    "description": "Text for a quit button"
+  },
+  "unsavedChanges": "Unsaved changes",
+  "@unsavedChanges": {
+    "description": "Title for the unsaved changes dialog"
+  },
+  "comment": "Comment",
+  "@comment": {
+    "description": "Title for the edit comment text field"
+  },
+  "modalEditFileText": "Modify the file properties",
+  "@modalEditFileText": {
+    "description": "Text for the file edit modal dialog"
+  },
+  "modalEditPartText": "Properties of this specification part:",
+  "@modalEditPartText": {
+    "description": "Text for the part edit modal dialog"
+  },
+  "close": "Close",
+  "@close": {
+    "description": "Text for close buttons"
+  },
+  "navigationToolTip": "Toggle navigation",
+  "@navigationToolTip": {
+    "description": "Tooltip for the navigation button"
+  },
+  "unsavedChangesText": "There are unsaved changes to one of the documents. Do you want to save the changes?",
+  "@unsavedChangesText": {
+    "description": "Body for the unsaved changes dialog"
+  },
+  "part": "Part",
+  "@part": {
+    "description": "Fallback text if a document part is not named"
+  },
+  "section": "Section",
+  "@section": {
+    "description": "Fallback text if a document element is not named"
+  },
+  "headingsTooltip": "Choose the column with the text of the Headings",
+  "@headingsTooltip": {
+    "description": "Tooltip for box to select headings column"
+  },
+  "headings": "Headings:",
+  "@headings": {
+    "description": "Text in front of dropdown for headings"
+  },
+  "openDocuments": "Open documents",
+  "@openDocuments": {
+    "description": "description for open documents"
+  },
+  "failedToLoad": "Failed to import file",
+  "@failedToLoad": {
+    "description": "Title for failed load dialog"
+  },
+  "failedToLoadBody": "An exception was thrown during import:",
+  "@failedToLoadBody": {
+    "description": "Body for failed load dialog"
+  },
+  "contains": "Contains",
+  "@contains": {
+    "description": "Hint for filter text"
+  },
+  "toggleFilter": "Toggle filter",
+  "@toggleFilter": {
+    "description": "Tooltip for filter button"
+  },
+  "ofSearchBox": "of",
+  "@ofSearchBox": {
+    "description": "Word of"
+  },
+  "matches": "matches",
+  "@matches": {
+    "description": "Word matches"
+  },
+  "caseSensitive": "Case sensitive",
+  "@caseSensitive": {
+    "description": "Checkbox text to trigger case sensitive on/off"
+  },
+  "noMatches": "No matches",
+  "@noMatches": {
+    "description": "Status text for no matches"
+  },
+  "searchPage": "Search page",
+  "@searchPage": {
+    "description": "text for empty search field"
+  },
+  "lastUsed": "Last used",
+  "@lastUsed": {
+    "description": "text for last used field"
+  }
+}

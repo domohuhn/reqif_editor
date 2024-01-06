@@ -1,3 +1,3 @@
-## 1.0.0
+## 0.1.0
 
-- Initial version.
+- Initial version. Opening and editing ReqIF files with Xhtml and enums works.

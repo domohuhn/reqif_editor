@@ -1,0 +1,134 @@
+// Copyright 2023, domohuhn.
+// SPDX-License-Identifier: BSD-3-Clause
+// See LICENSE for the full text of the license
+
+import 'package:reqif_editor/src/reqif/reqif_common.dart';
+import 'package:reqif_editor/src/reqif/reqif_document.dart';
+import 'package:reqif_editor/src/reqif/reqif_error.dart';
+import 'package:xml/xml.dart' as xml;
+
+/// This class describes the names and data types of the specification objects
+/// that belong to this specification object.
+class ReqIfSpecificationObjectType extends ReqIfIdentifiable {
+  static const String xmlName = 'SPEC-OBJECT-TYPE';
+
+  /// [node] must be SPEC-OBJECT-TYPE
+  ///
+  /// Children:
+  /// <SPEC-ATTRIBUTES>
+  ///   <ATTRIBUTE-DEFINITION-XXX>
+  ///     <TYPE>
+  ///       <DATATYPE-DEFINITION-XXX-REF>
+  ///
+  ReqIfSpecificationObjectType.parse(
+      xml.XmlElement node, ReqIfDocument document)
+      : super.parse(node, ReqIfElementTypes.specificationObjectType) {
+    if (node.name.local != xmlName) {
+      throw ReqIfError(
+          'Internal error: wrong node given to ReqIfSpecificationObjectTypes.parse\n\n Expected: $xmlName\nActual: ${node.name.local}\n\nNode: $node');
+    }
+    final outerContent = node.findElements('SPEC-ATTRIBUTES');
+    if (outerContent.length != 1) {
+      throw ReqIfError(
+          "Failed to parse document! Only one SPEC-ATTRIBUTES node is allowed per SPEC-OBJECT-TYPE!");
+    }
+    int i = 0;
+    for (final element in outerContent.first.childElements) {
+      switch (element.name.local) {
+        case ReqIfAttributeEnumDefinition.xmlName:
+          children
+              .add(ReqIfAttributeEnumDefinition.parse(element, document, i));
+        case "ATTRIBUTE-DEFINITION-XHTML":
+          children.add(ReqIfAttributeDefinition.parse(element, document, i));
+        case "ATTRIBUTE-DEFINITION-STRING":
+          children.add(ReqIfAttributeDefinition.parse(element, document, i));
+        // TODO
+//        case "ATTRIBUTE-DEFINITION-BOOLEAN": children.add(ReqIfAttributeDefinition.parse(element,ReqIfElementTypes.datatypeDefinitionBoolean,"DATATYPE-DEFINITION-BOOLEAN-REF",document));
+//        case "ATTRIBUTE-DEFINITION-DATE": children.add(ReqIfAttributeDefinition.parse(element,ReqIfElementTypes.datatypeDefinitionDate,"DATATYPE-DEFINITION-DATE-REF",document));
+//        case "ATTRIBUTE-DEFINITION-INTEGER": children.add(ReqIfAttributeDefinition.parse(element,ReqIfElementTypes.datatypeDefinitionInteger,"DATATYPE-DEFINITION-INTEGER-REF",document));
+//        case "ATTRIBUTE-DEFINITION-REAL": children.add(ReqIfAttributeDefinition.parse(element,ReqIfElementTypes.datatypeDefinitionReal,"DATATYPE-DEFINITION-REAL-REF",document));
+      }
+      ++i;
+    }
+  }
+
+  /// The definition of all attributes in the specification objects.
+  Iterable<ReqIfAttributeDefinition> get attributeDefinitions =>
+      children.map((e) => e as ReqIfAttributeDefinition);
+
+  ReqIfAttributeDefinition operator [](int i) {
+    return children[i] as ReqIfAttributeDefinition;
+  }
+}
+
+class ReqIfAttributeDefinition extends ReqIfElementWithIdNameTimeEditable {
+  /// [node] must be ATTRIBUTE-DEFINITION-XXX
+  ///
+  /// children:
+  ///   <ATTRIBUTE-DEFINITION-XXX>
+  ///     <TYPE>
+  ///       <DATATYPE-DEFINITION-XXX-REF>
+  ReqIfAttributeDefinition.parse(
+      xml.XmlElement element, ReqIfDocument document, this.index,
+      [ReqIfElementTypes nodeType = ReqIfElementTypes.attributeDefinition])
+      : _dataType = getDataTypeFromXmlTag(element.name.local),
+        super.parse(element, ReqIfElementTypes.attributeDefinition) {
+    String xmlDefinition = getXmlDefinitionReferenceName(_dataType);
+    final outerContent = node.findElements('TYPE');
+    if (outerContent.length != 1) {
+      throw ReqIfError(
+          "Failed to parse document! Only one TYPE node is allowed per node!\n\n$node");
+    }
+    _referencedDataTypeId =
+        getInnerTextOfChildElements(outerContent.first, xmlDefinition);
+    final link = document.find(_referencedDataTypeId);
+    if (link == null || link.type != _dataType) {
+      throw ReqIfError(
+          "Failed to parse document! Referenced data type $_referencedDataTypeId does not exist!\n\n$node");
+    }
+    _dataTypeDefinition = link as ReqIfElementWithIdNameTime;
+    if (name == null) {
+      throw ReqIfError(
+          "Failed to parse document! LONG-NAME is mandatory for all AttributeDefinitions!\n\n$node");
+    }
+  }
+  final ReqIfElementTypes _dataType;
+  ReqIfElementTypes get dataType => _dataType;
+
+  late String _referencedDataTypeId;
+
+  /// Returns the identifier of the referenced data type.
+  String get referencedDataTypeId => _referencedDataTypeId;
+
+  late ReqIfElementWithIdNameTime _dataTypeDefinition;
+
+  /// The referenced data type if it could be resolved.
+  ReqIfElementWithIdNameTime get dataTypeDefinition => _dataTypeDefinition;
+
+  int index = 0;
+
+  bool get isText =>
+      dataType == ReqIfElementTypes.datatypeDefinitionXhtml ||
+      dataType == ReqIfElementTypes.datatypeDefinitionString;
+}
+
+class ReqIfAttributeEnumDefinition extends ReqIfAttributeDefinition {
+  static const String xmlName = "ATTRIBUTE-DEFINITION-ENUMERATION";
+  ReqIfAttributeEnumDefinition.parse(
+      xml.XmlElement element, ReqIfDocument document, index)
+      : super.parse(
+            element, document, index, ReqIfElementTypes.attributeDefinition) {
+    _isMultiValued =
+        getRequiredAttribute(node, _xmlAttributeNameMultiValue) == "true";
+  }
+  bool _isMultiValued = false;
+
+  static const String _xmlAttributeNameMultiValue = "MULTI-VALUED";
+
+  bool get isMultiValued => _isMultiValued;
+  set isMultiValued(bool v) {
+    _isMultiValued = v;
+    setAttribute(node, _xmlAttributeNameMultiValue, v.toString());
+    updateLastChange();
+  }
+}
