@@ -40,7 +40,7 @@ class ReqIfEditorApp extends StatelessWidget {
                   ],
                   supportedLocales: const [
                     Locale('en', ''),
-                    //Locale('de', ''),
+                    Locale('de', ''),
                   ],
                   onGenerateTitle: (BuildContext context) =>
                       AppLocalizations.of(context)!.appTitle,
