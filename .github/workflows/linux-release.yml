@@ -1,0 +1,47 @@
+name: Linux-release
+
+on:
+  release:
+   types: [created]
+
+jobs:
+  build:
+   runs-on: ${{ matrix.os }}
+   strategy:
+      matrix:
+        name: [ubuntu-20.04, ubuntu-22.04]
+
+        include:
+          - name: ubuntu-20.04
+            os: ubuntu-20.04
+          - name: ubuntu-22.04
+            os: ubuntu-22.04
+
+   steps:
+     - uses: actions/checkout@v3
+     - uses: subosito/flutter-action@v2
+       with:
+         channel: 'stable'
+     - run: |
+        sudo apt-get update -y
+        sudo apt-get install -y ninja-build libgtk-3-dev
+     - run: flutter config --enable-linux-desktop
+     - name: Verify formatting
+       run: dart format --output=none --set-exit-if-changed .
+     - name: Run tests
+       run: flutter test
+     - name: Build executable
+       run: flutter build linux --release
+     - name: Create bundle
+       run: |
+          mkdir -p release
+          pushd build/linux/x64/release/bundle/
+          tar -czvf ../../../../../release/reqif-editor-${{ matrix.name }}-x64.tar.gz .
+          popd
+     - name: Upload artifacts to release
+       uses: svenstaro/upload-release-action@v2
+       with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: release/reqif-editor-*
+          tag: ${{ github.ref }}
+          file_glob: true
