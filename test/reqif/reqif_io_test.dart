@@ -183,7 +183,9 @@ void main() {
       expect(val.value(1), "Linux");
       expect(val.value(2), "MacOS");
       expect(val.value(3), "Windows");
-      expect(val.node.toString(), """<ATTRIBUTE-VALUE-ENUMERATION>
+      expect(
+          val.node.toString().replaceAll('\r\n', '\n'),
+          """<ATTRIBUTE-VALUE-ENUMERATION>
 <DEFINITION>
 <ATTRIBUTE-DEFINITION-ENUMERATION-REF>_c49cf6e2-96f7-477e-a5af-57eeafafb481</ATTRIBUTE-DEFINITION-ENUMERATION-REF>
 </DEFINITION>
@@ -193,7 +195,8 @@ void main() {
 <ENUM-VALUE-REF>_5d64b5c0-1b13-483a-b0fe-279442fe1c30</ENUM-VALUE-REF>
 <ENUM-VALUE-REF>_a8f5266e-4330-4660-951e-0e8f22822f44</ENUM-VALUE-REF>
 </VALUES>
-</ATTRIBUTE-VALUE-ENUMERATION>""");
+</ATTRIBUTE-VALUE-ENUMERATION>"""
+              .replaceAll('\r\n', '\n'));
     });
 
     test('remove enum value', () {
@@ -212,7 +215,9 @@ void main() {
       expect(val.length, 2);
       expect(val.value(0), "Windows");
       expect(val.value(1), "MacOS");
-      expect(val.node.toString(), """<ATTRIBUTE-VALUE-ENUMERATION>
+      expect(
+          val.node.toString().replaceAll('\r\n', '\n'),
+          """<ATTRIBUTE-VALUE-ENUMERATION>
 <DEFINITION>
 <ATTRIBUTE-DEFINITION-ENUMERATION-REF>_c49cf6e2-96f7-477e-a5af-57eeafafb481</ATTRIBUTE-DEFINITION-ENUMERATION-REF>
 </DEFINITION>
@@ -220,7 +225,8 @@ void main() {
 <ENUM-VALUE-REF>_a8f5266e-4330-4660-951e-0e8f22822f44</ENUM-VALUE-REF>
 <ENUM-VALUE-REF>_5d64b5c0-1b13-483a-b0fe-279442fe1c30</ENUM-VALUE-REF>
 </VALUES>
-</ATTRIBUTE-VALUE-ENUMERATION>""");
+</ATTRIBUTE-VALUE-ENUMERATION>"""
+              .replaceAll('\r\n', '\n'));
     });
 
     test('update xhtml value', () {
@@ -230,7 +236,7 @@ void main() {
           .specificationObjects.first.children[0] as ReqIfAttributeValueXhtml;
       expect(val.namespacePrefixForValue, "reqif-xhtml");
       expect(
-          val.element.toString(),
+          val.element.toString().replaceAll('\r\n', '\n'),
           '<ATTRIBUTE-VALUE-XHTML>\n'
           '<DEFINITION>\n'
           '<ATTRIBUTE-DEFINITION-XHTML-REF>_2ae87137-93fe-471f-a4b7-471ad94d1741</ATTRIBUTE-DEFINITION-XHTML-REF>\n'
@@ -248,7 +254,7 @@ void main() {
       assert(next.childElements.length == 1);
       val.value = next.firstElementChild!;
       expect(
-          val.element.toString(),
+          val.element.toString().replaceAll('\r\n', '\n'),
           '<ATTRIBUTE-VALUE-XHTML>\n'
           '<DEFINITION>\n'
           '<ATTRIBUTE-DEFINITION-XHTML-REF>_2ae87137-93fe-471f-a4b7-471ad94d1741</ATTRIBUTE-DEFINITION-XHTML-REF>\n'

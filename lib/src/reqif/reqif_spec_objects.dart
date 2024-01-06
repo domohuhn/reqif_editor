@@ -244,9 +244,9 @@ class ReqIfAttributeValueEnum extends ReqIfAttributeValue {
   /// Removes the value at [index].
   void removeValue(int index) {
     final removed = _values.removeAt(index);
-    final values = removed.$2.parent;
-    if (values != null) {
-      removeChildElements(values, 'ENUM-VALUE-REF', position: index);
+    final value = removed.$2.parent;
+    if (value != null) {
+      removeChildElements(value, 'ENUM-VALUE-REF', position: index);
     } else {
       throw ReqIfError('Internal error: ${removed.$2} is an orphan');
     }

@@ -138,6 +138,16 @@ xml.XmlElement createGrandChildElementWithInnerText(
   return toModify[toModify.length - 2] as xml.XmlElement;
 }
 
+bool _isNewline(xml.XmlNode itr) =>
+    itr is xml.XmlText && (itr.value == '\n' || itr.value == '\r\n');
+bool _removeThis(xml.XmlNode itr, String tag) =>
+    itr is xml.XmlElement && itr.name.local == tag;
+bool _removeNext(xml.XmlNode? next, String tag,
+        [int current = 0, int? target]) =>
+    next is xml.XmlElement &&
+    next.name.local == tag &&
+    (target == null || current == target);
+
 /// Removes child elements of [node] with the name [tag].
 /// If there is a text element directly before that has only a newline
 /// as content, then the preceding text is also removed.
@@ -150,9 +160,9 @@ void removeChildElements(xml.XmlNode node, String tag, {int? position}) {
   if (position == null) {
     node.children.removeWhere((itr) {
       final next = itr.nextSibling;
-      bool removeThis = itr is xml.XmlElement && itr.name.local == tag;
-      bool removeNext = next is xml.XmlElement && next.name.local == tag;
-      bool thisIsNewline = itr is xml.XmlText && itr.value == '\n';
+      bool removeThis = _removeThis(itr, tag);
+      bool removeNext = _removeNext(next, tag);
+      bool thisIsNewline = _isNewline(itr);
       return removeThis || (removeNext && thisIsNewline);
     });
     return;
@@ -160,10 +170,9 @@ void removeChildElements(xml.XmlNode node, String tag, {int? position}) {
   int count = 0;
   node.children.removeWhere((itr) {
     final next = itr.nextSibling;
-    bool removeThis = itr is xml.XmlElement && itr.name.local == tag;
-    bool removeNext =
-        next is xml.XmlElement && next.name.local == tag && count == position;
-    bool thisIsNewline = itr is xml.XmlText && itr.value == '\n';
+    bool removeThis = _removeThis(itr, tag);
+    bool removeNext = _removeNext(next, tag, count, position);
+    bool thisIsNewline = _isNewline(itr);
     int removeIndex = count;
     if (removeThis) {
       count += 1;
