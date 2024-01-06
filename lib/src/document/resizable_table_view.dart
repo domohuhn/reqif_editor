@@ -237,29 +237,38 @@ class _ResizableTableViewState extends State<ResizableTableView> {
   @override
   Widget build(BuildContext context) {
     ensureSizesInitialized();
-    return Scrollbar(
-      thumbVisibility: true,
-      controller: _horizontalController,
-      child: Scrollbar(
+    return NotificationListener<ScrollNotification>(
+        onNotification: (scrollNotification) {
+          // TODO: This is required to work aorund bug
+          // https://github.com/flutter/flutter/issues/137112
+          if (scrollNotification is ScrollStartNotification) {
+            _unfocus();
+          }
+          return false;
+        },
+        child: Scrollbar(
           thumbVisibility: true,
-          controller: _verticalController,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(0, 0, 10, 10),
-            child: TableView.builder(
-              pinnedRowCount: 1,
-              pinnedColumnCount: 1,
-              verticalDetails:
-                  ScrollableDetails.vertical(controller: _verticalController),
-              horizontalDetails: ScrollableDetails.horizontal(
-                  controller: _horizontalController),
-              cellBuilder: _buildCell,
-              columnCount: widget.columnCount + 1,
-              columnBuilder: _buildColumnSpan,
-              rowCount: widget.rowCount + 1,
-              rowBuilder: _buildRowSpan,
-            ),
-          )),
-    );
+          controller: _horizontalController,
+          child: Scrollbar(
+              thumbVisibility: true,
+              controller: _verticalController,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(0, 0, 10, 10),
+                child: TableView.builder(
+                  pinnedRowCount: 1,
+                  pinnedColumnCount: 1,
+                  verticalDetails: ScrollableDetails.vertical(
+                      controller: _verticalController),
+                  horizontalDetails: ScrollableDetails.horizontal(
+                      controller: _horizontalController),
+                  cellBuilder: _buildCell,
+                  columnCount: widget.columnCount + 1,
+                  columnBuilder: _buildColumnSpan,
+                  rowCount: widget.rowCount + 1,
+                  rowBuilder: _buildRowSpan,
+                ),
+              )),
+        ));
   }
 
   TableVicinity get selection => widget.selection != null

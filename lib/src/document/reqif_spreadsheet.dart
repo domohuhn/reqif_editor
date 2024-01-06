@@ -373,7 +373,8 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
       switch (value.type) {
         case ReqIfElementTypes.attributeValueEnumeration:
           return CellContents(
-              child: _buildEditableEnumList(value as ReqIfAttributeValueEnum),
+              child: _buildEditableEnumList(
+                  context, value as ReqIfAttributeValueEnum),
               attribute: cellAttribute);
         case ReqIfElementTypes.attributeValueXhtml:
           value as ReqIfAttributeValueXhtml;
@@ -433,7 +434,8 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
     return null;
   }
 
-  Widget? _buildEditableEnumList(ReqIfAttributeValueEnum value) {
+  Widget? _buildEditableEnumList(
+      BuildContext context, ReqIfAttributeValueEnum value) {
     final cache = _comboBoxDropDownLists[value.column];
     if (cache == null || cache.length != value.validValues.length) {
       throw ReqIfError("internal error: Cache seems to be invalid");
@@ -449,7 +451,9 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
               if (v != null && v != value.value(i)) {
                 setState(() {
                   value.setValue(i, v);
-                  widget.wasModified();
+                  if (mounted) {
+                    widget.wasModified();
+                  }
                 });
               }
             },
