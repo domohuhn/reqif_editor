@@ -22,4 +22,12 @@ jobs:
        run: dart format --output=none --set-exit-if-changed .
      - name: Run tests
        run: flutter test
-     - run: flutter build linux
+     - name: Build executable
+       run: flutter build linux --release
+     - name: Create Package
+       run: |
+          mkdir -p release
+          pushd build/linux/release/bundle/
+          tar -czvf reqif_editor_ubuntu_x86-64.tar.gz .
+          popd
+          mv build/linux/release/bundle/reqif_editor_ubuntu_x86-64.tar.gz release/
