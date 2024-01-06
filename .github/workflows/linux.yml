@@ -36,12 +36,8 @@ jobs:
        run: |
           flutter build linux --release
           mkdir -p release
-          ls 
-          ls build
-          ls build/linux
-          ls build/linux/release/
-          ls build/linux/release/bundle/
-          pushd build/linux/release/bundle/
+          ls -R build/linux/
+          pushd build/linux/x64/release/bundle/
           tar -czvf reqif_editor_ubuntu_x86-64.tar.gz .
           popd
-          mv build/linux/release/bundle/reqif_editor_ubuntu_x86-64.tar.gz release/
+          mv build/linux/x64/release/bundle/reqif-editor-${{ matrix.name }}-x64.tar.gz release/
