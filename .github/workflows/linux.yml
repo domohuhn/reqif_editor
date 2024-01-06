@@ -33,11 +33,10 @@ jobs:
      - name: Run tests
        run: flutter test
      - name: Build executable
+       run: flutter build linux --release
+     - name: Create bundle
        run: |
-          flutter build linux --release
           mkdir -p release
-          ls -R build/linux/
           pushd build/linux/x64/release/bundle/
-          tar -czvf reqif_editor_ubuntu_x86-64.tar.gz .
+          tar -czvf ../../../../../release/reqif-editor-${{ matrix.name }}-x64.tar.gz .
           popd
-          mv build/linux/x64/release/bundle/reqif-editor-${{ matrix.name }}-x64.tar.gz release/
