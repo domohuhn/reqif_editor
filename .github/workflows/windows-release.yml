@@ -1,0 +1,35 @@
+name: Windows-release
+
+on:
+  release:
+   types: [created]
+
+jobs:
+  build:
+   runs-on: windows-latest
+
+   steps:
+     - uses: actions/checkout@v3
+     - uses: subosito/flutter-action@v2
+       with:
+         channel: 'stable'
+     - run: flutter config --enable-windows-desktop
+     - name: Verify formatting
+       run: dart format --output=none --set-exit-if-changed .
+     - name: Run tests
+       run: flutter test
+     - name: Build executable
+       run: flutter build windows --release
+     - name: Create bundle
+       run: |
+          mkdir release
+          pushd release
+          powershell Compress-Archive ../build/windows/x64/runner/Release/* reqif-editor-windows-x64.zip
+          popd
+     - name: Upload artifacts to release
+       uses: svenstaro/upload-release-action@v2
+       with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: release/reqif-editor-*
+          tag: ${{ github.ref }}
+          file_glob: true
