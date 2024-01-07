@@ -1,6 +1,7 @@
 ## 0.1.4
 
 - Modified string escapes
+- Added Integer fields as read only
 
 ## 0.1.3
 

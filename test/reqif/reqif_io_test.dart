@@ -31,7 +31,7 @@ void main() {
     var parsed = ReqIfDocument.parse(doc);
     test('count', () {
       expect(parsed.dataTypes.length, 1);
-      expect(parsed.dataTypes.first.types.length, 5);
+      expect(parsed.dataTypes.first.types.length, 6);
     });
 
     test('string', () {
@@ -74,6 +74,20 @@ void main() {
         fail("Wrong data type");
       }
     });
+
+    test('int', () {
+      final type = parsed.dataTypes.first.types[5];
+      expect(type.type, ReqIfElementTypes.datatypeDefinitionInteger);
+      if (type is ReqIfDataTypeInt) {
+        expect(type.identifier, "_7e2e7ce9-99ee-4a30-86e9-2576580f426c");
+        expect(type.lastChange.toIso8601String(), "2023-11-22T10:42:13.000Z");
+        expect(type.name, "Number1");
+        expect(type.maximum, 127);
+        expect(type.minimum, -128);
+      } else {
+        fail("Wrong data type");
+      }
+    });
   });
 
   group('Columns', () {
@@ -81,7 +95,7 @@ void main() {
     var parsed = ReqIfDocument.parse(doc);
     test('count', () {
       expect(parsed.specificationObjectTypes.length, 1);
-      expect(parsed.specificationObjectTypes.first.children.length, 6);
+      expect(parsed.specificationObjectTypes.first.children.length, 7);
     });
 
     test('xhtml 1', () {
@@ -90,7 +104,7 @@ void main() {
       if (col is ReqIfAttributeDefinition) {
         expect(col.identifier, "_2ae87137-93fe-471f-a4b7-471ad94d1741");
         expect(col.lastChange.toIso8601String(), "2023-11-22T10:42:13.000Z");
-        expect(col.name, "Object Id");
+        expect(col.name, "Object ID");
         expect(col.dataType, ReqIfElementTypes.datatypeDefinitionXhtml);
         expect(
             col.referencedDataTypeId, "_81c063b5-1b5a-4579-bc3b-52d5909eaa4d");
@@ -159,8 +173,13 @@ void main() {
       expect(val3.isEditable, true);
       expect(val3.isMultiValued, false);
       expect(val3.value(0), "Draft");
-      expect(val3.validValues,
-          ['Accepted', 'Rejected', 'Draft', 'Review', 'Clarification-needed']);
+      expect(val3.validValues, [
+        'Accepted',
+        'Rejected',
+        'Draft',
+        'Review Üä',
+        'Clarification-needed'
+      ]);
       val3.setValue(0, val3.validValues.first);
       expect(val3.value(0), "Accepted");
     });

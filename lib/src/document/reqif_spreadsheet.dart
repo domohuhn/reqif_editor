@@ -232,7 +232,6 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
       final bool rowEditable = element.isEditable && widget.isEditable;
       for (int i = 0; i < widget.part.columnCount; ++i) {
         final column = map.remap(i);
-        final bool wrapWithPrefix = widget.controller.headingsColumn == column;
         final attr = element.object[column];
         if (attr == null) {
           continue;
@@ -276,11 +275,12 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
             columnWidth = max(columnWidth, size.width + defaultTextPadding);
           default:
         }
-        if (wrapWithPrefix) {
-          columnWidth += 40;
-        }
         columnWidths[i] = columnWidth;
       }
+    }
+    final int columnWithPrefix = widget.controller.headingsColumn;
+    if (columnWithPrefix < columnWidths.length) {
+      columnWidths[columnWithPrefix] += 40;
     }
     return columnWidths;
   }
@@ -423,7 +423,10 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
               attribute: cellAttribute);
         case ReqIfElementTypes.attributeValueString:
           return _wrapWithPrefix(
-              element, Text(element.toString()), cellAttribute, wrapWithPrefix);
+              element, Text(value.toString()), cellAttribute, wrapWithPrefix);
+        case ReqIfElementTypes.attributeValueInteger:
+          return _wrapWithPrefix(
+              element, Text(value.toString()), cellAttribute, wrapWithPrefix);
         default:
           return null;
       }
@@ -435,7 +438,7 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
             attribute: cellAttribute);
       case ReqIfElementTypes.attributeValueString:
         return _wrapWithPrefix(
-            element, Text(element.toString()), cellAttribute, wrapWithPrefix);
+            element, Text(value.toString()), cellAttribute, wrapWithPrefix);
       case ReqIfElementTypes.attributeValueXhtml:
         return _wrapWithPrefix(
             element,
@@ -446,6 +449,9 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
             )),
             cellAttribute,
             wrapWithPrefix);
+      case ReqIfElementTypes.attributeValueInteger:
+        return _wrapWithPrefix(
+            element, Text(value.toString()), cellAttribute, wrapWithPrefix);
       default:
         return null;
     }

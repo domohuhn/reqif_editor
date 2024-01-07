@@ -25,6 +25,8 @@ class ReqIfDataTypes extends ReqIfElement {
           children.add(ReqIfDataTypeXhtml.parse(element));
         case ReqIfDataTypeEnum.xmlName:
           children.add(ReqIfDataTypeEnum.parse(element));
+        case ReqIfDataTypeInt.xmlName:
+          children.add(ReqIfDataTypeInt.parse(element));
       }
     }
   }
@@ -54,6 +56,35 @@ class ReqIfDataTypeString extends ReqIfIdentifiable {
     _maxLength = v;
     setAttribute(node, _xmlAttributeNameMaxLength, v.toString());
     updateLastChange();
+  }
+}
+
+mixin ReqIfMinMaxInt {
+  static const String _xmlMin = 'MIN';
+  static const String _xmlMax = 'MAX';
+
+  void parseMinMax(xml.XmlElement el) {
+    _minimum = int.parse(getRequiredAttribute(el, _xmlMin));
+    _maximum = int.parse(getRequiredAttribute(el, _xmlMax));
+  }
+
+  late int _minimum;
+  late int _maximum;
+  int get minimum => _minimum;
+  int get maximum => _maximum;
+}
+
+class ReqIfDataTypeInt extends ReqIfIdentifiable with ReqIfMinMaxInt {
+  static const String xmlName = 'DATATYPE-DEFINITION-INTEGER';
+
+  /// [node] must be DATATYPE-DEFINITION-INTEGER
+  ReqIfDataTypeInt.parse(xml.XmlElement node)
+      : super.parse(node, ReqIfElementTypes.datatypeDefinitionInteger) {
+    if (node.name.local != xmlName) {
+      throw ReqIfError(
+          'Internal error: wrong node given to ReqIfDataTypeInt.parse\n\n$node');
+    }
+    parseMinMax(node);
   }
 }
 

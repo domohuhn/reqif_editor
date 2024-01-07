@@ -93,7 +93,18 @@ class ReqIfAttributeValueSimple extends ReqIfAttributeValue {
   }
 }
 
+class ReqIfAttributeValueInteger extends ReqIfAttributeValueSimple {
+  static const String xmlName = 'ATTRIBUTE-VALUE-INTEGER';
+
+  ReqIfAttributeValueInteger.parse(
+      {required ReqIfElementWithIdNameTime parent,
+      required xml.XmlElement element,
+      required ReqIfDocument document})
+      : super.parse(parent: parent, element: element, document: document);
+}
+
 class ReqIfAttributeValueEnum extends ReqIfAttributeValue {
+  static const String xmlName = 'ATTRIBUTE-VALUE-ENUMERATION';
   ReqIfAttributeValueEnum.parse(
       {required ReqIfElementWithIdNameTime parent,
       required xml.XmlElement element,

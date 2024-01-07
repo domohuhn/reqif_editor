@@ -224,6 +224,10 @@ enum ReqIfElementTypes {
   /// Describes an enum and all possible values
   datatypeDefinitionEnum,
 
+  /// DATATYPE-DEFINITION-INTEGER
+  /// Describes an enum and all possible values
+  datatypeDefinitionInteger,
+
   /// ENUM-VALUE
   /// Describes a value of an enum
   datatypeEnumValue,
@@ -247,6 +251,10 @@ enum ReqIfElementTypes {
   /// ATTRIBUTE-VALUE-STRING
   /// contains one value and a reference to a column of the specification.
   attributeValueString,
+
+  /// ATTRIBUTE-VALUE-INTEGER
+  /// contains one value and a reference to a column of the specification.
+  attributeValueInteger,
 
   /// ATTRIBUTE-VALUE-ENUMERATION
   /// contains one value and a reference to a column of the specification.
@@ -521,12 +529,16 @@ String getXmlDefinitionReferenceName(ReqIfElementTypes dataType) {
       return "ATTRIBUTE-DEFINITION-STRING-REF";
     case ReqIfElementTypes.attributeValueXhtml:
       return "ATTRIBUTE-DEFINITION-XHTML-REF";
+    case ReqIfElementTypes.attributeValueInteger:
+      return "ATTRIBUTE-DEFINITION-INTEGER-REF";
     case ReqIfElementTypes.datatypeDefinitionXhtml:
       return "DATATYPE-DEFINITION-XHTML-REF";
     case ReqIfElementTypes.datatypeDefinitionEnum:
       return "DATATYPE-DEFINITION-ENUMERATION-REF";
     case ReqIfElementTypes.datatypeDefinitionString:
       return "DATATYPE-DEFINITION-STRING-REF";
+    case ReqIfElementTypes.datatypeDefinitionInteger:
+      return "DATATYPE-DEFINITION-INTEGER-REF";
     default:
       throw ReqIfError(
           "Internal error: getXmlDefinitionReferenceName called with $dataType");
@@ -541,6 +553,8 @@ ReqIfElementTypes getXmlDefinitionDataType(ReqIfElementTypes dataType) {
       return ReqIfElementTypes.datatypeDefinitionString;
     case ReqIfElementTypes.attributeValueXhtml:
       return ReqIfElementTypes.datatypeDefinitionXhtml;
+    case ReqIfElementTypes.attributeValueInteger:
+      return ReqIfElementTypes.datatypeDefinitionInteger;
     default:
       throw ReqIfError(
           "Internal error: getXmlDefinitionDataType called with $dataType");
@@ -555,10 +569,14 @@ ReqIfElementTypes getDataTypeFromXmlTag(String element) {
       return ReqIfElementTypes.attributeValueString;
     case "ATTRIBUTE-VALUE-XHTML":
       return ReqIfElementTypes.attributeValueXhtml;
+    case "ATTRIBUTE-VALUE-INTEGER":
+      return ReqIfElementTypes.attributeValueInteger;
     case "ATTRIBUTE-DEFINITION-ENUMERATION":
       return ReqIfElementTypes.datatypeDefinitionEnum;
     case "ATTRIBUTE-DEFINITION-STRING":
       return ReqIfElementTypes.datatypeDefinitionString;
+    case "ATTRIBUTE-DEFINITION-INTEGER":
+      return ReqIfElementTypes.datatypeDefinitionInteger;
     case "ATTRIBUTE-DEFINITION-XHTML":
       return ReqIfElementTypes.datatypeDefinitionXhtml;
     default:

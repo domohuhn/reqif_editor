@@ -34,11 +34,16 @@ void writeXMLToFile(
 /// escapes the same characters DOORS seems to escape.
 String _escapeSpecialCharacters(String input) {
   StringBuffer buffer = StringBuffer();
+  int startOtherEscapes = input.indexOf("DATATYPES");
+  int endOtherEscapes = input.indexOf("/DATATYPES");
+  int counter = 0;
   for (int pt in input.codeUnits) {
     if (pt < 127 && pt != 91 && pt != 93 && pt != 9) {
       buffer.write(ascii.decode([pt]));
     } else {
-      if (pt > 100) {
+      final bool inRange =
+          startOtherEscapes < counter && counter < endOtherEscapes;
+      if (pt > 100 && !inRange) {
         buffer.write('&#x${pt.toRadixString(16).toUpperCase()};');
       } else if (pt == 9) {
         buffer.write('&#${pt.toString().padLeft(3, '0')};');
@@ -46,6 +51,7 @@ String _escapeSpecialCharacters(String input) {
         buffer.write('&#$pt;');
       }
     }
+    ++counter;
   }
   return buffer.toString();
 }

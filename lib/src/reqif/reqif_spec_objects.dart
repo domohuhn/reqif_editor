@@ -43,7 +43,10 @@ class ReqIfSpecificationObject extends ReqIfIdentifiable {
             case "ATTRIBUTE-VALUE-STRING":
               children.add(ReqIfAttributeValueSimple.parse(
                   parent: this, element: inner, document: document));
-            case "ATTRIBUTE-VALUE-ENUMERATION":
+            case ReqIfAttributeValueInteger.xmlName:
+              children.add(ReqIfAttributeValueInteger.parse(
+                  parent: this, element: inner, document: document));
+            case ReqIfAttributeValueEnum.xmlName:
               children.add(ReqIfAttributeValueEnum.parse(
                   parent: this, element: inner, document: document));
             case ReqIfAttributeValueXhtml.xmlName:
