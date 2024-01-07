@@ -1,3 +1,7 @@
+## 0.1.4
+
+- Modified string escapes
+
 ## 0.1.3
 
 - Empty xhtml columns can be edited
