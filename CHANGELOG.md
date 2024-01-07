@@ -1,3 +1,7 @@
+## 0.1.3
+
+- Empty xhtml columns can be edited
+
 ## 0.1.2
 
 - Fixed display of empty columns

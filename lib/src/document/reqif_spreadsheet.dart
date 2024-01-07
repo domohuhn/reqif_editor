@@ -314,15 +314,21 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
     final int columnIndex = map.remap(position.column - 1);
     final int rowIndex = position.row - 1;
     final element = widget.part[rowIndex];
-    final value = element.object[columnIndex];
+    var value = element.object[columnIndex];
     final datatype = widget.part.type[columnIndex];
+    final bool isEditable =
+        ((datatype.isEditable && element.isEditable && widget.isEditable) ||
+            widget.forceEditable);
+    if (value == null &&
+        isEditable &&
+        datatype.dataType == ReqIfElementTypes.datatypeDefinitionXhtml) {
+      value = element.object.appendXhtmlValue(datatype.identifier);
+    }
     if (value == null) {
       widget.onNewQuillEditor(null);
       return;
     }
-    if (((datatype.isEditable && element.isEditable && widget.isEditable) ||
-            widget.forceEditable) &&
-        value.embeddedObjectCount == 0) {
+    if (isEditable && value.embeddedObjectCount == 0) {
       switch (value.type) {
         case ReqIfElementTypes.attributeValueXhtml:
           widget.onNewQuillEditor(value);

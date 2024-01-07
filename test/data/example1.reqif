@@ -515,7 +515,7 @@
 <DEFINITION>
 <ATTRIBUTE-DEFINITION-XHTML-REF>_0db30098-9450-4a8a-bdcb-9be6bd8ddf40</ATTRIBUTE-DEFINITION-XHTML-REF>
 </DEFINITION>
-<THE-VALUE><reqif-xhtml:div>The program must be able to save files conforming to ReqIf version 1.0.<reqif-xhtml:br/>Some characters may need to be escaped: &#91;brackets&#93;&#9;Some non ascii characters: &#228;&#246;<reqif-xhtml:br/></reqif-xhtml:div></THE-VALUE>
+<THE-VALUE><reqif-xhtml:div>The program must be able to save files conforming to ReqIf version 1.0.<reqif-xhtml:br/>Some characters may need to be escaped: &#91;brackets&#93;&#9;Some non ascii characters: &#xE4;&#xF6;<reqif-xhtml:br/></reqif-xhtml:div></THE-VALUE>
 </ATTRIBUTE-VALUE-XHTML>
 <ATTRIBUTE-VALUE-ENUMERATION>
 <DEFINITION>
