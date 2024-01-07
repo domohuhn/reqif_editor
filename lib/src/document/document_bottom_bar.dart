@@ -29,15 +29,12 @@ class _DocumentBottomBarState extends State<DocumentBottomBar> {
       partNumber >= 0 &&
       partNumber < widget.controller.visibleData.flatDocument.partCount;
 
-  bool get hasSearchTerm =>
-      hasPart &&
-      widget.controller.visibleData.searchData[partNumber].searchController
-              .text !=
-          "";
   String get searchTerm => hasPart
       ? widget
           .controller.visibleData.searchData[partNumber].searchController.text
       : "";
+  bool get hasSearchTerm => hasPart && searchTerm != "";
+
   int get matches => hasPart
       ? widget.controller.visibleData.searchData[partNumber].matches
       : 0;
@@ -51,8 +48,9 @@ class _DocumentBottomBarState extends State<DocumentBottomBar> {
     }
   }
 
-  TextEditingController get searchController =>
-      widget.controller.visibleData.searchData[partNumber].searchController;
+  TextEditingController? get searchController => hasPart
+      ? widget.controller.visibleData.searchData[partNumber].searchController
+      : null;
 
   int get currentMatch => hasPart
       ? widget.controller.visibleData.searchData[partNumber].currentMatch

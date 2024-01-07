@@ -11,10 +11,10 @@ import 'package:reqif_editor/src/document/document_controller.dart';
 import 'package:reqif_editor/src/document/resizable_table_view.dart';
 import 'package:reqif_editor/src/reqif/convert_reqif_xhtml_to_widgets.dart';
 import 'package:reqif_editor/src/reqif/flat_document.dart';
+import 'package:reqif_editor/src/reqif/reqif_attribute_values.dart';
 import 'package:reqif_editor/src/reqif/reqif_common.dart';
 import 'package:reqif_editor/src/reqif/reqif_data_types.dart';
 import 'package:reqif_editor/src/reqif/reqif_error.dart';
-import 'package:reqif_editor/src/reqif/reqif_spec_objects.dart';
 import 'package:two_dimensional_scrollables/two_dimensional_scrollables.dart';
 
 class ReqIfSpreadSheet extends StatefulWidget {

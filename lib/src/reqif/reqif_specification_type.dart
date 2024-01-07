@@ -9,11 +9,10 @@ import 'package:xml/xml.dart' as xml;
 
 /// This class describes the names and data types of the specification objects
 /// that belong to this specification object.
-class ReqIfSpecificationObjectType extends ReqIfSpecType {
-  static const String xmlName = 'SPEC-OBJECT-TYPE';
+class ReqIfSpecificationType extends ReqIfSpecType {
+  static const String xmlName = 'SPECIFICATION-TYPE';
 
-  ReqIfSpecificationObjectType.parse(
-      xml.XmlElement node, ReqIfDocument document)
+  ReqIfSpecificationType.parse(xml.XmlElement node, ReqIfDocument document)
       : super.parse(
-            node, document, ReqIfElementTypes.specificationObjectType, xmlName);
+            node, document, ReqIfElementTypes.specificationType, xmlName);
 }

@@ -4,12 +4,12 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:reqif_editor/src/document/document_service.dart';
-import 'package:reqif_editor/src/reqif/reqif_spec_object_type.dart';
+import 'package:reqif_editor/src/reqif/reqif_attribute_definitions.dart';
+import 'package:reqif_editor/src/reqif/reqif_attribute_values.dart';
 import 'package:reqif_editor/src/reqif/reqif_common.dart';
 import 'package:reqif_editor/src/reqif/reqif_data_types.dart';
 import 'package:reqif_editor/src/reqif/reqif_document.dart';
 import 'package:reqif_editor/src/reqif/reqif_io.dart';
-import 'package:reqif_editor/src/reqif/reqif_spec_objects.dart';
 import 'package:xml/xml.dart' as xml;
 
 void main() {
@@ -81,7 +81,7 @@ void main() {
     var parsed = ReqIfDocument.parse(doc);
     test('count', () {
       expect(parsed.specificationObjectTypes.length, 1);
-      expect(parsed.specificationObjectTypes.first.children.length, 7);
+      expect(parsed.specificationObjectTypes.first.children.length, 6);
     });
 
     test('xhtml 1', () {

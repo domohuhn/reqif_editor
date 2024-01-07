@@ -10,6 +10,7 @@ import 'package:reqif_editor/src/reqif/reqif_common.dart';
 import 'package:reqif_editor/src/reqif/reqif_data_types.dart';
 import 'package:reqif_editor/src/reqif/reqif_error.dart';
 import 'package:reqif_editor/src/reqif/reqif_specification.dart';
+import 'package:reqif_editor/src/reqif/reqif_specification_type.dart';
 import 'package:xml/xml.dart' as xml;
 import 'package:reqif_editor/src/reqif/reqif_header.dart';
 
@@ -27,6 +28,7 @@ class ReqIfDocument {
       _specificationObjects;
 
   final List<ReqIfSpecificationObjectType> _specificationObjectTypes;
+  final List<ReqIfSpecificationType> _specificationTypes;
   final List<ReqIfSpecification> _specifications;
 
   /// Returns the available columns per specification
@@ -56,6 +58,7 @@ class ReqIfDocument {
 
   ReqIfDocument({String title = "Requirements", this.validateNameSpaces = true})
       : _specificationObjectTypes = <ReqIfSpecificationObjectType>[],
+        _specificationTypes = <ReqIfSpecificationType>[],
         _specificationObjects = <ReqIfSpecificationObject>[],
         _dataTypes = <ReqIfDataTypes>[],
         _specifications = <ReqIfSpecification>[] {
@@ -153,6 +156,7 @@ class ReqIfDocument {
   ReqIfDocument.parse(this._document, {this.validateNameSpaces = true})
       : _dataTypes = [],
         _specificationObjectTypes = [],
+        _specificationTypes = <ReqIfSpecificationType>[],
         _specifications = [],
         _specificationObjects = [] {
     final topLevel = _document.findElements('REQ-IF');
@@ -239,9 +243,15 @@ class ReqIfDocument {
   /// parses the available columns per specification
   void _parseSpecObjectTypes(xml.XmlElement reqIf) {
     for (final specTypes in reqIf.findElements('SPEC-TYPES')) {
-      for (final columns in specTypes.findElements('SPEC-OBJECT-TYPE')) {
+      for (final columns
+          in specTypes.findElements(ReqIfSpecificationObjectType.xmlName)) {
         _specificationObjectTypes
             .add(ReqIfSpecificationObjectType.parse(columns, this));
+      }
+      for (final specificationTypes
+          in specTypes.findElements(ReqIfSpecificationType.xmlName)) {
+        _specificationTypes
+            .add(ReqIfSpecificationType.parse(specificationTypes, this));
       }
     }
   }
@@ -249,7 +259,8 @@ class ReqIfDocument {
   /// parses all spec objects
   void _parseSpecObject(xml.XmlElement reqIf) {
     for (final specObjects in reqIf.findElements('SPEC-OBJECTS')) {
-      for (final object in specObjects.findElements('SPEC-OBJECT')) {
+      for (final object
+          in specObjects.findElements(ReqIfSpecificationObject.xmlName)) {
         _specificationObjects.add(ReqIfSpecificationObject.parse(object, this));
       }
     }
@@ -257,7 +268,8 @@ class ReqIfDocument {
 
   void _parseSpecification(xml.XmlElement reqIf) {
     for (final specObjects in reqIf.findElements('SPECIFICATIONS')) {
-      for (final object in specObjects.findElements('SPECIFICATION')) {
+      for (final object
+          in specObjects.findElements(ReqIfSpecification.xmlName)) {
         _specifications.add(ReqIfSpecification.parse(object, this));
       }
     }
@@ -297,9 +309,13 @@ class ReqIfDocument {
     if (type != null) {
       return type;
     }
-    final specType = _find(_specificationObjectTypes, id);
+    final specType = _find(_specificationTypes, id);
     if (specType != null) {
       return specType;
+    }
+    final objectType = _find(_specificationObjectTypes, id);
+    if (objectType != null) {
+      return objectType;
     }
     final specObject = _find(_specificationObjects, id);
     if (specObject != null) {

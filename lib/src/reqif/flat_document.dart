@@ -2,7 +2,9 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // See LICENSE for the full text of the license
 
+import 'package:reqif_editor/src/reqif/reqif_attribute_definitions.dart';
 import 'package:reqif_editor/src/reqif/reqif_document.dart';
+import 'package:reqif_editor/src/reqif/reqif_error.dart';
 import 'package:reqif_editor/src/reqif/reqif_spec_hierarchy.dart';
 import 'package:reqif_editor/src/reqif/reqif_spec_object_type.dart';
 import 'package:reqif_editor/src/reqif/reqif_spec_objects.dart';
@@ -300,8 +302,14 @@ class ReqIfFlatDocument {
     List<ReqIfDocumentPart> parts = [];
     for (var specIdx in doc.specifications.indexed) {
       final spec = specIdx.$2;
-      ReqIfDocumentPart part = ReqIfDocumentPart(spec.specificationObjectType,
-          name: spec.name, index: specIdx.$1);
+      if (spec.specificationObjectTypes.length != 1) {
+        throw ReqIfError(
+            "Currently every specification only supports one type, but ${spec.name} has ${spec.specificationObjectTypes.length}");
+      }
+      ReqIfDocumentPart part = ReqIfDocumentPart(
+          spec.specificationObjectTypes.first,
+          name: spec.name,
+          index: specIdx.$1);
       spec.visit(visitor: (position, element) {
         if (element is! ReqIfSpecHierarchy) {
           return;

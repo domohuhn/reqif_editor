@@ -232,6 +232,10 @@ enum ReqIfElementTypes {
   /// Describes the columns of a specification.
   specificationObjectType,
 
+  /// SPECIFICATION-TYPE
+  /// Describes the attributes of a specification.
+  specificationType,
+
   /// ATTRIBUTE-DEFINITION-***
   /// Describes the contents of a column of the specification.
   attributeDefinition,

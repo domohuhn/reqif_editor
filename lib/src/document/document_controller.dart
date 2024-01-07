@@ -348,6 +348,8 @@ class DocumentController with ChangeNotifier {
     final contents = await _service.read(path);
     final doc =
         await compute(_parseAsync, contents).onError((error, stackTrace) {
+      print(error);
+      print(stackTrace);
       if (onError != null) {
         onError(error, stackTrace);
       }

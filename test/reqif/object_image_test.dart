@@ -3,9 +3,9 @@
 // See LICENSE for the full text of the license
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:reqif_editor/src/reqif/reqif_attribute_values.dart';
 import 'package:reqif_editor/src/reqif/reqif_common.dart';
 import 'package:reqif_editor/src/reqif/reqif_document.dart';
-import 'package:reqif_editor/src/reqif/reqif_spec_objects.dart';
 import 'package:xml/xml.dart' as xml;
 
 void main() {
