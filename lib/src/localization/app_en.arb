@@ -100,7 +100,7 @@
   "@comment": {
     "description": "Title for the edit comment text field"
   },
-  "modalEditFileText": "Modify the file properties",
+  "modalEditFileText": "File properties",
   "@modalEditFileText": {
     "description": "Text for the file edit modal dialog"
   },
@@ -128,7 +128,7 @@
   "@section": {
     "description": "Fallback text if a document element is not named"
   },
-  "headingsTooltip": "Choose the column with the text of the Headings",
+  "headingsTooltip": "Column with the text of the Headings",
   "@headingsTooltip": {
     "description": "Tooltip for box to select headings column"
   },
@@ -175,6 +175,10 @@
   "searchPage": "Search page",
   "@searchPage": {
     "description": "text for empty search field"
+  },
+  "columnOrder": "Order of columns:",
+  "@columnOrder": {
+    "description": "text above colum reorder widget"
   },
   "lastUsed": "Last used",
   "@lastUsed": {

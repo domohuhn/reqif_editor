@@ -1,7 +1,7 @@
 ## 0.1.2
 
 - Fixed display of empty columns
-
+- Columns can be reordered
 
 ## 0.1.1
 

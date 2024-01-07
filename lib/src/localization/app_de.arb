@@ -29,10 +29,10 @@
   "navigationToolTip": "Navigationsleiste umschalten",
   "unsavedChangesText": "An einem der Dokumente wurden Änderungen vorgenommen, die nicht gespeichert sind. Möchten Sie die Änderungen jetzt speichern?",
   "part": "Kapitel",
-  "headingsTooltip": "Wählen Sie die Spalte mit den Überschriften",
+  "headingsTooltip": "Spalte mit den Überschriften",
   "headings": "Überschriften:",
-  "modalEditFileText": "Editieren Sie die Metadaten der Datei:",
-  "modalEditPartText": "Editieren Sie die Eigenschaften dieses Kapitels:",
+  "modalEditFileText": "Metadaten der Datei:",
+  "modalEditPartText": "Eigenschaften dieses Kapitels:",
   "section": "Abschnitt",
   "openDocuments": "Offene Dokumente",
   "close": "Schließen",
@@ -45,5 +45,6 @@
   "searchPage": "Seite durchsuchen",
   "toggleFilter": "Filter umschalten",
   "lastUsed": "Zuletzt geöffnet",
+  "columnOrder": "Reihenfolge der Spalten:",
   "noMatches": "Ausdruck nicht gefunden"
 }

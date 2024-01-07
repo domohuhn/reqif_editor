@@ -221,14 +221,24 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
 
   List<double> _estimateInitialColumnWidths() {
     List<double> columnWidths = [];
+    if (!widget.hasData || !widget.hasPart) {
+      return columnWidths;
+    }
+    final map = widget.data.columnMapping[widget.partNumber];
     for (int i = 0; i < widget.part.columnCount; ++i) {
       columnWidths.add(defaultColumnWidth);
     }
     for (final element in widget.part.elements) {
       final bool rowEditable = element.isEditable && widget.isEditable;
-      for (final attr in element.object.values) {
+      for (int i = 0; i < widget.part.columnCount; ++i) {
+        final column = map.remap(i);
+        final bool wrapWithPrefix = widget.controller.headingsColumn == column;
+        final attr = element.object[column];
+        if (attr == null) {
+          continue;
+        }
         bool columnEditable = attr.isEditable;
-        double columnWidth = columnWidths[attr.column];
+        double columnWidth = columnWidths[i];
         switch (attr.type) {
           case ReqIfElementTypes.attributeValueEnumeration:
             attr as ReqIfAttributeValueEnum;
@@ -266,7 +276,10 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
             columnWidth = max(columnWidth, size.width + defaultTextPadding);
           default:
         }
-        columnWidths[attr.column] = columnWidth;
+        if (wrapWithPrefix) {
+          columnWidth += 40;
+        }
+        columnWidths[i] = columnWidth;
       }
     }
     return columnWidths;
@@ -293,8 +306,13 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
         position.column < 1) {
       return;
     }
+    if (!widget.hasData || !widget.hasPart) {
+      widget.onNewQuillEditor(null);
+      return;
+    }
+    final map = widget.data.columnMapping[widget.partNumber];
+    final int columnIndex = map.remap(position.column - 1);
     final int rowIndex = position.row - 1;
-    final int columnIndex = position.column - 1;
     final element = widget.part[rowIndex];
     final value = element.object[columnIndex];
     final datatype = widget.part.type[columnIndex];
@@ -315,7 +333,11 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
   }
 
   Widget? _buildColumnHeader(BuildContext context, dynamic vicinity) {
-    final int columnIndex = vicinity.column - 1;
+    if (!widget.hasData || !widget.hasPart) {
+      return null;
+    }
+    final map = widget.data.columnMapping[widget.partNumber];
+    final int columnIndex = map.remap(vicinity.column - 1);
     final datatype = widget.part.type[columnIndex];
     final partNumber = widget.partNumber;
     final data = widget.data;
@@ -351,8 +373,12 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
 
   CellContents? _buildCell(
       BuildContext context, dynamic vicinity, bool selected) {
+    if (!widget.hasData || !widget.hasPart) {
+      return null;
+    }
+    final map = widget.data.columnMapping[widget.partNumber];
     final int rowIndex = vicinity.row - 1;
-    final int columnIndex = vicinity.column - 1;
+    final int columnIndex = map.remap(vicinity.column - 1);
     final element = widget.part[rowIndex];
     final value = element.object[columnIndex];
     final datatype = widget.part.type[columnIndex];

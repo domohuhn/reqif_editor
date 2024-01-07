@@ -206,6 +206,7 @@ class _NavigationTreeTileState extends State<NavigationTreeTile> {
     }
     return Column(
       mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(AppLocalizations.of(context)!.modalEditPartText),
         Row(mainAxisSize: MainAxisSize.min, children: [
@@ -232,9 +233,57 @@ class _NavigationTreeTileState extends State<NavigationTreeTile> {
                     }
                   },
                   value: headerColumn[partNumber].$1))
-        ])
+        ]),
+        Text(AppLocalizations.of(context)!.columnOrder),
+        _buildReorderBox(context, part)
       ],
     );
+  }
+
+  Widget _buildReorderBox(BuildContext context, NavigationTreeNode part) {
+    final documentPart = part.part;
+    final partNumber = documentPart.index;
+    final document = part.document;
+    final map = document.columnMapping[partNumber];
+    return Container(
+        margin: const EdgeInsets.fromLTRB(0, 16, 0, 16),
+        height: 300,
+        width: 500,
+        decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.secondaryContainer,
+            border: Border.all(width: 2)),
+        child: ListView.builder(
+          itemCount: documentPart.columnCount,
+          itemBuilder: (BuildContext ctx, int index) {
+            final column = map.remap(index);
+            return Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                    onPressed: () {
+                      widget.documentController.moveColumn(
+                          document: document.index,
+                          part: partNumber,
+                          column: index,
+                          move: -1);
+                    },
+                    icon: const Icon(Icons.keyboard_arrow_up)),
+                IconButton(
+                    onPressed: () {
+                      widget.documentController.moveColumn(
+                          document: document.index,
+                          part: partNumber,
+                          column: index,
+                          move: 1);
+                    },
+                    icon: const Icon(Icons.keyboard_arrow_down)),
+                Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 8, 0),
+                    child: Text(documentPart.columnNames[column])),
+              ],
+            );
+          },
+        ));
   }
 
   Future<void> _dialogBuilder(BuildContext context, NavigationTreeNode node) {

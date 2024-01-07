@@ -174,6 +174,7 @@ class DocumentData {
       partSelections.add(const TableVicinity(column: -1, row: -1));
       searchData
           .add(ReqIfSearchController(part: flatDocument[i], partNumber: i));
+      columnMapping.add(ColumnMappings(flatDocument[i].columnCount));
     }
   }
 
@@ -262,6 +263,7 @@ class DocumentData {
 
   final List<TableVicinity> partSelections = [];
   final List<ReqIfSearchController> searchData = [];
+  final List<ColumnMappings> columnMapping = [];
 
   void countMatches(int partNumber, String text) {
     if (partNumber < flatDocument.partCount) {
@@ -276,6 +278,57 @@ class DocumentData {
           .updateSelectionAndFindMatchRow(matchNumber, text);
     }
     return -1;
+  }
+
+  void moveColumn({required int part, required int column, required int move}) {
+    if (part >= columnMapping.length ||
+        part < 0 ||
+        part >= partColumnWidths.length) {
+      return;
+    }
+    columnMapping[part].moveColumn(column, move);
+    moveDataInList<double>(partColumnWidths[part], column + 1, move);
+  }
+}
+
+void moveDataInList<T>(List<T> data, int index, int move) {
+  if (index < 0 || index >= data.length || move == 0) {
+    return;
+  }
+  final target = max(min(index + move, data.length - 1), 0);
+  if (move < 0) {
+    for (int i = index; i > target; --i) {
+      T tmp = data[i];
+      data[i] = data[i - 1];
+      data[i - 1] = tmp;
+    }
+  } else {
+    for (int i = index; i < target; i++) {
+      T tmp = data[i];
+      data[i] = data[i + 1];
+      data[i + 1] = tmp;
+    }
+  }
+}
+
+class ColumnMappings {
+  final List<int> mappings;
+  ColumnMappings(int size) : mappings = [] {
+    for (int i = 0; i < size; ++i) {
+      mappings.add(i);
+    }
+  }
+
+  int remap(int i) {
+    if (i < mappings.length) {
+      return mappings[i];
+    }
+    return i;
+  }
+
+  /// [move] less than zero moves the column to an earlier position
+  void moveColumn(int column, int move) {
+    moveDataInList<int>(mappings, column, move);
   }
 }
 
@@ -348,8 +401,6 @@ class DocumentController with ChangeNotifier {
     final contents = await _service.read(path);
     final doc =
         await compute(_parseAsync, contents).onError((error, stackTrace) {
-      print(error);
-      print(stackTrace);
       if (onError != null) {
         onError(error, stackTrace);
       }
@@ -446,6 +497,7 @@ class DocumentController with ChangeNotifier {
 
   Future<void> saveCurrent({String? outputPath}) async {
     await save(visibleDocumentNumber, outputPath: outputPath);
+    notifyListeners();
   }
 
   int _visibleDocumentNumber = 0;
@@ -527,6 +579,18 @@ class DocumentController with ChangeNotifier {
     for (final doc in documents) {
       doc.applyFilter(active);
     }
+    notifyListeners();
+  }
+
+  void moveColumn(
+      {required int document,
+      required int part,
+      required int column,
+      required int move}) {
+    if (document < 0 || document >= length) {
+      return;
+    }
+    documents[document].moveColumn(part: part, column: column, move: move);
     notifyListeners();
   }
 }
