@@ -68,6 +68,7 @@ class ReqIfSpecificationObject extends ReqIfIdentifiable {
           return children[i] as ReqIfAttributeValue;
         }
       }
+      return null;
     }
     return rv;
   }

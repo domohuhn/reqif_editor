@@ -1,3 +1,8 @@
+## 0.1.2
+
+- Fixed display of empty columns
+
+
 ## 0.1.1
 
 - Fixed wrong link in example files

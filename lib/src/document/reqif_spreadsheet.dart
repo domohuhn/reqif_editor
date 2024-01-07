@@ -356,13 +356,14 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
     final element = widget.part[rowIndex];
     final value = element.object[columnIndex];
     final datatype = widget.part.type[columnIndex];
-    if (value == null) {
-      return null;
-    }
     CellAttributes? cellAttribute =
         element.type == ReqIfFlatDocumentElementType.heading
             ? CellAttributes.heading
             : null;
+    if (value == null) {
+      return CellContents(child: null, attribute: cellAttribute);
+    }
+
     final bool wrapWithPrefix =
         widget.controller.headingsColumn == columnIndex &&
             element.type == ReqIfFlatDocumentElementType.heading;
