@@ -209,16 +209,15 @@ class ReqIfDocumentPart {
   }
 
   bool _matches(ReqIfDocumentElement element, List<RegExp> filter) {
-    for (final attribute in element.object.values.indexed) {
-      final index = attribute.$1;
-      final value = attribute.$2;
-      if (index < filter.length &&
-          filter[index].pattern != "" &&
-          !filter[index].hasMatch(value.toStringWithNewlines())) {
-        return false;
+    List<bool> matches = filter.map((e) => e.pattern == "").toList();
+    for (final attribute in element.object.values) {
+      final index = attribute.column;
+      final value = attribute;
+      if (index < filter.length && filter[index].pattern != "") {
+        matches[index] = filter[index].hasMatch(value.toStringWithNewlines());
       }
     }
-    return true;
+    return matches.every((element) => element);
   }
 
   (bool, int) _outlineChildMatches(
