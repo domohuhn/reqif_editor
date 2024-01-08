@@ -1,3 +1,8 @@
+## 0.1.5
+
+- Modified string escapes
+- Fixed bugs
+
 ## 0.1.4
 
 - Modified string escapes
