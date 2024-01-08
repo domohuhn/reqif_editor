@@ -67,9 +67,6 @@ class _DocumentBottomBarState extends State<DocumentBottomBar> {
     }
     final data = widget.controller.visibleData;
     data.countMatches(partNumber, searchTerm);
-    if (matches > 0) {
-      _navigateToMatch(0);
-    }
     widget.controller.triggerRebuild();
   }
 

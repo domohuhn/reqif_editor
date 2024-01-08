@@ -3,6 +3,7 @@
 // See LICENSE for the full text of the license
 
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:xml/xml.dart' as xml;
 import 'package:reqif_editor/src/document/document_service.dart';
@@ -22,7 +23,7 @@ xml.XmlDocument parseXMLString(String contents) {
 }
 
 String convertXMLToString(xml.XmlDocument doc) {
-  return _escapeSpecialCharacters(doc.toXmlString(pretty: false));
+  return escapeSpecialCharacters(doc.toXmlString(pretty: false));
 }
 
 /// Converts the XML tree in [doc] to a string and writes the contents to the file [outputPath].
@@ -32,18 +33,35 @@ void writeXMLToFile(
 }
 
 /// escapes the same characters DOORS seems to escape.
-String _escapeSpecialCharacters(String input) {
+String escapeSpecialCharacters(String input) {
   StringBuffer buffer = StringBuffer();
   int startOtherEscapes = input.indexOf("DATATYPES");
   int endOtherEscapes = input.indexOf("/DATATYPES");
   int counter = 0;
+  int bracketCount = 0;
+  bool inAttribute = false;
+  int attributeStart = 0;
   for (int pt in input.codeUnits) {
-    if (pt < 127 && pt != 91 && pt != 93 && pt != 9) {
+    if (pt == 60 && !inAttribute) bracketCount += 1;
+    if (inAttribute && attributeStart == pt) {
+      attributeStart = 0;
+      inAttribute = false;
+    } else if (bracketCount > 0 && !inAttribute && (pt == 34 || pt == 39)) {
+      attributeStart = pt;
+      inAttribute = true;
+    }
+    if (pt == 62 && !inAttribute) bracketCount -= 1;
+    final bool escapeBracket = (bracketCount < 0 || inAttribute) && pt == 62;
+    //print("'${ascii.decode([pt])}' $bracketCount $inAttribute +> $escapeBracket ");
+    bracketCount = max(bracketCount, 0);
+    if (pt < 127 && pt != 91 && pt != 93 && pt != 9 && !escapeBracket) {
       buffer.write(ascii.decode([pt]));
     } else {
       final bool inRange =
           startOtherEscapes < counter && counter < endOtherEscapes;
-      if (pt > 100 && !inRange) {
+      if (escapeBracket) {
+        buffer.write('&gt;');
+      } else if (pt > 100 && !inRange) {
         buffer.write('&#x${pt.toRadixString(16).toUpperCase()};');
       } else if (pt == 9) {
         buffer.write('&#${pt.toString().padLeft(3, '0')};');

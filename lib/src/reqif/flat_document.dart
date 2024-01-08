@@ -263,15 +263,13 @@ class ReqIfDocumentPart {
     int count = 0;
     int row = 0;
     for (final val in elements) {
-      int column = 0;
       for (final attr in val.object.values) {
         if (regex.hasMatch(attr.toStringWithNewlines())) {
           if (count == position) {
-            return (row, column);
+            return (row, attr.column);
           }
           count += 1;
         }
-        column += 1;
       }
       row += 1;
     }

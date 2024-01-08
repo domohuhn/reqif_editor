@@ -180,6 +180,13 @@ void main() {
         expect(el.isEditable, true);
       }
     });
+
+    test('string escape', () {
+      final str = escapeSpecialCharacters(
+          '<SPEC-OBJECT LAST-CHANGE="2023-11-22T11:42:13+01:00" IDENTIFIER="_3f12b85a-a5c3-4749-b586-7dd7db436a8b" LONG-NAME="REQ_7  &lt;tag>">');
+      expect(str,
+          '<SPEC-OBJECT LAST-CHANGE="2023-11-22T11:42:13+01:00" IDENTIFIER="_3f12b85a-a5c3-4749-b586-7dd7db436a8b" LONG-NAME="REQ_7  &lt;tag&gt;">');
+    });
   });
 }
 
@@ -195,5 +202,5 @@ const flatString = """\
 [1] | [8] |  | REQ_8 | [Requirement] | The program must be able to save files conforming to ReqIf version 1.0.Some characters may need to be escaped: [brackets]\tSome non ascii characters: äö | [Windows, Linux, MacOS] | [Draft] | Initial revision
 [1] | [9] |  | REQ_9 | [Requirement] | A round trip testing strikethrough consisting of loading a file and saving it must produce equivalent output. Only these fields shall be modified:LAST-CHANGECOMMENTSOURCE-TOOL-ID | [Windows, Linux, MacOS] | [Draft] | Initial revision
 [1] | [10] | 2.2 | REQ_12 | [Heading] | Edit | [Windows, Linux, MacOS] | [Draft] | Initial revision
-[1] | [11] |  | REQ_10 | [Requirement] | Only contents in columns marked as editable can be modified. | [Windows, Linux, MacOS] | [Draft] | Initial revision
+[1] | [11] |  | REQ_10 | [Requirement] | Only contents in columns marked as editable can be modified. | [Windows, Linux, MacOS] | [Draft] | Initial revision <tag>
 """;

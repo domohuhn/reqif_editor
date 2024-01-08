@@ -172,9 +172,9 @@ class DocumentData {
   void _initializeSelectionAndSearchData() {
     for (int i = 0; i < flatDocument.partCount; ++i) {
       partSelections.add(const TableVicinity(column: -1, row: -1));
-      searchData
-          .add(ReqIfSearchController(part: flatDocument[i], partNumber: i));
       columnMapping.add(ColumnMappings(flatDocument[i].columnCount));
+      searchData.add(ReqIfSearchController(
+          part: flatDocument[i], partNumber: i, map: columnMapping.last));
     }
   }
 
@@ -288,6 +288,7 @@ class DocumentData {
     }
     columnMapping[part].moveColumn(column, move);
     moveDataInList<double>(partColumnWidths[part], column + 1, move);
+    searchData[part].update();
   }
 }
 
@@ -319,11 +320,19 @@ class ColumnMappings {
     }
   }
 
-  int remap(int i) {
-    if (i < mappings.length) {
-      return mappings[i];
+  int remap(int displayColumn) {
+    if (displayColumn < mappings.length) {
+      return mappings[displayColumn];
     }
-    return i;
+    return displayColumn;
+  }
+
+  int inverse(int internalColumn) {
+    final displayColumn = mappings.indexOf(internalColumn);
+    if (displayColumn < 0) {
+      return internalColumn;
+    }
+    return displayColumn;
   }
 
   /// [move] less than zero moves the column to an earlier position
@@ -340,8 +349,10 @@ class ReqIfSearchController {
   bool caseSensitive = false;
   final int partNumber;
   ReqIfDocumentPart part;
+  ColumnMappings map;
 
-  ReqIfSearchController({required this.part, required this.partNumber});
+  ReqIfSearchController(
+      {required this.part, required this.partNumber, required this.map});
 
   void update() {
     String filter = searchController.text;
@@ -379,8 +390,8 @@ class ReqIfSearchController {
       matchPosition = const TableVicinity(column: -1, row: -1);
       return -1;
     }
-    matchPosition =
-        TableVicinity(row: position.$1 + 1, column: position.$2 + 1);
+    matchPosition = TableVicinity(
+        row: position.$1 + 1, column: map.inverse(position.$2) + 1);
     return position.$1;
   }
 }
