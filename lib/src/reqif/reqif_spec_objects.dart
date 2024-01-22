@@ -40,8 +40,8 @@ class ReqIfSpecificationObject extends ReqIfIdentifiable {
         firstChildTag: _xmlValues,
         builder: (inner) {
           switch (inner.name.local) {
-            case "ATTRIBUTE-VALUE-STRING":
-              children.add(ReqIfAttributeValueSimple.parse(
+            case ReqIfAttributeValueString.xmlName:
+              children.add(ReqIfAttributeValueString.parse(
                   parent: this, element: inner, document: document));
             case ReqIfAttributeValueInteger.xmlName:
               children.add(ReqIfAttributeValueInteger.parse(
@@ -51,6 +51,15 @@ class ReqIfSpecificationObject extends ReqIfIdentifiable {
                   parent: this, element: inner, document: document));
             case ReqIfAttributeValueXhtml.xmlName:
               children.add(ReqIfAttributeValueXhtml.parse(
+                  parent: this, element: inner, document: document));
+            case ReqIfAttributeValueDate.xmlName:
+              children.add(ReqIfAttributeValueDate.parse(
+                  parent: this, element: inner, document: document));
+            case ReqIfAttributeValueReal.xmlName:
+              children.add(ReqIfAttributeValueReal.parse(
+                  parent: this, element: inner, document: document));
+            case ReqIfAttributeValueBool.xmlName:
+              children.add(ReqIfAttributeValueBool.parse(
                   parent: this, element: inner, document: document));
           }
         });

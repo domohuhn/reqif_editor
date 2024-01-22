@@ -206,7 +206,7 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
           default:
         }
       }
-      rowHeights.add(rowHeight);
+      rowHeights.add(1.2 * rowHeight);
     }
     return rowHeights;
   }
@@ -437,8 +437,8 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
             child: _buildConstEnumList(value as ReqIfAttributeValueEnum),
             attribute: cellAttribute);
       case ReqIfElementTypes.attributeValueString:
-        return _wrapWithPrefix(
-            element, Text(value.toString()), cellAttribute, wrapWithPrefix);
+        return _wrapWithPrefix(element, SelectableText(value.toString()),
+            cellAttribute, wrapWithPrefix);
       case ReqIfElementTypes.attributeValueXhtml:
         return _wrapWithPrefix(
             element,

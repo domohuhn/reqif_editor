@@ -225,8 +225,20 @@ enum ReqIfElementTypes {
   datatypeDefinitionEnum,
 
   /// DATATYPE-DEFINITION-INTEGER
-  /// Describes an enum and all possible values
+  /// Describes an integer and all possible values
   datatypeDefinitionInteger,
+
+  /// DATATYPE-DEFINITION-BOOLEAN
+  /// Describes a bool
+  datatypeDefinitionBoolean,
+
+  /// DATATYPE-DEFINITION-DATE
+  /// Describes a date
+  datatypeDefinitionDate,
+
+  /// DATATYPE-DEFINITION-REAL
+  /// Describes a floating point number
+  datatypeDefinitionReal,
 
   /// ENUM-VALUE
   /// Describes a value of an enum
@@ -255,6 +267,18 @@ enum ReqIfElementTypes {
   /// ATTRIBUTE-VALUE-INTEGER
   /// contains one value and a reference to a column of the specification.
   attributeValueInteger,
+
+  /// ATTRIBUTE-VALUE-BOOLEAN
+  /// Describes a bool
+  attributeValueBoolean,
+
+  /// ATTRIBUTE-VALUE-DATE
+  /// Describes a date
+  attributeValueDate,
+
+  /// ATTRIBUTE-VALUE-REAL
+  /// Describes a floating point number
+  attributeValueReal,
 
   /// ATTRIBUTE-VALUE-ENUMERATION
   /// contains one value and a reference to a column of the specification.
@@ -531,6 +555,12 @@ String getXmlDefinitionReferenceName(ReqIfElementTypes dataType) {
       return "ATTRIBUTE-DEFINITION-XHTML-REF";
     case ReqIfElementTypes.attributeValueInteger:
       return "ATTRIBUTE-DEFINITION-INTEGER-REF";
+    case ReqIfElementTypes.attributeValueBoolean:
+      return "ATTRIBUTE-DEFINITION-BOOLEAN-REF";
+    case ReqIfElementTypes.attributeValueDate:
+      return "ATTRIBUTE-DEFINITION-DATE-REF";
+    case ReqIfElementTypes.attributeValueReal:
+      return "ATTRIBUTE-DEFINITION-REAL-REF";
     case ReqIfElementTypes.datatypeDefinitionXhtml:
       return "DATATYPE-DEFINITION-XHTML-REF";
     case ReqIfElementTypes.datatypeDefinitionEnum:
@@ -539,6 +569,12 @@ String getXmlDefinitionReferenceName(ReqIfElementTypes dataType) {
       return "DATATYPE-DEFINITION-STRING-REF";
     case ReqIfElementTypes.datatypeDefinitionInteger:
       return "DATATYPE-DEFINITION-INTEGER-REF";
+    case ReqIfElementTypes.datatypeDefinitionBoolean:
+      return "DATATYPE-DEFINITION-BOOLEAN-REF";
+    case ReqIfElementTypes.datatypeDefinitionDate:
+      return "DATATYPE-DEFINITION-DATE-REF";
+    case ReqIfElementTypes.datatypeDefinitionReal:
+      return "DATATYPE-DEFINITION-REAL-REF";
     default:
       throw ReqIfError(
           "Internal error: getXmlDefinitionReferenceName called with $dataType");
@@ -555,6 +591,12 @@ ReqIfElementTypes getXmlDefinitionDataType(ReqIfElementTypes dataType) {
       return ReqIfElementTypes.datatypeDefinitionXhtml;
     case ReqIfElementTypes.attributeValueInteger:
       return ReqIfElementTypes.datatypeDefinitionInteger;
+    case ReqIfElementTypes.attributeValueBoolean:
+      return ReqIfElementTypes.datatypeDefinitionBoolean;
+    case ReqIfElementTypes.attributeValueReal:
+      return ReqIfElementTypes.datatypeDefinitionReal;
+    case ReqIfElementTypes.attributeValueDate:
+      return ReqIfElementTypes.datatypeDefinitionDate;
     default:
       throw ReqIfError(
           "Internal error: getXmlDefinitionDataType called with $dataType");
@@ -571,6 +613,12 @@ ReqIfElementTypes getDataTypeFromXmlTag(String element) {
       return ReqIfElementTypes.attributeValueXhtml;
     case "ATTRIBUTE-VALUE-INTEGER":
       return ReqIfElementTypes.attributeValueInteger;
+    case "ATTRIBUTE-VALUE-DATE":
+      return ReqIfElementTypes.attributeValueDate;
+    case "ATTRIBUTE-VALUE-REAL":
+      return ReqIfElementTypes.attributeValueReal;
+    case "ATTRIBUTE-VALUE-BOOLEAN":
+      return ReqIfElementTypes.attributeValueBoolean;
     case "ATTRIBUTE-DEFINITION-ENUMERATION":
       return ReqIfElementTypes.datatypeDefinitionEnum;
     case "ATTRIBUTE-DEFINITION-STRING":
@@ -579,6 +627,12 @@ ReqIfElementTypes getDataTypeFromXmlTag(String element) {
       return ReqIfElementTypes.datatypeDefinitionInteger;
     case "ATTRIBUTE-DEFINITION-XHTML":
       return ReqIfElementTypes.datatypeDefinitionXhtml;
+    case "ATTRIBUTE-DEFINITION-DATE":
+      return ReqIfElementTypes.datatypeDefinitionDate;
+    case "ATTRIBUTE-DEFINITION-REAL":
+      return ReqIfElementTypes.datatypeDefinitionReal;
+    case "ATTRIBUTE-DEFINITION-BOOLEAN":
+      return ReqIfElementTypes.datatypeDefinitionBoolean;
     default:
       throw ReqIfError(
           "Internal error: getXmlDefinitionDataType called with $element");

@@ -93,10 +93,50 @@ class ReqIfAttributeValueSimple extends ReqIfAttributeValue {
   }
 }
 
+class ReqIfAttributeValueString extends ReqIfAttributeValueSimple {
+  static const String xmlName = 'ATTRIBUTE-VALUE-STRING';
+
+  ReqIfAttributeValueString.parse(
+      {required ReqIfElementWithIdNameTime parent,
+      required xml.XmlElement element,
+      required ReqIfDocument document})
+      : super.parse(parent: parent, element: element, document: document);
+}
+
 class ReqIfAttributeValueInteger extends ReqIfAttributeValueSimple {
   static const String xmlName = 'ATTRIBUTE-VALUE-INTEGER';
 
   ReqIfAttributeValueInteger.parse(
+      {required ReqIfElementWithIdNameTime parent,
+      required xml.XmlElement element,
+      required ReqIfDocument document})
+      : super.parse(parent: parent, element: element, document: document);
+}
+
+class ReqIfAttributeValueBool extends ReqIfAttributeValueSimple {
+  static const String xmlName = 'ATTRIBUTE-VALUE-BOOLEAN';
+
+  ReqIfAttributeValueBool.parse(
+      {required ReqIfElementWithIdNameTime parent,
+      required xml.XmlElement element,
+      required ReqIfDocument document})
+      : super.parse(parent: parent, element: element, document: document);
+}
+
+class ReqIfAttributeValueReal extends ReqIfAttributeValueSimple {
+  static const String xmlName = 'ATTRIBUTE-VALUE-REAL';
+
+  ReqIfAttributeValueReal.parse(
+      {required ReqIfElementWithIdNameTime parent,
+      required xml.XmlElement element,
+      required ReqIfDocument document})
+      : super.parse(parent: parent, element: element, document: document);
+}
+
+class ReqIfAttributeValueDate extends ReqIfAttributeValueSimple {
+  static const String xmlName = 'ATTRIBUTE-VALUE-DATE';
+
+  ReqIfAttributeValueDate.parse(
       {required ReqIfElementWithIdNameTime parent,
       required xml.XmlElement element,
       required ReqIfDocument document})

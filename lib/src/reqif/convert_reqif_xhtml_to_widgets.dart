@@ -88,7 +88,8 @@ class XHtmlToWidgetsConverter extends StatelessWidget {
     if (currentTextSpan.isNotEmpty) {
       widgets.add(Container(
           alignment: Alignment.centerLeft,
-          child: Text.rich(TextSpan(children: [...currentTextSpan]))));
+          child:
+              SelectableText.rich(TextSpan(children: [...currentTextSpan]))));
     }
     currentTextSpan.clear();
   }

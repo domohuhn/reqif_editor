@@ -42,11 +42,14 @@ class ReqIfSpecType extends ReqIfIdentifiable {
           children.add(ReqIfAttributeDefinition.parse(element, document, i));
         case "ATTRIBUTE-DEFINITION-INTEGER":
           children.add(ReqIfAttributeDefinition.parse(element, document, i));
-        // TODO
-//        case "ATTRIBUTE-DEFINITION-BOOLEAN": children.add(ReqIfAttributeDefinition.parse(element,ReqIfElementTypes.datatypeDefinitionBoolean,"DATATYPE-DEFINITION-BOOLEAN-REF",document));
-//        case "ATTRIBUTE-DEFINITION-DATE": children.add(ReqIfAttributeDefinition.parse(element,ReqIfElementTypes.datatypeDefinitionDate,"DATATYPE-DEFINITION-DATE-REF",document));
-//        case "ATTRIBUTE-DEFINITION-INTEGER": children.add(ReqIfAttributeDefinition.parse(element,ReqIfElementTypes.datatypeDefinitionInteger,"DATATYPE-DEFINITION-INTEGER-REF",document));
-//        case "ATTRIBUTE-DEFINITION-REAL": children.add(ReqIfAttributeDefinition.parse(element,ReqIfElementTypes.datatypeDefinitionReal,"DATATYPE-DEFINITION-REAL-REF",document));
+        case "ATTRIBUTE-DEFINITION-BOOLEAN":
+          children.add(ReqIfAttributeDefinition.parse(element, document, i));
+        case "ATTRIBUTE-DEFINITION-DATE":
+          children
+              .add(ReqIfAttributeDefinition.parse(element, document, i /*  */));
+        case "ATTRIBUTE-DEFINITION-REAL":
+          children
+              .add(ReqIfAttributeDefinition.parse(element, document, i /*  */));
       }
       ++i;
     }

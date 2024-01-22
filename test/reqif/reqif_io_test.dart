@@ -31,7 +31,7 @@ void main() {
     var parsed = ReqIfDocument.parse(doc);
     test('count', () {
       expect(parsed.dataTypes.length, 1);
-      expect(parsed.dataTypes.first.types.length, 6);
+      expect(parsed.dataTypes.first.types.length, 9);
     });
 
     test('string', () {
@@ -95,7 +95,7 @@ void main() {
     var parsed = ReqIfDocument.parse(doc);
     test('count', () {
       expect(parsed.specificationObjectTypes.length, 1);
-      expect(parsed.specificationObjectTypes.first.children.length, 7);
+      expect(parsed.specificationObjectTypes.first.children.length, 10);
     });
 
     test('xhtml 1', () {

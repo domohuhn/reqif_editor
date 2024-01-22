@@ -27,6 +27,12 @@ class ReqIfDataTypes extends ReqIfElement {
           children.add(ReqIfDataTypeEnum.parse(element));
         case ReqIfDataTypeInt.xmlName:
           children.add(ReqIfDataTypeInt.parse(element));
+        case ReqIfDataTypeReal.xmlName:
+          children.add(ReqIfDataTypeReal.parse(element));
+        case ReqIfDataTypeDate.xmlName:
+          children.add(ReqIfDataTypeDate.parse(element));
+        case ReqIfDataTypeBool.xmlName:
+          children.add(ReqIfDataTypeBool.parse(element));
       }
     }
   }
@@ -74,6 +80,21 @@ mixin ReqIfMinMaxInt {
   int get maximum => _maximum;
 }
 
+mixin ReqIfMinMaxReal {
+  static const String _xmlMin = 'MIN';
+  static const String _xmlMax = 'MAX';
+
+  void parseMinMax(xml.XmlElement el) {
+    _minimum = double.parse(getRequiredAttribute(el, _xmlMin));
+    _maximum = double.parse(getRequiredAttribute(el, _xmlMax));
+  }
+
+  late double _minimum;
+  late double _maximum;
+  double get minimum => _minimum;
+  double get maximum => _maximum;
+}
+
 class ReqIfDataTypeInt extends ReqIfIdentifiable with ReqIfMinMaxInt {
   static const String xmlName = 'DATATYPE-DEFINITION-INTEGER';
 
@@ -85,6 +106,51 @@ class ReqIfDataTypeInt extends ReqIfIdentifiable with ReqIfMinMaxInt {
           'Internal error: wrong node given to ReqIfDataTypeInt.parse\n\n$node');
     }
     parseMinMax(node);
+  }
+}
+
+class ReqIfDataTypeReal extends ReqIfIdentifiable with ReqIfMinMaxReal {
+  static const String xmlName = 'DATATYPE-DEFINITION-REAL';
+  static const String _xmlAccuracy = 'ACCURACY';
+
+  /// [node] must be DATATYPE-DEFINITION-REAL
+  ReqIfDataTypeReal.parse(xml.XmlElement node)
+      : super.parse(node, ReqIfElementTypes.datatypeDefinitionReal) {
+    if (node.name.local != xmlName) {
+      throw ReqIfError(
+          'Internal error: wrong node given to ReqIfDataTypeReal.parse\n\n$node');
+    }
+    parseMinMax(node);
+    _accuracy = int.parse(getRequiredAttribute(node, _xmlAccuracy));
+  }
+
+  int _accuracy = 2;
+  int get accuracy => _accuracy;
+}
+
+class ReqIfDataTypeBool extends ReqIfIdentifiable {
+  static const String xmlName = 'DATATYPE-DEFINITION-BOOLEAN';
+
+  /// [node] must be DATATYPE-DEFINITION-BOOLEAN
+  ReqIfDataTypeBool.parse(xml.XmlElement node)
+      : super.parse(node, ReqIfElementTypes.datatypeDefinitionBoolean) {
+    if (node.name.local != xmlName) {
+      throw ReqIfError(
+          'Internal error: wrong node given to ReqIfDataTypeBool.parse\n\n$node');
+    }
+  }
+}
+
+class ReqIfDataTypeDate extends ReqIfIdentifiable {
+  static const String xmlName = 'DATATYPE-DEFINITION-DATE';
+
+  /// [node] must be DATATYPE-DEFINITION-DATE
+  ReqIfDataTypeDate.parse(xml.XmlElement node)
+      : super.parse(node, ReqIfElementTypes.datatypeDefinitionDate) {
+    if (node.name.local != xmlName) {
+      throw ReqIfError(
+          'Internal error: wrong node given to ReqIfDataTypeDate.parse\n\n$node');
+    }
   }
 }
 
