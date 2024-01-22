@@ -1,3 +1,7 @@
+## 0.2.0
+
+- Text is selectable
+
 ## 0.1.5
 
 - Modified string escapes
