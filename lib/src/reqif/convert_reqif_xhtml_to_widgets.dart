@@ -50,14 +50,10 @@ class _XhtmlTextStyles {
 
 class XHtmlToWidgetsConverter extends StatelessWidget {
   const XHtmlToWidgetsConverter(
-      {super.key,
-      required this.node,
-      required this.cache,
-      required this.selectable});
+      {super.key, required this.node, required this.cache});
 
   final xml.XmlNode node;
   final DocumentData cache;
-  final bool selectable;
 
   @override
   Widget build(BuildContext context) {
@@ -92,9 +88,7 @@ class XHtmlToWidgetsConverter extends StatelessWidget {
     if (currentTextSpan.isNotEmpty) {
       widgets.add(Container(
           alignment: Alignment.centerLeft,
-          child: selectable
-              ? SelectableText.rich(TextSpan(children: [...currentTextSpan]))
-              : Text.rich(TextSpan(children: [...currentTextSpan]))));
+          child: Text.rich(TextSpan(children: [...currentTextSpan]))));
     }
     currentTextSpan.clear();
   }

@@ -136,30 +136,31 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
     }
     _fillCache();
     final documentPart = flatDocument[widget.partNumber];
-    return ResizableTableView(
-        rowCount: documentPart.rowCount,
-        columnCount: documentPart.columnCount,
-        cellBuilder: _buildCell,
-        columnHeaderBuilder: _buildColumnHeader,
-        initialRowHeights: _estimateInitialRowHeights,
-        initialColumnWidths: _estimateInitialColumnWidths,
-        onSelectionChanged: _onSelectionChanged,
-        columnWidthsProvider: () => widget.controller.columnWidths,
-        rowHeightsProvider: () => widget.controller.rowHeights,
-        selection: _selected,
-        rowPositionBuilder: _buildRowPosition,
-        searchPosition: () {
-          if (widget.hasPart && widget.searchIsEnabled) {
-            return widget.data.searchData[widget.partNumber].matchPosition;
-          }
-          return const TableVicinity(row: -1, column: -1);
-        },
-        scrollControllerBuilder: () {
-          widget.controller.refreshScrollControllers();
-          return TableViewScrollControllers(
-              horizontal: widget.controller.horizontalScrollController,
-              vertical: widget.controller.verticalScrollController);
-        });
+    return SelectionArea(
+        child: ResizableTableView(
+            rowCount: documentPart.rowCount,
+            columnCount: documentPart.columnCount,
+            cellBuilder: _buildCell,
+            columnHeaderBuilder: _buildColumnHeader,
+            initialRowHeights: _estimateInitialRowHeights,
+            initialColumnWidths: _estimateInitialColumnWidths,
+            onSelectionChanged: _onSelectionChanged,
+            columnWidthsProvider: () => widget.controller.columnWidths,
+            rowHeightsProvider: () => widget.controller.rowHeights,
+            selection: _selected,
+            rowPositionBuilder: _buildRowPosition,
+            searchPosition: () {
+              if (widget.hasPart && widget.searchIsEnabled) {
+                return widget.data.searchData[widget.partNumber].matchPosition;
+              }
+              return const TableVicinity(row: -1, column: -1);
+            },
+            scrollControllerBuilder: () {
+              widget.controller.refreshScrollControllers();
+              return TableViewScrollControllers(
+                  horizontal: widget.controller.horizontalScrollController,
+                  vertical: widget.controller.verticalScrollController);
+            }));
   }
 
   double defaultRowHeight = 40;
@@ -421,7 +422,6 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
                   child: XHtmlToWidgetsConverter(
                 node: value.node,
                 cache: widget.data,
-                selectable: false,
               )),
               attribute: cellAttribute);
         case ReqIfElementTypes.attributeValueString:
@@ -440,8 +440,8 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
             child: _buildConstEnumList(value as ReqIfAttributeValueEnum),
             attribute: cellAttribute);
       case ReqIfElementTypes.attributeValueString:
-        return _wrapWithPrefix(element, SelectableText(value.toString()),
-            cellAttribute, wrapWithPrefix);
+        return _wrapWithPrefix(
+            element, Text(value.toString()), cellAttribute, wrapWithPrefix);
       case ReqIfElementTypes.attributeValueXhtml:
         return _wrapWithPrefix(
             element,
@@ -449,33 +449,30 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
                 child: XHtmlToWidgetsConverter(
               node: value.node,
               cache: widget.data,
-              selectable: true,
             )),
             cellAttribute,
             wrapWithPrefix);
       case ReqIfElementTypes.attributeValueInteger:
-        return _wrapWithPrefix(element, SelectableText(value.toString()),
-            cellAttribute, wrapWithPrefix);
+        return _wrapWithPrefix(
+            element, Text(value.toString()), cellAttribute, wrapWithPrefix);
       default:
         return null;
     }
   }
 
   Widget? _buildConstEnumList(ReqIfAttributeValueEnum value) {
-    if (value.length > 0) {
-      List<InlineSpan> texts = [];
+    if (value.length > 1) {
+      List<Text> values = [];
       for (int i = 0; i < value.length; ++i) {
-        texts.add(TextSpan(text: "${value.value(i)}\n"));
+        values.add(Text(value.value(i)));
       }
-      return Container(
-          alignment: Alignment.topCenter,
-          padding: const EdgeInsets.all(5),
-          child: SelectableText.rich(TextSpan(children: texts)));
+      return Padding(
+          padding: const EdgeInsets.all(5), child: Column(children: values));
     } else if (value.length == 1) {
       return Container(
           alignment: Alignment.topCenter,
           padding: const EdgeInsets.all(5),
-          child: SelectableText(value.value(0)));
+          child: Text(value.value(0)));
     }
     return null;
   }

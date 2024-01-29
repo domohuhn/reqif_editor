@@ -1,6 +1,8 @@
 ## 0.2.1
 
 - Bugfixes for text selection
+- Updated dependencies
+- Performance improvements
 
 ## 0.2.0
 

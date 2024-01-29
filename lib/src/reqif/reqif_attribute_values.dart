@@ -159,11 +159,15 @@ class ReqIfAttributeValueEnum extends ReqIfAttributeValue {
         builder: (inner) {
           _values.add((enumDefinition.idToValue(inner.innerText), inner));
         });
+    updateCache();
   }
 
   final List<(String, xml.XmlElement)> _values;
 
   int get length => _values.length;
+  late String _cachedString;
+
+  void updateCache() => _cachedString = _toString();
 
   /// Gets the value of the multi-valued enum field at index [i]
   /// as either long name (if defined) or as number key.
@@ -180,6 +184,7 @@ class ReqIfAttributeValueEnum extends ReqIfAttributeValue {
     final id = enumDefinition.valueToId(value);
     _values[i] = (value, _values[i].$2);
     _values[i].$2.innerText = id;
+    updateCache();
     parent.updateLastChange();
   }
 
@@ -199,6 +204,7 @@ class ReqIfAttributeValueEnum extends ReqIfAttributeValue {
     final newNode = createGrandChildElementWithInnerText(
         node, 'VALUES', 'ENUM-VALUE-REF', id);
     _values.add((value, newNode));
+    updateCache();
     parent.updateLastChange();
   }
 
@@ -211,11 +217,11 @@ class ReqIfAttributeValueEnum extends ReqIfAttributeValue {
     } else {
       throw ReqIfError('Internal error: ${removed.$2} is an orphan');
     }
+    updateCache();
     parent.updateLastChange();
   }
 
-  @override
-  String toString() {
+  String _toString() {
     final buffer = StringBuffer();
     buffer.write("[");
     bool first = true;
@@ -229,6 +235,9 @@ class ReqIfAttributeValueEnum extends ReqIfAttributeValue {
     buffer.write("]");
     return buffer.toString();
   }
+
+  @override
+  String toString() => _cachedString;
 }
 
 class ReqIfAttributeValueXhtml extends ReqIfAttributeValue {
@@ -250,6 +259,7 @@ class ReqIfAttributeValueXhtml extends ReqIfAttributeValue {
           "Failed to parse document: $xmlName - $_xmlValueName must have exactly one child, either <xhtml:div> or <xhtml:p>!\n\n$node");
     }
     _theValue = values.first.childElements.first;
+    updateCache();
   }
 
   late xml.XmlElement _theValue;
@@ -273,18 +283,24 @@ class ReqIfAttributeValueXhtml extends ReqIfAttributeValue {
     final copy = newValue.copy();
     _theValue.replace(copy);
     _theValue = copy;
+    updateCache();
     parent.updateLastChange();
+  }
+
+  late String _cachedString;
+  late String _cachedStringWithNewlines;
+
+  void updateCache() {
+    _cachedString = _toString();
+    _cachedStringWithNewlines = _toStringWithNewlines();
   }
 
   /// Returns the unformatted text of the node.
   @override
-  String toString() {
-    final buffer = StringBuffer();
-    for (final child in node.findAllElements(_xmlValueName)) {
-      buffer.write(child.innerText);
-    }
-    return buffer.toString();
-  }
+  String toString() => _cachedString;
+
+  @override
+  String toStringWithNewlines() => _cachedStringWithNewlines;
 
   /// Counts the embedded objects in the formatted text.
   /// Each object must either be image/png or have an alternative image/png image.
@@ -304,8 +320,16 @@ class ReqIfAttributeValueXhtml extends ReqIfAttributeValue {
     return countPng;
   }
 
-  @override
-  String toStringWithNewlines() {
+  /// Returns the unformatted text of the node.
+  String _toString() {
+    final buffer = StringBuffer();
+    for (final child in node.findAllElements(_xmlValueName)) {
+      buffer.write(child.innerText);
+    }
+    return buffer.toString();
+  }
+
+  String _toStringWithNewlines() {
     final buffer = StringBuffer();
     for (final child in node.findAllElements(_xmlValueName)) {
       for (final xhtml in child.descendants) {
