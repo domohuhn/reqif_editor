@@ -180,7 +180,7 @@ class _TopMenuBarState extends State<TopMenuBar> with OpenDocument<TopMenuBar> {
           showAboutDialog(
             context: context,
             applicationName: AppLocalizations.of(context)!.appTitle,
-            applicationVersion: '0.1.0',
+            applicationVersion: '0.2.1',
           );
         },
       ),

@@ -24,6 +24,7 @@ class ReqIfSpreadSheet extends StatefulWidget {
   final void Function() onNewFilterValue;
   final bool isEditable;
   final bool filterIsEnabled;
+  final bool searchIsEnabled;
 
   /// Forces all values to editable.
   /// Ignores the values requested by the document controller.
@@ -56,6 +57,7 @@ class ReqIfSpreadSheet extends StatefulWidget {
       required this.onNewQuillEditor,
       required this.filterIsEnabled,
       required this.onNewFilterValue,
+      required this.searchIsEnabled,
       super.key,
       this.isEditable = true,
       this.forceEditable = false});
@@ -147,7 +149,7 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
         selection: _selected,
         rowPositionBuilder: _buildRowPosition,
         searchPosition: () {
-          if (widget.hasPart) {
+          if (widget.hasPart && widget.searchIsEnabled) {
             return widget.data.searchData[widget.partNumber].matchPosition;
           }
           return const TableVicinity(row: -1, column: -1);
@@ -460,12 +462,15 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
   }
 
   Widget? _buildConstEnumList(ReqIfAttributeValueEnum value) {
-    if (value.length > 1) {
-      List<SelectableText> values = [];
+    if (value.length > 0) {
+      List<InlineSpan> texts = [];
       for (int i = 0; i < value.length; ++i) {
-        values.add(SelectableText(value.value(i)));
+        texts.add(TextSpan(text: "${value.value(i)}\n"));
       }
-      return Column(children: values);
+      return Container(
+          alignment: Alignment.topCenter,
+          padding: const EdgeInsets.all(5),
+          child: SelectableText.rich(TextSpan(children: texts)));
     } else if (value.length == 1) {
       return Container(
           alignment: Alignment.topCenter,

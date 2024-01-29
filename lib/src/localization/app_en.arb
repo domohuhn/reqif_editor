@@ -64,11 +64,11 @@
   "@settingsSave": {
     "description": "Heading for the save section"
   },
-  "settingsSaveUpdateUUID": "Update the documents UUID when saving",
+  "settingsSaveUpdateUUID": "Update the document's UUID when saving",
   "@settingsSaveUpdateUUID": {
     "description": "Description for a settings checkbox"
   },
-  "settingsSaveUpdateTime": "Update the documents creation time when saving",
+  "settingsSaveUpdateTime": "Update the document's creation time when saving",
   "@settingsSaveUpdateTime": {
     "description": "Description for a settings checkbox"
   },
@@ -155,6 +155,10 @@
   "toggleFilter": "Toggle filter",
   "@toggleFilter": {
     "description": "Tooltip for filter button"
+  },
+  "toggleSearch": "Toggle search",
+  "@toggleSearch": {
+    "description": "Tooltip for search button"
   },
   "ofSearchBox": "of",
   "@ofSearchBox": {

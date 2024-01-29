@@ -10,16 +10,20 @@ class DocumentTopBar extends StatelessWidget {
   final QuillController controller;
   final bool navbarIsVisible;
   final bool filterIsVisible;
+  final bool searchIsVisible;
   final void Function() onNavBarPressed;
   final void Function() onFilterPressed;
+  final void Function() onSearchPressed;
 
   const DocumentTopBar({
     Key? key,
     required this.controller,
     required this.navbarIsVisible,
     required this.filterIsVisible,
+    required this.searchIsVisible,
     required this.onNavBarPressed,
     required this.onFilterPressed,
+    required this.onSearchPressed,
   }) : super(key: key);
 
   @override
@@ -44,6 +48,11 @@ class DocumentTopBar extends StatelessWidget {
                 ? Icons.filter_alt
                 : Icons.filter_alt_off_outlined),
             tooltip: AppLocalizations.of(context)!.toggleFilter,
+          ),
+          IconButton(
+            onPressed: onSearchPressed,
+            icon: Icon(searchIsVisible ? Icons.search : Icons.search_off),
+            tooltip: AppLocalizations.of(context)!.toggleSearch,
           ),
           VerticalDivider(
               thickness: 3.0,

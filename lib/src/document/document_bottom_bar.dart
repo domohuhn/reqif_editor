@@ -61,7 +61,7 @@ class _DocumentBottomBarState extends State<DocumentBottomBar> {
     }
   }
 
-  void _updateMatchesAndGotoFirst() {
+  void _updateMatches() {
     if (!hasData) {
       return;
     }
@@ -134,7 +134,7 @@ class _DocumentBottomBarState extends State<DocumentBottomBar> {
           controller: searchController,
           onChanged: (value) {
             setState(() {
-              _updateMatchesAndGotoFirst();
+              _updateMatches();
             });
           },
         ),
@@ -155,7 +155,7 @@ class _DocumentBottomBarState extends State<DocumentBottomBar> {
             if (value != null && caseSensitive != value) {
               setState(() {
                 caseSensitive = value;
-                _updateMatchesAndGotoFirst();
+                _updateMatches();
               });
             }
           }),

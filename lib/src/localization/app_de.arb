@@ -44,6 +44,7 @@
   "caseSensitive": "Groß-/Kleinschreibung",
   "searchPage": "Seite durchsuchen",
   "toggleFilter": "Filter umschalten",
+  "toggleSearch": "Suche umschalten",
   "lastUsed": "Zuletzt geöffnet",
   "columnOrder": "Reihenfolge der Spalten:",
   "noMatches": "Ausdruck nicht gefunden"

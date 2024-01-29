@@ -36,6 +36,7 @@ class _ReqIfDocumentViewState extends State<ReqIfDocumentView> {
   static const double widthBorder = 4.0;
   bool navbarIsVisible = true;
   bool filterIsActive = false;
+  bool searchIsVisible = false;
   int filterCounter = 0;
 
   QuillController _controller = QuillController.basic();
@@ -157,6 +158,12 @@ class _ReqIfDocumentViewState extends State<ReqIfDocumentView> {
     _applyFilter();
   }
 
+  void _toggleSearchState() {
+    setState(() {
+      searchIsVisible = !searchIsVisible;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     List<Widget> centerRow = [];
@@ -181,7 +188,7 @@ class _ReqIfDocumentViewState extends State<ReqIfDocumentView> {
     }
     centerRow.add(_buildTableView(context));
 
-    return Column(children: [
+    List<Widget> children = [
       SizedBox(
           height: heightNavBar,
           child: DocumentTopBar(
@@ -190,17 +197,22 @@ class _ReqIfDocumentViewState extends State<ReqIfDocumentView> {
             onNavBarPressed: _toggleNavBarVisibility,
             filterIsVisible: filterIsActive,
             onFilterPressed: _toggleFilterState,
+            searchIsVisible: searchIsVisible,
+            onSearchPressed: _toggleSearchState,
           )),
       Expanded(
           child: Row(
         children: centerRow,
       )),
-      SizedBox(
+    ];
+    if (searchIsVisible) {
+      children.add(SizedBox(
           height: heightFooter,
           child: DocumentBottomBar(
             controller: widget.documentController,
-          ))
-    ]);
+          )));
+    }
+    return Column(children: children);
   }
 
   Widget _buildDecoratedTabBox(BuildContext context, int idx) {
@@ -270,12 +282,12 @@ class _ReqIfDocumentViewState extends State<ReqIfDocumentView> {
       ),
       Expanded(
           child: ReqIfSpreadSheet(
-        controller: widget.documentController,
-        editorController: _controller,
-        onNewQuillEditor: _exchangeControllerAndText,
-        filterIsEnabled: filterIsActive,
-        onNewFilterValue: _applyFilter,
-      ))
+              controller: widget.documentController,
+              editorController: _controller,
+              onNewQuillEditor: _exchangeControllerAndText,
+              filterIsEnabled: filterIsActive,
+              onNewFilterValue: _applyFilter,
+              searchIsEnabled: searchIsVisible))
     ]));
   }
 }
