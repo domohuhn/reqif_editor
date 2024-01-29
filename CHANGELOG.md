@@ -1,3 +1,7 @@
+## 0.2.1
+
+- Bugfixes for text selection
+
 ## 0.2.0
 
 - Text is selectable

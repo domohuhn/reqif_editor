@@ -419,6 +419,7 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
                   child: XHtmlToWidgetsConverter(
                 node: value.node,
                 cache: widget.data,
+                selectable: false,
               )),
               attribute: cellAttribute);
         case ReqIfElementTypes.attributeValueString:
@@ -446,12 +447,13 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
                 child: XHtmlToWidgetsConverter(
               node: value.node,
               cache: widget.data,
+              selectable: true,
             )),
             cellAttribute,
             wrapWithPrefix);
       case ReqIfElementTypes.attributeValueInteger:
-        return _wrapWithPrefix(
-            element, Text(value.toString()), cellAttribute, wrapWithPrefix);
+        return _wrapWithPrefix(element, SelectableText(value.toString()),
+            cellAttribute, wrapWithPrefix);
       default:
         return null;
     }
@@ -459,16 +461,16 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
 
   Widget? _buildConstEnumList(ReqIfAttributeValueEnum value) {
     if (value.length > 1) {
-      List<Text> values = [];
+      List<SelectableText> values = [];
       for (int i = 0; i < value.length; ++i) {
-        values.add(Text(value.value(i)));
+        values.add(SelectableText(value.value(i)));
       }
       return Column(children: values);
     } else if (value.length == 1) {
       return Container(
           alignment: Alignment.topCenter,
           padding: const EdgeInsets.all(5),
-          child: Text(value.value(0)));
+          child: SelectableText(value.value(0)));
     }
     return null;
   }
