@@ -44,6 +44,7 @@ class ResizableTableView extends StatefulWidget {
       this.cellBuilder,
       required this.rowCount,
       required this.columnCount,
+      required this.selectAble,
       this.defaultColumnWidth = 160,
       this.minColumnWidth = 100,
       this.defaultRowHeight = 40,
@@ -134,6 +135,8 @@ class ResizableTableView extends StatefulWidget {
   /// The width of the drag able borders in the table view.
   final double borderWidth;
 
+  final bool selectAble;
+
   /// A callback to access the list where the actual column widths are stored.
   /// The widget will either use the list provided by the callback
   /// or create a new one if it is null.
@@ -156,6 +159,9 @@ class _ResizableTableViewState extends State<ResizableTableView> {
 
   final List<double> _columnWidths = <double>[];
   final List<double> _rowHeights = <double>[];
+
+  final GlobalKey<State<ResizableTableView>> tableViewKey =
+      GlobalKey<State<ResizableTableView>>(debugLabel: "resizableTableView");
 
   List<double> get columnWidths {
     if (widget.columnWidthsProvider != null) {
@@ -237,6 +243,22 @@ class _ResizableTableViewState extends State<ResizableTableView> {
   @override
   Widget build(BuildContext context) {
     ensureSizesInitialized();
+    final tableView = KeyedSubtree(
+        key: tableViewKey,
+        child: TableView.builder(
+          pinnedRowCount: 1,
+          pinnedColumnCount: 1,
+          verticalDetails:
+              ScrollableDetails.vertical(controller: _verticalController),
+          horizontalDetails:
+              ScrollableDetails.horizontal(controller: _horizontalController),
+          cellBuilder: _buildCell,
+          columnCount: widget.columnCount + 1,
+          columnBuilder: _buildColumnSpan,
+          rowCount: widget.rowCount + 1,
+          rowBuilder: _buildRowSpan,
+        ));
+
     return NotificationListener<ScrollNotification>(
         onNotification: (scrollNotification) {
           // TODO: This is required to work aorund bug
@@ -254,19 +276,10 @@ class _ResizableTableViewState extends State<ResizableTableView> {
               controller: _verticalController,
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(0, 0, 10, 10),
-                child: TableView.builder(
-                  pinnedRowCount: 1,
-                  pinnedColumnCount: 1,
-                  verticalDetails: ScrollableDetails.vertical(
-                      controller: _verticalController),
-                  horizontalDetails: ScrollableDetails.horizontal(
-                      controller: _horizontalController),
-                  cellBuilder: _buildCell,
-                  columnCount: widget.columnCount + 1,
-                  columnBuilder: _buildColumnSpan,
-                  rowCount: widget.rowCount + 1,
-                  rowBuilder: _buildRowSpan,
-                ),
+                // TODO: this throws exception with duplicate global keys
+                child: widget.selectAble
+                    ? SelectionArea(child: tableView)
+                    : tableView,
               )),
         ));
   }

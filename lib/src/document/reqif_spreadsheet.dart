@@ -70,7 +70,11 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
   @override
   void initState() {
     super.initState();
+    tableViewKey =
+        GlobalKey<State<ReqIfSpreadSheet>>(debugLabel: "tableViewGlobalKey");
   }
+
+  late GlobalKey<State<ReqIfSpreadSheet>> tableViewKey;
 
   @override
   void dispose() {
@@ -78,6 +82,7 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
   }
 
   final FocusNode editorFocusNode = FocusNode();
+  bool quillSelected = false;
 
   Widget _buildQuillEditor() {
     return QuillEditor.basic(
@@ -136,31 +141,32 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
     }
     _fillCache();
     final documentPart = flatDocument[widget.partNumber];
-    return SelectionArea(
-        child: ResizableTableView(
-            rowCount: documentPart.rowCount,
-            columnCount: documentPart.columnCount,
-            cellBuilder: _buildCell,
-            columnHeaderBuilder: _buildColumnHeader,
-            initialRowHeights: _estimateInitialRowHeights,
-            initialColumnWidths: _estimateInitialColumnWidths,
-            onSelectionChanged: _onSelectionChanged,
-            columnWidthsProvider: () => widget.controller.columnWidths,
-            rowHeightsProvider: () => widget.controller.rowHeights,
-            selection: _selected,
-            rowPositionBuilder: _buildRowPosition,
-            searchPosition: () {
-              if (widget.hasPart && widget.searchIsEnabled) {
-                return widget.data.searchData[widget.partNumber].matchPosition;
-              }
-              return const TableVicinity(row: -1, column: -1);
-            },
-            scrollControllerBuilder: () {
-              widget.controller.refreshScrollControllers();
-              return TableViewScrollControllers(
-                  horizontal: widget.controller.horizontalScrollController,
-                  vertical: widget.controller.verticalScrollController);
-            }));
+    return ResizableTableView(
+        key: tableViewKey,
+        rowCount: documentPart.rowCount,
+        columnCount: documentPart.columnCount,
+        cellBuilder: _buildCell,
+        columnHeaderBuilder: _buildColumnHeader,
+        initialRowHeights: _estimateInitialRowHeights,
+        initialColumnWidths: _estimateInitialColumnWidths,
+        onSelectionChanged: _onSelectionChanged,
+        columnWidthsProvider: () => widget.controller.columnWidths,
+        rowHeightsProvider: () => widget.controller.rowHeights,
+        selection: _selected,
+        rowPositionBuilder: _buildRowPosition,
+        selectAble: !quillSelected,
+        searchPosition: () {
+          if (widget.hasPart && widget.searchIsEnabled) {
+            return widget.data.searchData[widget.partNumber].matchPosition;
+          }
+          return const TableVicinity(row: -1, column: -1);
+        },
+        scrollControllerBuilder: () {
+          widget.controller.refreshScrollControllers();
+          return TableViewScrollControllers(
+              horizontal: widget.controller.horizontalScrollController,
+              vertical: widget.controller.verticalScrollController);
+        });
   }
 
   double defaultRowHeight = 40;
@@ -303,10 +309,15 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
   }
 
   void _onSelectionChanged(TableVicinity position, CellState state) {
+    if (widget.data.partSelections[widget.partNumber] == position) {
+      return;
+    }
     widget.data.partSelections[widget.partNumber] = position;
+    quillSelected = false;
     if (state != CellState.selected ||
         position.row < 1 ||
         position.column < 1) {
+      widget.onNewQuillEditor(null);
       return;
     }
     if (!widget.hasData || !widget.hasPart) {
@@ -335,6 +346,7 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
       switch (value.type) {
         case ReqIfElementTypes.attributeValueXhtml:
           widget.onNewQuillEditor(value);
+          quillSelected = isEditable;
         default:
           widget.onNewQuillEditor(null);
       }
