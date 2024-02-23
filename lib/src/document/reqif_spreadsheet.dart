@@ -70,11 +70,7 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
   @override
   void initState() {
     super.initState();
-    tableViewKey =
-        GlobalKey<State<ReqIfSpreadSheet>>(debugLabel: "tableViewGlobalKey");
   }
-
-  late GlobalKey<State<ReqIfSpreadSheet>> tableViewKey;
 
   @override
   void dispose() {
@@ -142,7 +138,6 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
     _fillCache();
     final documentPart = flatDocument[widget.partNumber];
     return ResizableTableView(
-        key: tableViewKey,
         rowCount: documentPart.rowCount,
         columnCount: documentPart.columnCount,
         cellBuilder: _buildCell,
@@ -308,20 +303,31 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
     return widget.data.partSelections[widget.partNumber];
   }
 
+  void _onQuillEditorChange(dynamic node) {
+    final nextNeedsEditor = node != null;
+    if (nextNeedsEditor != quillSelected) {
+      widget.controller.setRestoreScrollPositions(true);
+    }
+    quillSelected = nextNeedsEditor;
+    widget.onNewQuillEditor(node);
+  }
+
   void _onSelectionChanged(TableVicinity position, CellState state) {
+    if (!widget.hasData || !widget.hasPart) {
+      return;
+    }
+    widget.controller.setRestoreScrollPositions(false);
     if (widget.data.partSelections[widget.partNumber] == position) {
+      widget.data.partSelections[widget.partNumber] =
+          const TableVicinity(column: -1, row: -1);
+      _onQuillEditorChange(null);
       return;
     }
     widget.data.partSelections[widget.partNumber] = position;
-    quillSelected = false;
     if (state != CellState.selected ||
         position.row < 1 ||
         position.column < 1) {
-      widget.onNewQuillEditor(null);
-      return;
-    }
-    if (!widget.hasData || !widget.hasPart) {
-      widget.onNewQuillEditor(null);
+      _onQuillEditorChange(null);
       return;
     }
     final map = widget.data.columnMapping[widget.partNumber];
@@ -338,19 +344,14 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
         datatype.dataType == ReqIfElementTypes.datatypeDefinitionXhtml) {
       value = element.object.appendXhtmlValue(datatype.identifier);
     }
-    if (value == null) {
-      widget.onNewQuillEditor(null);
+    if (value == null ||
+        !isEditable ||
+        value.embeddedObjectCount != 0 ||
+        value.type != ReqIfElementTypes.attributeValueXhtml) {
+      _onQuillEditorChange(null);
       return;
     }
-    if (isEditable && value.embeddedObjectCount == 0) {
-      switch (value.type) {
-        case ReqIfElementTypes.attributeValueXhtml:
-          widget.onNewQuillEditor(value);
-          quillSelected = isEditable;
-        default:
-          widget.onNewQuillEditor(null);
-      }
-    }
+    _onQuillEditorChange(value);
   }
 
   Widget? _buildColumnHeader(BuildContext context, dynamic vicinity) {
@@ -504,13 +505,13 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
             style: textTheme.bodyMedium,
             onChanged: (v) {
               if (v != null && v != value.value(i)) {
-                setState(() {
-                  value.setValue(i, v);
-                  if (mounted) {
-                    widget.wasModified();
-                  }
-                });
+                value.setValue(i, v);
+                if (mounted) {
+                  widget.wasModified();
+                }
               }
+              final focus = FocusScope.of(context);
+              focus.unfocus();
             },
             value: value.value(i)));
       }

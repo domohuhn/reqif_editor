@@ -239,8 +239,10 @@ class _ReqIfDocumentViewState extends State<ReqIfDocumentView> {
                 },
                 splashColor: theme.colorScheme.primary,
                 child: Row(mainAxisSize: MainAxisSize.min, children: [
-                  Text(data.flatDocument.title,
-                      style: theme.textTheme.bodySmall),
+                  Padding(
+                      padding: const EdgeInsets.fromLTRB(6, 0, 0, 0),
+                      child: Text(data.flatDocument.title,
+                          style: theme.textTheme.bodySmall)),
                   Padding(
                       padding: const EdgeInsets.fromLTRB(2, 0, 2, 0),
                       child: IconButton(
@@ -261,7 +263,8 @@ class _ReqIfDocumentViewState extends State<ReqIfDocumentView> {
                           widget.documentController.closeDocument(idx);
                           if (widget.documentController.length == 0 &&
                               mounted) {
-                            Navigator.of(context).popAndPushNamed("TODO");
+                            // return to default page
+                            Navigator.of(context).popAndPushNamed("lastUsed");
                           }
                         },
                       ))

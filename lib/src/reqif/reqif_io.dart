@@ -53,7 +53,12 @@ String escapeSpecialCharacters(String input) {
     if (pt == 62 && !inAttribute) bracketCount -= 1;
     final bool escapeBracket = (bracketCount < 0 || inAttribute) && pt == 62;
     bracketCount = max(bracketCount, 0);
-    if (pt < 127 && pt != 91 && pt != 93 && pt != 9 && !escapeBracket) {
+    if (pt < 127 &&
+        pt != 91 &&
+        pt != 93 &&
+        pt != 124 &&
+        pt != 9 &&
+        !escapeBracket) {
       buffer.write(ascii.decode([pt]));
     } else {
       final bool inRange =

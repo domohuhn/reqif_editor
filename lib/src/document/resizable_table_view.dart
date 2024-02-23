@@ -160,9 +160,6 @@ class _ResizableTableViewState extends State<ResizableTableView> {
   final List<double> _columnWidths = <double>[];
   final List<double> _rowHeights = <double>[];
 
-  final GlobalKey<State<ResizableTableView>> tableViewKey =
-      GlobalKey<State<ResizableTableView>>(debugLabel: "resizableTableView");
-
   List<double> get columnWidths {
     if (widget.columnWidthsProvider != null) {
       return widget.columnWidthsProvider!();
@@ -243,25 +240,23 @@ class _ResizableTableViewState extends State<ResizableTableView> {
   @override
   Widget build(BuildContext context) {
     ensureSizesInitialized();
-    final tableView = KeyedSubtree(
-        key: tableViewKey,
-        child: TableView.builder(
-          pinnedRowCount: 1,
-          pinnedColumnCount: 1,
-          verticalDetails:
-              ScrollableDetails.vertical(controller: _verticalController),
-          horizontalDetails:
-              ScrollableDetails.horizontal(controller: _horizontalController),
-          cellBuilder: _buildCell,
-          columnCount: widget.columnCount + 1,
-          columnBuilder: _buildColumnSpan,
-          rowCount: widget.rowCount + 1,
-          rowBuilder: _buildRowSpan,
-        ));
+    final tableView = TableView.builder(
+      pinnedRowCount: 1,
+      pinnedColumnCount: 1,
+      verticalDetails:
+          ScrollableDetails.vertical(controller: _verticalController),
+      horizontalDetails:
+          ScrollableDetails.horizontal(controller: _horizontalController),
+      cellBuilder: _buildCell,
+      columnCount: widget.columnCount + 1,
+      columnBuilder: _buildColumnSpan,
+      rowCount: widget.rowCount + 1,
+      rowBuilder: _buildRowSpan,
+    );
 
     return NotificationListener<ScrollNotification>(
         onNotification: (scrollNotification) {
-          // TODO: This is required to work aorund bug
+          // TODO: This is required to work around bug
           // https://github.com/flutter/flutter/issues/137112
           if (scrollNotification is ScrollStartNotification) {
             _unfocus();
@@ -276,7 +271,6 @@ class _ResizableTableViewState extends State<ResizableTableView> {
               controller: _verticalController,
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(0, 0, 10, 10),
-                // TODO: this throws exception with duplicate global keys
                 child: widget.selectAble
                     ? SelectionArea(child: tableView)
                     : tableView,
@@ -313,9 +307,6 @@ class _ResizableTableViewState extends State<ResizableTableView> {
                     CellState.selected);
               }
             });
-          },
-          onSecondaryTap: () {
-            _unfocus();
           },
           child: contents);
     } else {
@@ -379,13 +370,17 @@ class _ResizableTableViewState extends State<ResizableTableView> {
         child: contents);
   }
 
-  void _unfocus() {
+  void _unfocus([bool force = false]) {
+    final focus = FocusScope.of(context);
+    if (!focus.hasFocus && !force) {
+      return;
+    }
     setState(() {
       if (widget.onSelectionChanged != null) {
         widget.onSelectionChanged!(
             const TableVicinity(row: -1, column: -1), CellState.deselected);
       }
-      FocusScope.of(context).unfocus();
+      focus.unfocus();
     });
   }
 
@@ -472,7 +467,7 @@ class _ResizableTableViewState extends State<ResizableTableView> {
     final selected = vicinity == selection;
     var color = selected ? Theme.of(context).colorScheme.inversePrimary : null;
     if (vicinity == searchPosition) {
-      color = Theme.of(context).colorScheme.inversePrimary;
+      color = Theme.of(context).colorScheme.tertiaryContainer;
     }
     Widget? contents;
     if (widget.cellBuilder != null) {

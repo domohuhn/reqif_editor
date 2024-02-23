@@ -111,6 +111,8 @@ class _NavigationTreeTileState extends State<NavigationTreeTile> {
     return InkWell(
       onTap: () {
         if (node.isPart || node.isNode) {
+          final focus = FocusScope.of(context);
+          focus.unfocus();
           widget.documentController.setPosition(
               document: node.document.index,
               part: node.part.index,

@@ -520,8 +520,6 @@ class DocumentController with ChangeNotifier {
     notifyListeners();
   }
 
-  int get visibleDocumentNumber => _visibleDocumentNumber;
-
   int _visibleDocumentPartNumber = 0;
   set visibleDocumentPartNumber(int i) {
     if (i == _visibleDocumentPartNumber ||
@@ -534,7 +532,13 @@ class DocumentController with ChangeNotifier {
     notifyListeners();
   }
 
+  int get visibleDocumentNumber => _visibleDocumentNumber;
   int get visibleDocumentPartNumber => _visibleDocumentPartNumber;
+  bool get hasVisibleDocument => _visibleDocumentNumber < documents.length;
+  bool get hasVisibleDocumentPart =>
+      hasVisibleDocument &&
+      _visibleDocumentPartNumber <
+          documents[visibleDocumentNumber].flatDocument.partCount;
 
   void setHeaderColumn(int docId, int partId, (String, int) heading) {
     assert(docId < documents.length);
@@ -564,27 +568,62 @@ class DocumentController with ChangeNotifier {
   ScrollController get verticalScrollController => _verticalScrollController;
 
   void setPosition({int? document, int? part, int? row}) {
+    setRestoreScrollPositions(false);
+    bool changed = false;
     if (document != null) {
+      changed = visibleDocumentNumber != document;
       visibleDocumentNumber = document;
     }
     if (part != null) {
+      changed = changed || visibleDocumentPartNumber != part;
       visibleDocumentPartNumber = part;
     }
     _sanitizeValues();
-    if (row != null && visibleDocumentNumber < documents.length) {
+    if (row != null &&
+        visibleDocumentNumber < documents.length &&
+        hasVisibleDocumentPart) {
       double offset = visibleData.getRowOffset(visibleDocumentPartNumber, row);
       _verticalScrollController.animateTo(offset,
           duration: const Duration(seconds: 1), curve: Curves.easeOutQuart);
     }
+    if (changed) {
+      visibleData.partSelections[visibleDocumentPartNumber] =
+          const TableVicinity(column: -1, row: -1);
+      notifyListeners();
+    }
   }
 
   void refreshScrollControllers() {
-    _verticalScrollController = ScrollController();
-    _horizontalScrollController = ScrollController();
+    _verticalScrollController = ScrollController(onAttach: (position) {
+      if (_restoreScrollVerticalPositions) {
+        position.restoreOffset(_verticalOffset, initialRestore: true);
+        _restoreScrollVerticalPositions = false;
+      }
+    });
+    _horizontalScrollController = ScrollController(onAttach: (position) {
+      if (_restoreScrollHorizontalPositions) {
+        position.restoreOffset(_horizontalOffset, initialRestore: true);
+        _restoreScrollHorizontalPositions = false;
+      }
+    });
   }
 
   ScrollController _verticalScrollController = ScrollController();
   ScrollController _horizontalScrollController = ScrollController();
+
+  bool _restoreScrollHorizontalPositions = false;
+  bool _restoreScrollVerticalPositions = false;
+  double _verticalOffset = 0.0;
+  double _horizontalOffset = 0.0;
+
+  void setRestoreScrollPositions(bool v) {
+    _restoreScrollHorizontalPositions = v;
+    _restoreScrollVerticalPositions = v;
+    if (v) {
+      _verticalOffset = _verticalScrollController.offset;
+      _horizontalOffset = _horizontalScrollController.offset;
+    }
+  }
 
   void applyFilter(bool active) {
     for (final doc in documents) {
