@@ -427,6 +427,10 @@ class DocumentController with ChangeNotifier {
     return true;
   }
 
+  void forceRedraw() {
+    notifyListeners();
+  }
+
   void closeDocument(int idx) {
     if (idx >= documents.length) {
       return;

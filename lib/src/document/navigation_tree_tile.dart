@@ -32,6 +32,10 @@ class NavigationTreeTile extends StatefulWidget {
   void setHeaderColumn(int docId, int partId, (String, int) heading) {
     documentController.setHeaderColumn(docId, partId, heading);
   }
+
+  void forceRedraw() {
+    documentController.forceRedraw();
+  }
 }
 
 class _NavigationTreeTileState extends State<NavigationTreeTile> {
@@ -236,7 +240,11 @@ class _NavigationTreeTileState extends State<NavigationTreeTile> {
                   },
                   value: headerColumn[partNumber].$1))
         ]),
-        Text(AppLocalizations.of(context)!.columnOrder),
+        Row(mainAxisSize: MainAxisSize.max, children: [
+          Text(AppLocalizations.of(context)!.columnOrder),
+          const Spacer(),
+          Text(AppLocalizations.of(context)!.editable)
+        ]),
         _buildReorderBox(context, part)
       ],
     );
@@ -247,6 +255,8 @@ class _NavigationTreeTileState extends State<NavigationTreeTile> {
     final partNumber = documentPart.index;
     final document = part.document;
     final map = document.columnMapping[partNumber];
+    final attributes =
+        documentPart.attributeDefinitions.toList(growable: false);
     return Container(
         margin: const EdgeInsets.fromLTRB(0, 16, 0, 16),
         height: 300,
@@ -282,6 +292,15 @@ class _NavigationTreeTileState extends State<NavigationTreeTile> {
                 Padding(
                     padding: const EdgeInsets.fromLTRB(16, 0, 8, 0),
                     child: Text(documentPart.columnNames[column])),
+                const Spacer(),
+                Checkbox.adaptive(
+                    value: attributes[column].isEditable,
+                    onChanged: (val) {
+                      if (val != null && val != attributes[column].isEditable) {
+                        attributes[column].editable = val;
+                        widget.forceRedraw();
+                      }
+                    })
               ],
             );
           },

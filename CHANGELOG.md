@@ -1,3 +1,8 @@
+## 0.3.0
+
+- Bugfixes for text selection
+- Columns can be marked as editable
+
 ## 0.2.1
 
 - Bugfixes for text selection

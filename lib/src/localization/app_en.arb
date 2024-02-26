@@ -182,7 +182,11 @@
   },
   "columnOrder": "Order of columns:",
   "@columnOrder": {
-    "description": "text above colum reorder widget"
+    "description": "text above column reorder widget"
+  },
+  "editable": "Editable",
+  "@editable": {
+    "description": "text above column reorder widget editable column"
   },
   "lastUsed": "Last used",
   "@lastUsed": {
