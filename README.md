@@ -1,5 +1,8 @@
 # ReqIf editor
 
+[![Windows](https://github.com/domohuhn/reqif_editor/actions/workflows/windows.yml/badge.svg)](https://github.com/domohuhn/reqif_editor/actions/workflows/windows.yml)
+[![Linux](https://github.com/domohuhn/reqif_editor/actions/workflows/linux.yml/badge.svg)](https://github.com/domohuhn/reqif_editor/actions/workflows/linux.yml)
+
 A GUI editor for the [Requirements Interchange Format (ReqIF)](https://www.omg.org/reqif/) built with flutter.
 
 ![Image of the ui](reqif_editor.png)
