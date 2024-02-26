@@ -4,6 +4,7 @@
 
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:reqif_editor/src/document/column_header.dart';
@@ -169,50 +170,7 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
   double defaultComboBoxHeight = 50;
 
   List<double> _estimateInitialRowHeights() {
-    List<double> rowHeights = [];
-    rowHeights.add(defaultRowHeight + 32);
-    for (final element in widget.part.elements) {
-      double rowHeight = defaultRowHeight;
-      final bool rowEditable = element.isEditable && widget.isEditable;
-      for (final attr in element.object.values) {
-        bool columnEditable = attr.isEditable;
-        switch (attr.type) {
-          case ReqIfElementTypes.attributeValueEnumeration:
-            attr as ReqIfAttributeValueEnum;
-            if ((rowEditable && columnEditable) || widget.forceEditable) {
-              rowHeight = max(rowHeight, attr.length * defaultComboBoxHeight);
-            } else {
-              rowHeight = max(rowHeight, attr.length * defaultLineHeight);
-            }
-          case ReqIfElementTypes.attributeValueString:
-            attr as ReqIfAttributeValueSimple;
-            final text = attr.toString();
-            final Size size = (TextPainter(
-                    text: TextSpan(text: text),
-                    textScaler: MediaQuery.of(context).textScaler,
-                    textDirection: TextDirection.ltr)
-                  ..layout(maxWidth: maxTextLineWidth))
-                .size;
-            rowHeight = max(rowHeight, size.height + defaultTextPadding);
-          case ReqIfElementTypes.attributeValueXhtml:
-            attr as ReqIfAttributeValueXhtml;
-            final text = attr.toStringWithNewlines();
-            final Size size = (TextPainter(
-                    text: TextSpan(text: text),
-                    textScaler: MediaQuery.of(context).textScaler,
-                    textDirection: TextDirection.ltr)
-                  ..layout(maxWidth: maxTextLineWidth))
-                .size;
-            rowHeight = max(rowHeight, size.height + defaultTextPadding);
-            if (attr.embeddedObjectCount > 0) {
-              rowHeight += maxTextLineWidth * attr.embeddedObjectCount;
-            }
-          default:
-        }
-      }
-      rowHeights.add(1.2 * rowHeight);
-    }
-    return rowHeights;
+    return _rowHeights;
   }
 
   static const double defaultColumnWidth = 120;
@@ -223,16 +181,19 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
 
   static const double maxTextLineWidth = 600;
 
-  List<double> _estimateInitialColumnWidths() {
+  List<double> _columnWidths = [];
+  List<double> _rowHeights = [];
+
+  void _estimateInitialColumnWidthAndHeight() {
     List<double> columnWidths = [];
-    if (!widget.hasData || !widget.hasPart) {
-      return columnWidths;
-    }
+    List<double> rowHeights = [];
+    rowHeights.add(defaultRowHeight + 32);
     final map = widget.data.columnMapping[widget.partNumber];
     for (int i = 0; i < widget.part.columnCount; ++i) {
       columnWidths.add(defaultColumnWidth);
     }
     for (final element in widget.part.elements) {
+      double rowHeight = defaultRowHeight;
       final bool rowEditable = element.isEditable && widget.isEditable;
       for (int i = 0; i < widget.part.columnCount; ++i) {
         final column = map.remap(i);
@@ -249,9 +210,11 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
               if ((rowEditable && columnEditable) || widget.forceEditable) {
                 columnWidth = max(columnWidth,
                     text.length * comboBoxLetterWidth + comboBoxPadding);
+                rowHeight = max(rowHeight, attr.length * defaultComboBoxHeight);
               } else {
                 columnWidth =
                     max(columnWidth, text.length * defaultLetterWidth);
+                rowHeight = max(rowHeight, attr.length * defaultLineHeight);
               }
             }
           case ReqIfElementTypes.attributeValueString:
@@ -264,6 +227,7 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
                   ..layout(maxWidth: maxTextLineWidth))
                 .size;
             columnWidth = max(columnWidth, size.width + defaultTextPadding);
+            rowHeight = max(rowHeight, size.height + defaultTextPadding);
           case ReqIfElementTypes.attributeValueXhtml:
             attr as ReqIfAttributeValueXhtml;
             final text = attr.toStringWithNewlines();
@@ -277,16 +241,27 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
               columnWidth = maxTextLineWidth;
             }
             columnWidth = max(columnWidth, size.width + defaultTextPadding);
+            rowHeight = max(rowHeight, size.height + defaultTextPadding);
+            if (attr.embeddedObjectCount > 0) {
+              rowHeight += maxTextLineWidth * attr.embeddedObjectCount;
+            }
           default:
         }
         columnWidths[i] = columnWidth;
       }
+      rowHeights.add(1.2 * rowHeight);
     }
     final int columnWithPrefix = widget.controller.headingsColumn;
     if (columnWithPrefix < columnWidths.length) {
       columnWidths[columnWithPrefix] += 40;
     }
-    return columnWidths;
+    _columnWidths = columnWidths;
+    _rowHeights = rowHeights;
+  }
+
+  List<double> _estimateInitialColumnWidths() {
+    _estimateInitialColumnWidthAndHeight();
+    return _columnWidths;
   }
 
   Widget? _buildRowPosition(BuildContext context, TableVicinity vicinity) {
