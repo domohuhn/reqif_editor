@@ -23,7 +23,7 @@ dependencies:
   flutter_quill: ^9.1.0
   uuid: ^4.2.2
   shared_preferences: ^2.2.2
-  two_dimensional_scrollables: ^0.0.5
+  two_dimensional_scrollables: ^0.1.0
   flutter_fancy_tree_view: ^1.4.1
   path: ^1.8.3
 
@@ -31,7 +31,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
 
-  flutter_lints: ^2.0.0
+  flutter_lints: ^3.0.0
   flutter_oss_licenses: ^2.0.0
 
 flutter:

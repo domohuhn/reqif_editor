@@ -375,8 +375,7 @@ class ReqIfElementWithId extends ReqIfElement {
 
   late String _identifier;
 
-  ReqIfElementWithId.parse(xml.XmlElement node, ReqIfElementTypes type)
-      : super.parse(node, type) {
+  ReqIfElementWithId.parse(super.node, super.type) : super.parse() {
     _identifier = getRequiredAttribute(_node, xmlAttributeNameIdentifier);
   }
 
@@ -397,8 +396,7 @@ class ReqIfElementWithIdTime extends ReqIfElementWithId {
   static const String _attributeNameLastChange = 'LAST-CHANGE';
   late DateTime _lastChange;
 
-  ReqIfElementWithIdTime.parse(xml.XmlElement node, ReqIfElementTypes type)
-      : super.parse(node, type) {
+  ReqIfElementWithIdTime.parse(super.node, super.type) : super.parse() {
     _lastChange =
         DateTime.parse(getRequiredAttribute(_node, _attributeNameLastChange));
   }

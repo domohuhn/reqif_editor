@@ -458,9 +458,9 @@ class _ResizableTableViewState extends State<ResizableTableView> {
         borderColor: borderColor);
   }
 
-  Widget _buildCell(BuildContext context, TableVicinity vicinity) {
+  TableViewCell _buildCell(BuildContext context, TableVicinity vicinity) {
     if (vicinity.column == 0 || vicinity.row == 0) {
-      return _buildFixedCell(context, vicinity);
+      return TableViewCell(child: _buildFixedCell(context, vicinity));
     }
     final borderColor = Theme.of(context).colorScheme.outlineVariant;
 
@@ -480,12 +480,13 @@ class _ResizableTableViewState extends State<ResizableTableView> {
       }
     }
     contents ??= const SizedBox.shrink();
-    return _wrapInResizableBox(
-        contents: contents,
-        color: color,
-        column: vicinity.column,
-        row: vicinity.row,
-        borderColor: borderColor);
+    return TableViewCell(
+        child: _wrapInResizableBox(
+            contents: contents,
+            color: color,
+            column: vicinity.column,
+            row: vicinity.row,
+            borderColor: borderColor));
   }
 
   TableSpan _buildColumnSpan(int index) {

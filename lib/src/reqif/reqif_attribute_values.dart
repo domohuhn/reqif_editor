@@ -72,10 +72,10 @@ class ReqIfAttributeValueSimple extends ReqIfAttributeValue {
   static const String xmlNameValue = 'THE-VALUE';
 
   ReqIfAttributeValueSimple.parse(
-      {required ReqIfElementWithIdNameTime parent,
+      {required super.parent,
       required xml.XmlElement element,
-      required ReqIfDocument document})
-      : super.parse(parent: parent, element: element, document: document) {
+      required super.document})
+      : super.parse(element: element) {
     _valueString = getRequiredAttribute(element, xmlNameValue);
   }
 
@@ -97,60 +97,50 @@ class ReqIfAttributeValueString extends ReqIfAttributeValueSimple {
   static const String xmlName = 'ATTRIBUTE-VALUE-STRING';
 
   ReqIfAttributeValueString.parse(
-      {required ReqIfElementWithIdNameTime parent,
-      required xml.XmlElement element,
-      required ReqIfDocument document})
-      : super.parse(parent: parent, element: element, document: document);
+      {required super.parent, required super.element, required super.document})
+      : super.parse();
 }
 
 class ReqIfAttributeValueInteger extends ReqIfAttributeValueSimple {
   static const String xmlName = 'ATTRIBUTE-VALUE-INTEGER';
 
   ReqIfAttributeValueInteger.parse(
-      {required ReqIfElementWithIdNameTime parent,
-      required xml.XmlElement element,
-      required ReqIfDocument document})
-      : super.parse(parent: parent, element: element, document: document);
+      {required super.parent, required super.element, required super.document})
+      : super.parse();
 }
 
 class ReqIfAttributeValueBool extends ReqIfAttributeValueSimple {
   static const String xmlName = 'ATTRIBUTE-VALUE-BOOLEAN';
 
   ReqIfAttributeValueBool.parse(
-      {required ReqIfElementWithIdNameTime parent,
-      required xml.XmlElement element,
-      required ReqIfDocument document})
-      : super.parse(parent: parent, element: element, document: document);
+      {required super.parent, required super.element, required super.document})
+      : super.parse();
 }
 
 class ReqIfAttributeValueReal extends ReqIfAttributeValueSimple {
   static const String xmlName = 'ATTRIBUTE-VALUE-REAL';
 
   ReqIfAttributeValueReal.parse(
-      {required ReqIfElementWithIdNameTime parent,
-      required xml.XmlElement element,
-      required ReqIfDocument document})
-      : super.parse(parent: parent, element: element, document: document);
+      {required super.parent, required super.element, required super.document})
+      : super.parse();
 }
 
 class ReqIfAttributeValueDate extends ReqIfAttributeValueSimple {
   static const String xmlName = 'ATTRIBUTE-VALUE-DATE';
 
   ReqIfAttributeValueDate.parse(
-      {required ReqIfElementWithIdNameTime parent,
-      required xml.XmlElement element,
-      required ReqIfDocument document})
-      : super.parse(parent: parent, element: element, document: document);
+      {required super.parent, required super.element, required super.document})
+      : super.parse();
 }
 
 class ReqIfAttributeValueEnum extends ReqIfAttributeValue {
   static const String xmlName = 'ATTRIBUTE-VALUE-ENUMERATION';
   ReqIfAttributeValueEnum.parse(
-      {required ReqIfElementWithIdNameTime parent,
+      {required super.parent,
       required xml.XmlElement element,
-      required ReqIfDocument document})
+      required super.document})
       : _values = [],
-        super.parse(parent: parent, element: element, document: document) {
+        super.parse(element: element) {
     buildChildObjects(
         element: element,
         firstChildTag: 'VALUES',
@@ -245,10 +235,10 @@ class ReqIfAttributeValueXhtml extends ReqIfAttributeValue {
   static const String _xmlValueName = "THE-VALUE";
   static const String _xmlObjectName = "object";
   ReqIfAttributeValueXhtml.parse(
-      {required ReqIfElementWithIdNameTime parent,
+      {required super.parent,
       required xml.XmlElement element,
-      required ReqIfDocument document})
-      : super.parse(parent: parent, element: element, document: document) {
+      required super.document})
+      : super.parse(element: element) {
     final values = element.findAllElements(_xmlValueName);
     if (values.length != 1) {
       throw ReqIfError(

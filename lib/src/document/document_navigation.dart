@@ -11,8 +11,7 @@ class DocumentNavigation extends StatelessWidget {
   final DocumentController controller;
   final double width;
   const DocumentNavigation(
-      {Key? key, required this.controller, required this.width})
-      : super(key: key);
+      {super.key, required this.controller, required this.width});
 
   @override
   Widget build(BuildContext context) {

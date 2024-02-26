@@ -11,8 +11,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 class DocumentBottomBar extends StatefulWidget {
   final DocumentController controller;
 
-  const DocumentBottomBar({Key? key, required this.controller})
-      : super(key: key);
+  const DocumentBottomBar({super.key, required this.controller});
 
   @override
   State<DocumentBottomBar> createState() => _DocumentBottomBarState();

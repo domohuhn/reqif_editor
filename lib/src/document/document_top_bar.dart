@@ -16,7 +16,7 @@ class DocumentTopBar extends StatelessWidget {
   final void Function() onSearchPressed;
 
   const DocumentTopBar({
-    Key? key,
+    super.key,
     required this.controller,
     required this.navbarIsVisible,
     required this.filterIsVisible,
@@ -24,7 +24,7 @@ class DocumentTopBar extends StatelessWidget {
     required this.onNavBarPressed,
     required this.onFilterPressed,
     required this.onSearchPressed,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

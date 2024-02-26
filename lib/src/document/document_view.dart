@@ -20,8 +20,7 @@ class ReqIfDocumentView extends StatefulWidget {
   static const routeName = '/reqif_editor';
   final DocumentController documentController;
 
-  const ReqIfDocumentView({Key? key, required this.documentController})
-      : super(key: key);
+  const ReqIfDocumentView({super.key, required this.documentController});
 
   @override
   State<ReqIfDocumentView> createState() => _ReqIfDocumentViewState();
@@ -262,7 +261,7 @@ class _ReqIfDocumentViewState extends State<ReqIfDocumentView> {
                           }
                           widget.documentController.closeDocument(idx);
                           if (widget.documentController.length == 0 &&
-                              mounted) {
+                              context.mounted) {
                             // return to default page
                             Navigator.of(context).popAndPushNamed("lastUsed");
                           }
