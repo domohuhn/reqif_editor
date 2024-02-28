@@ -317,7 +317,7 @@ class ReqIfFlatDocument {
                 : ReqIfFlatDocumentElementType.normal,
             object: element.specificationObject,
             level: position.position.length - 2,
-            prefix: position.toString().substring(2),
+            prefix: position.toSection(),
             isEditable: element.isEditable));
       });
       parts.add(part);

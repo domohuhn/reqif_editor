@@ -1,3 +1,8 @@
+## 0.3.1
+
+- Fixed section number for objects with mixed descendant levels
+
+
 ## 0.3.0
 
 - Bugfixes for text selection

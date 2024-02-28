@@ -310,11 +310,32 @@ class ReqIfHierarchicalPosition {
   /// The positions to reach the current element.
   /// E.g. repeating children[position[i]] for every
   /// entry would reach the current element.
-  List<int> position = [0];
+  List<int> position = [];
 
-  ReqIfHierarchicalPosition() : position = [0];
+  /// The positions to reach the current element, but only
+  /// elements with children are considered. This list is
+  /// the current chapter/section number in the document.
+  List<int> section = [];
+
+  ReqIfHierarchicalPosition()
+      : position = [0],
+        section = [];
   ReqIfHierarchicalPosition.copy(ReqIfHierarchicalPosition other)
-      : position = List.from(other.position);
+      : position = List.from(other.position),
+        section = List.from(other.section);
+
+  String toSection() {
+    final buffer = StringBuffer();
+    bool notFirst = false;
+    for (final val in section) {
+      if (notFirst) {
+        buffer.write(".");
+      }
+      buffer.write(val + 1);
+      notFirst = true;
+    }
+    return buffer.toString();
+  }
 
   @override
   String toString() {
@@ -362,9 +383,15 @@ class ReqIfElement {
     visitor(position, this);
     final next = ReqIfHierarchicalPosition.copy(position);
     next.position.add(0);
+    if (hasChildren) {
+      next.section.add(0);
+    }
     for (final child in children) {
       child.visit(visitor: visitor, position: next);
       next.position.last += 1;
+      if (child.hasChildren) {
+        next.section.last += 1;
+      }
     }
   }
 }

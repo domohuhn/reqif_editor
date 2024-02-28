@@ -65,7 +65,7 @@ String escapeSpecialCharacters(String input) {
           startOtherEscapes < counter && counter < endOtherEscapes;
       if (escapeBracket) {
         buffer.write('&gt;');
-      } else if (pt > 100 && !inRange) {
+      } else if (pt > 100 && pt != 124 && !inRange) {
         buffer.write('&#x${pt.toRadixString(16).toUpperCase()};');
       } else if (pt == 9) {
         buffer.write('&#${pt.toString().padLeft(3, '0')};');
