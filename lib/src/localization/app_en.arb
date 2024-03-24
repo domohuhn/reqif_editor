@@ -191,5 +191,9 @@
   "lastUsed": "Last used",
   "@lastUsed": {
     "description": "text for last used field"
+  },
+  "openRecent": "Open recent",
+  "@openRecent": {
+    "description": "text for the open recent menu item"
   }
 }

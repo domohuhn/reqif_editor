@@ -1,3 +1,11 @@
+## 0.4.0
+
+- Added a menu entry allowing to open recently used files
+- TODO: Add all data types of reqif
+- TODO: Add merged cells
+- TODO: Add keyboard navigation
+
+
 ## 0.3.1
 
 - Fixed section number for objects with mixed descendant levels

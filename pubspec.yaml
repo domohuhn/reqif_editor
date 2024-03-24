@@ -8,7 +8,7 @@ issue_tracker: https://github.com/domohuhn/reqif_editor/issues
 # Prevent accidental publishing to pub.dev.
 publish_to: 'none'
 
-version: 0.3.0
+version: 0.4.0
 
 environment:
   sdk: '>=3.2.3 <4.0.0'
@@ -19,7 +19,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   xml: ^6.0.0
-  file_picker: ^6.1.1
+  file_picker: ^8.0.0
   flutter_quill: ^9.1.0
   uuid: ^4.2.2
   shared_preferences: ^2.2.2

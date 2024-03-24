@@ -61,12 +61,14 @@ class ReqIfEditorApp extends StatelessWidget {
                           case ReqIfDocumentView.routeName:
                             return TopMenuBar(
                                 documentController: documentController,
+                                settingsController: settingsController,
                                 centralWidget: ReqIfDocumentView(
                                     documentController: documentController));
                           case LastOpenedListView.routeName:
                           default:
                             return TopMenuBar(
                                 documentController: documentController,
+                                settingsController: settingsController,
                                 centralWidget: LastOpenedListView(
                                   controller: settingsController,
                                   documentController: documentController,

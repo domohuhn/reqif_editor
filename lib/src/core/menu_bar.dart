@@ -9,65 +9,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'dart:io';
 import 'package:flutter/services.dart';
+import 'package:reqif_editor/src/core/menu_entry.dart';
 import 'package:reqif_editor/src/core/open_document.dart';
 import 'package:reqif_editor/src/document/document_controller.dart';
+import 'package:reqif_editor/src/settings/settings_controller.dart';
 import 'package:reqif_editor/src/settings/settings_view.dart';
 
-/// A class for consolidating the definition of menu entries.
-class MenuEntry {
-  const MenuEntry(
-      {required this.label, this.shortcut, this.onPressed, this.menuChildren})
-      : assert(menuChildren == null || onPressed == null,
-            'onPressed is ignored if menuChildren are provided');
-  final String label;
-
-  final MenuSerializableShortcut? shortcut;
-  final VoidCallback? onPressed;
-  final List<MenuEntry>? menuChildren;
-
-  static List<Widget> build(List<MenuEntry> selections) {
-    Widget buildSelection(MenuEntry selection) {
-      if (selection.menuChildren != null) {
-        return SubmenuButton(
-          menuChildren: MenuEntry.build(selection.menuChildren!),
-          child: Text(selection.label),
-        );
-      }
-      return MenuItemButton(
-        shortcut: selection.shortcut,
-        onPressed: selection.onPressed,
-        child: Text(selection.label),
-      );
-    }
-
-    return selections.map<Widget>(buildSelection).toList();
-  }
-
-  static Map<MenuSerializableShortcut, Intent> shortcuts(
-      List<MenuEntry> selections) {
-    final Map<MenuSerializableShortcut, Intent> result =
-        <MenuSerializableShortcut, Intent>{};
-    for (final MenuEntry selection in selections) {
-      if (selection.menuChildren != null) {
-        result.addAll(MenuEntry.shortcuts(selection.menuChildren!));
-      } else {
-        if (selection.shortcut != null && selection.onPressed != null) {
-          result[selection.shortcut!] =
-              VoidCallbackIntent(selection.onPressed!);
-        }
-      }
-    }
-    return result;
-  }
-}
-
+/// A widget that adds a menu bar on top of the central widget.
 class TopMenuBar extends StatefulWidget {
   const TopMenuBar(
       {super.key,
       required this.centralWidget,
+      required this.settingsController,
       required this.documentController});
 
   final DocumentController documentController;
+  final SettingsController settingsController;
   final Widget centralWidget;
 
   @override
@@ -112,6 +69,17 @@ class _TopMenuBarState extends State<TopMenuBar> with OpenDocument<TopMenuBar> {
   }
 
   List<MenuEntry> _getMenus(BuildContext context) {
+    final List<MenuEntry> lastUsed = <MenuEntry>[];
+    for (final f in widget.settingsController.lastOpenedFiles) {
+      lastUsed.add(MenuEntry(
+        label: f.path,
+        onPressed: () {
+          if (f.path.isNotEmpty) {
+            openPath(widget.documentController, f.path);
+          }
+        },
+      ));
+    }
     final List<MenuEntry> result = <MenuEntry>[
       MenuEntry(
         label: AppLocalizations.of(context)!.file,
@@ -130,6 +98,9 @@ class _TopMenuBarState extends State<TopMenuBar> with OpenDocument<TopMenuBar> {
               });
             },
           ),
+          MenuEntry(
+              label: AppLocalizations.of(context)!.openRecent,
+              menuChildren: lastUsed),
           MenuEntry(
             label: AppLocalizations.of(context)!.save,
             onPressed: () {
