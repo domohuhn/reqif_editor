@@ -1,7 +1,7 @@
 ## 0.4.0
 
 - Added a menu entry allowing to open recently used files
-- TODO: Add all data types of reqif
+- All data types specified for the reqif document format are now displayed
 - TODO: Add merged cells
 - TODO: Add keyboard navigation
 

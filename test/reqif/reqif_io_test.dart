@@ -168,7 +168,7 @@ void main() {
       expect(val2.value(2), "Windows");
 
       ReqIfAttributeValueEnum val3 = parsed
-          .specificationObjects.first.children[4] as ReqIfAttributeValueEnum;
+          .specificationObjects.first.children[5] as ReqIfAttributeValueEnum;
       expect(val3.length, 1);
       expect(val3.isEditable, true);
       expect(val3.isMultiValued, false);

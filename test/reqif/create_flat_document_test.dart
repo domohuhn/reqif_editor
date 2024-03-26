@@ -191,7 +191,7 @@ void main() {
 }
 
 const flatString = """\
-[1] | [0] | 1 | REQ_1 | [Heading] | Introduction | [Windows, Linux, MacOS] | [Draft] | Initial revision
+[1] | [0] | 1 | REQ_1 | [Heading] | Introduction | [Windows, Linux, MacOS] | 42 | [Draft] | Initial revision | 43.0 | 2023-11-22T11:42:13+01:00 | true
 [1] | [1] |  | REQ_2 | [Information] | This document serves as a test input for the ReqIF-editor. | [Windows, Linux, MacOS] | [Draft] | Initial revision
 [1] | [2] |  | REQ_3 | [Requirement] | The application must work on the windows operating system. | [Windows] | [Draft] | Initial revision
 [1] | [3] |  | REQ_4 | [Requirement] | The application must work on the linux operating system. | [Linux] | [Draft] | Initial revision

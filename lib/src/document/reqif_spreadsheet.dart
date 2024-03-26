@@ -216,17 +216,6 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
                 rowHeight = max(rowHeight, attr.length * defaultLineHeight);
               }
             }
-          case ReqIfElementTypes.attributeValueString:
-            attr as ReqIfAttributeValueSimple;
-            final text = attr.toString();
-            final Size size = (TextPainter(
-                    text: TextSpan(text: text),
-                    textScaler: MediaQuery.of(context).textScaler,
-                    textDirection: TextDirection.ltr)
-                  ..layout(maxWidth: maxTextLineWidth))
-                .size;
-            columnWidth = max(columnWidth, size.width + defaultTextPadding);
-            rowHeight = max(rowHeight, size.height + defaultTextPadding);
           case ReqIfElementTypes.attributeValueXhtml:
             attr as ReqIfAttributeValueXhtml;
             final text = attr.toStringWithNewlines();
@@ -245,6 +234,15 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
               rowHeight += maxTextLineWidth * attr.embeddedObjectCount;
             }
           default:
+            final text = attr.toString();
+            final Size size = (TextPainter(
+                    text: TextSpan(text: text),
+                    textScaler: MediaQuery.of(context).textScaler,
+                    textDirection: TextDirection.ltr)
+                  ..layout(maxWidth: maxTextLineWidth))
+                .size;
+            columnWidth = max(columnWidth, size.width + defaultTextPadding);
+            rowHeight = max(rowHeight, size.height + defaultTextPadding);
         }
         columnWidths[i] = columnWidth;
       }
@@ -411,14 +409,9 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
                 cache: widget.data,
               )),
               attribute: cellAttribute);
-        case ReqIfElementTypes.attributeValueString:
-          return _wrapWithPrefix(
-              element, Text(value.toString()), cellAttribute, wrapWithPrefix);
-        case ReqIfElementTypes.attributeValueInteger:
-          return _wrapWithPrefix(
-              element, Text(value.toString()), cellAttribute, wrapWithPrefix);
         default:
-          return null;
+          return _wrapWithPrefix(
+              element, Text(value.toString()), cellAttribute, wrapWithPrefix);
       }
     }
     switch (value.type) {
@@ -426,9 +419,6 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
         return CellContents(
             child: _buildConstEnumList(value as ReqIfAttributeValueEnum),
             attribute: cellAttribute);
-      case ReqIfElementTypes.attributeValueString:
-        return _wrapWithPrefix(
-            element, Text(value.toString()), cellAttribute, wrapWithPrefix);
       case ReqIfElementTypes.attributeValueXhtml:
         return _wrapWithPrefix(
             element,
@@ -439,11 +429,9 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
             )),
             cellAttribute,
             wrapWithPrefix);
-      case ReqIfElementTypes.attributeValueInteger:
+      default:
         return _wrapWithPrefix(
             element, Text(value.toString()), cellAttribute, wrapWithPrefix);
-      default:
-        return null;
     }
   }
 
