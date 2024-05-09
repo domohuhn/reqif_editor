@@ -39,7 +39,7 @@ void setAttribute(xml.XmlNode node, String attribute, String? text) {
 
 String getRequiredAttribute(xml.XmlNode node, String attribute) {
   final attr = node.getAttribute(attribute);
-  if (attr == null || attr.isEmpty) {
+  if (attr == null) {
     throw ReqIfError(
         'Failed to parse document! $attribute is required for $node');
   }
