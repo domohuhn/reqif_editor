@@ -21,7 +21,7 @@ static void my_application_activate(GApplication* application) {
       GTK_WINDOW(gtk_application_window_new(GTK_APPLICATION(application)));
 
   // set icon 
-  auto icon_theme = gtk_icon_theme_get_for_display(gdk_display_get_default());
+  auto icon_theme = gtk_icon_theme_get_for_screen(gdk_display_get_default());
   gtk_icon_theme_add_search_path(icon_theme,"data/flutter_assets/assets/images");
   const char* icon = "flutter_logo";
   if (gtk_icon_theme_has_icon(icon_theme,icon)==1) {
