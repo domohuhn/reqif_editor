@@ -42,7 +42,7 @@ class _TopMenuBarState extends State<TopMenuBar> with OpenDocument<TopMenuBar> {
 
   @override
   Widget build(BuildContext context) {
-    OutlinedBorder getShape(Set<MaterialState> states) {
+    OutlinedBorder getShape(Set<WidgetState> states) {
       return const ContinuousRectangleBorder();
     }
 
@@ -56,7 +56,7 @@ class _TopMenuBarState extends State<TopMenuBar> with OpenDocument<TopMenuBar> {
             Expanded(
               child: MenuBar(
                 style: MenuStyle(
-                  shape: MaterialStateProperty.resolveWith(getShape),
+                  shape: WidgetStateProperty.resolveWith(getShape),
                 ),
                 children: MenuEntry.build(_getMenus(context)),
               ),

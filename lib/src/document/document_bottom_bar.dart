@@ -120,7 +120,7 @@ class _DocumentBottomBarState extends State<DocumentBottomBar> {
             filled: true,
             fillColor: noMatches
                 ? theme.colorScheme.tertiaryContainer
-                : theme.colorScheme.surfaceVariant,
+                : theme.colorScheme.surfaceContainerHighest,
             contentPadding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
             constraints: BoxConstraints.tight(const Size(256, 32)),
             border: OutlineInputBorder(

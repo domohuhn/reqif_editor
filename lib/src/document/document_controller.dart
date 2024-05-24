@@ -650,9 +650,14 @@ class DocumentController with ChangeNotifier {
 }
 
 Future<ReqIfDocument?> _parseAsync(String contents) async {
+  // show loading screen for at least two seconds
+  final start = DateTime.now();
   final doc = parseXMLString(contents);
-  // TODO remove this wait!
-  await Future.delayed(const Duration(seconds: 10));
   ReqIfDocument parsed = ReqIfDocument.parse(doc);
+  final end = DateTime.now();
+  final diff = end.difference(start);
+  if (diff.inSeconds < 2) {
+    await Future.delayed(const Duration(seconds: 2));
+  }
   return parsed;
 }

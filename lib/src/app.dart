@@ -5,6 +5,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:reqif_editor/src/core/loading_screen.dart';
 
 import 'package:reqif_editor/src/core/menu_bar.dart';
 import 'package:reqif_editor/src/document/document_controller.dart';
@@ -64,6 +65,8 @@ class ReqIfEditorApp extends StatelessWidget {
                                 settingsController: settingsController,
                                 centralWidget: ReqIfDocumentView(
                                     documentController: documentController));
+                          case LoadingScreen.routeName:
+                            return const LoadingScreen();
                           case LastOpenedListView.routeName:
                           default:
                             return TopMenuBar(

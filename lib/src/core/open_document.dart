@@ -4,13 +4,16 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:reqif_editor/src/core/loading_screen.dart';
 import 'package:reqif_editor/src/document/document_controller.dart';
 import 'package:reqif_editor/src/document/document_view.dart';
 
 mixin OpenDocument<T extends StatefulWidget> on State<T> {
   void openPath(DocumentController documentController, String path) {
+    Navigator.pushNamed(context, LoadingScreen.routeName);
     documentController.loadDocument(path, _showLoadError).then((value) {
       if (value) {
+        Navigator.pop(context);
         Navigator.popAndPushNamed(context, ReqIfDocumentView.routeName);
       }
     });
@@ -23,6 +26,7 @@ mixin OpenDocument<T extends StatefulWidget> on State<T> {
     Widget cancelButton = TextButton(
       child: Text(AppLocalizations.of(context)!.cancel),
       onPressed: () {
+        Navigator.of(context).pop();
         Navigator.of(context).pop();
       },
     );
