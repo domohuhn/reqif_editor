@@ -2,14 +2,12 @@
 
 - Added a menu entry allowing to open recently used files
 - All data types specified for the reqif document format are now displayed
-- TODO: Add merged cells
-- TODO: Add keyboard navigation
-
+- Added a loading screen
+- Added an icon for the ubuntu application
 
 ## 0.3.1
 
 - Fixed section number for objects with mixed descendant levels
-
 
 ## 0.3.0
 
