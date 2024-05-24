@@ -21,12 +21,10 @@ static void my_application_activate(GApplication* application) {
       GTK_WINDOW(gtk_application_window_new(GTK_APPLICATION(application)));
 
   // set icon 
-  auto icon_theme = gtk_icon_theme_get_for_screen(gdk_display_get_default());
-  gtk_icon_theme_add_search_path(icon_theme,"data/flutter_assets/assets/images");
-  const char* icon = "flutter_logo";
-  if (gtk_icon_theme_has_icon(icon_theme,icon)==1) {
-    gtk_window_set_default_icon_name(icon); 
-    gtk_window_set_icon_name(GTK_WINDOW(window),icon);
+  GdkPixbuf* icon = gdk_pixbuf_new_from_file("./data/flutter_assets/assets/images/flutter_logo.png", NULL);
+  if (icon != NULL) {
+    gtk_window_set_icon(GTK_WINDOW(window), icon);
+    g_object_unref(icon);
   }
 
   // Use a header bar when running in GNOME as this is the common style used
