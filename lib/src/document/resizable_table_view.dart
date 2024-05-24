@@ -256,7 +256,7 @@ class _ResizableTableViewState extends State<ResizableTableView> {
 
     return NotificationListener<ScrollNotification>(
         onNotification: (scrollNotification) {
-          // TODO: This is required to work around bug
+          // TODO: Unfocus is required to work around the bug that destroys the render tree if a widget in focus moves out of the viewport.
           // https://github.com/flutter/flutter/issues/137112
           if (scrollNotification is ScrollStartNotification) {
             _unfocus();
