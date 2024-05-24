@@ -11,7 +11,7 @@ class FileData {
 
 /// A sorted list of the last used files.
 class LastOpenedFiles {
-  static const int maxFilesToKeep = 10;
+  static const int maxFilesToKeep = 16;
 
   final List<FileData> _files;
   LastOpenedFiles(this._files);

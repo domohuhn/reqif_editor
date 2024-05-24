@@ -84,7 +84,6 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
     return QuillEditor.basic(
       configurations: QuillEditorConfigurations(
         controller: widget.editorController,
-        readOnly: false,
         autoFocus: true,
         expands: true,
         sharedConfigurations: const QuillSharedConfigurations(),

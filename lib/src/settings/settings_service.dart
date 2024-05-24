@@ -3,7 +3,7 @@
 // See LICENSE for the full text of the license
 
 import 'package:flutter/material.dart';
-import 'package:reqif_editor/src/settings/last_opened.dart';
+import 'package:reqif_editor/src/last_opened/last_opened.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:reqif_editor/src/reqif/reqif_common.dart';
 

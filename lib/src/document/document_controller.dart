@@ -651,6 +651,8 @@ class DocumentController with ChangeNotifier {
 
 Future<ReqIfDocument?> _parseAsync(String contents) async {
   final doc = parseXMLString(contents);
+  // TODO remove this wait!
+  await Future.delayed(const Duration(seconds: 10));
   ReqIfDocument parsed = ReqIfDocument.parse(doc);
   return parsed;
 }

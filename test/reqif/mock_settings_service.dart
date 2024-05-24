@@ -4,7 +4,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:reqif_editor/src/reqif/reqif_common.dart';
-import 'package:reqif_editor/src/settings/last_opened.dart';
+import 'package:reqif_editor/src/last_opened/last_opened.dart';
 import 'package:reqif_editor/src/settings/settings_service.dart';
 
 class MockSettingsService extends SettingsService {
