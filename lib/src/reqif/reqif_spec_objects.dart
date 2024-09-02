@@ -5,6 +5,7 @@
 import 'package:reqif_editor/src/reqif/reqif_attribute_definitions.dart';
 import 'package:reqif_editor/src/reqif/reqif_attribute_values.dart';
 import 'package:reqif_editor/src/reqif/reqif_common.dart';
+import 'package:reqif_editor/src/reqif/reqif_data_types.dart';
 import 'package:reqif_editor/src/reqif/reqif_document.dart';
 import 'package:reqif_editor/src/reqif/reqif_error.dart';
 import 'package:reqif_editor/src/reqif/reqif_spec_object_type.dart';
@@ -96,6 +97,7 @@ class ReqIfSpecificationObject extends ReqIfIdentifiable {
   ReqIfSpecificationObjectType get objectType => _specificationObjectType;
   Iterable<ReqIfAttributeDefinition> get attributeDefinitions =>
       specificationObjectType.attributeDefinitions;
+  int get columnCount => attributeDefinitions.length;
   Iterable<ReqIfAttributeValue> get values =>
       children.map((e) => e as ReqIfAttributeValue);
 
@@ -104,11 +106,12 @@ class ReqIfSpecificationObject extends ReqIfIdentifiable {
   String toString() {
     final buffer = StringBuffer();
     bool notFirst = false;
-    for (final value in values) {
+    for (var i = 0; i < columnCount; ++i) {
+      var value = this[i];
       if (notFirst) {
         buffer.write(' | ');
       }
-      buffer.write(value);
+      buffer.write(value ?? '');
       notFirst = true;
     }
     return buffer.toString();
@@ -160,5 +163,77 @@ class ReqIfSpecificationObject extends ReqIfIdentifiable {
     });
     updateLastChange();
     return newValue as ReqIfAttributeValueXhtml;
+  }
+
+  ReqIfAttributeValueEnum appendEnumValue(String ref,
+      [String ns = "reqif-xhtml"]) {
+    var definition = document.resolveLink(ref);
+    if (definition is! ReqIfAttributeEnumDefinition) {
+      throw ReqIfError(
+          'internal error: $ref does not resolve to an instance of ReqIfAttributeEnumDefinition');
+    }
+    List<String> initialValues = [];
+    if (definition.hasDefaultValue) {
+      if (definition.defaultValue is! ReqIfAttributeValueEnum) {
+        throw ReqIfError(
+            'internal error: Default value ${definition.defaultValue} has a wrong type');
+      }
+      final list = definition.defaultValue! as ReqIfAttributeValueEnum;
+      for (var i = 0; i < list.length; ++i) {
+        initialValues.add(list.id(i));
+      }
+    } else {
+      initialValues.add(
+          (definition.dataTypeDefinition as ReqIfDataTypeEnum).indexToId(0));
+    }
+    xml.XmlBuilder builder = xml.XmlBuilder();
+    builder.element(ReqIfAttributeValueEnum.xmlName, nest: () {
+      builder.text('\n');
+      builder.element('DEFINITION', nest: () {
+        builder.text('\n');
+        builder.element('ATTRIBUTE-DEFINITION-ENUMERATION-REF', nest: () {
+          builder.text(ref);
+        });
+        builder.text('\n');
+      });
+      builder.text('\n');
+      builder.element('VALUES', nest: () {
+        builder.text('\n');
+        for (final val in initialValues) {
+          builder.element('ENUM-VALUE-REF', nest: () {
+            builder.text(val);
+          });
+          builder.text('\n');
+        }
+      });
+      builder.text('\n');
+    });
+    builder.text('\n');
+    final fragment = builder.buildDocument();
+    final babies = fragment.children;
+
+    final targets = node.findElements(_xmlValues);
+    if (targets.isEmpty) {
+      throw ReqIfError('internal error: $node has no child $_xmlValues');
+    }
+    final toModify = targets.first.children;
+    int lenBefore = toModify.length;
+    for (final baby in babies) {
+      toModify.add(baby.copy());
+    }
+    // add appends at end of list
+    final newNode = toModify[lenBefore];
+    assert(newNode is xml.XmlElement &&
+        newNode.name.local == ReqIfAttributeValueEnum.xmlName);
+    children.add(ReqIfAttributeValueEnum.parse(
+        parent: this, element: newNode as xml.XmlElement, document: document));
+    final newValue = children.last;
+    children.sort((a, b) {
+      a as ReqIfAttributeValue;
+      b as ReqIfAttributeValue;
+      return a.column.compareTo(b.column);
+    });
+    updateLastChange();
+    return newValue as ReqIfAttributeValueEnum;
   }
 }

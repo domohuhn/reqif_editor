@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:reqif_editor/src/core/resizable_box.dart';
 import 'package:two_dimensional_scrollables/two_dimensional_scrollables.dart';
 
-enum CellAttributes { heading, added, removed, modified, normal }
+enum CellAttributes { heading, added, removed, modified, normal, defaultValue }
 
 /// Return value of the builder methods.
 class CellContents {
@@ -474,6 +474,9 @@ class _ResizableTableViewState extends State<ResizableTableView> {
       final cell = widget.cellBuilder!(context, vicinity, selected);
       if (cell != null) {
         contents = cell.child;
+        color ??= cell.attribute == CellAttributes.defaultValue
+            ? Theme.of(context).colorScheme.secondaryContainer
+            : color;
         color ??= cell.attribute == CellAttributes.heading
             ? Theme.of(context).colorScheme.onInverseSurface
             : color;

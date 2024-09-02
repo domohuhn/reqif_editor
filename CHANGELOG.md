@@ -1,3 +1,7 @@
+## 0.5.0
+
+- Default values for enums are now displayed and editing them inserts them into the document.
+
 ## 0.4.0
 
 - Added a menu entry allowing to open recently used files

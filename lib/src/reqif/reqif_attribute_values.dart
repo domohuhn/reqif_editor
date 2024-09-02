@@ -24,7 +24,8 @@ class ReqIfAttributeValue extends ReqIfElement {
   ReqIfAttributeValue.parse(
       {required this.parent,
       required xml.XmlElement element,
-      required this.document})
+      required this.document,
+      ReqIfElement? link})
       : _dataType =
             getXmlDefinitionDataType(getDataTypeFromXmlTag(element.name.local)),
         super.parse(element, getDataTypeFromXmlTag(element.name.local)) {
@@ -37,7 +38,7 @@ class ReqIfAttributeValue extends ReqIfElement {
         definitions.first,
         getXmlDefinitionReferenceName(
             getDataTypeFromXmlTag(element.name.local)));
-    final link = document.resolveLink(_definitionReferenceId);
+    link ??= document.resolveLink(_definitionReferenceId);
     if (link is! ReqIfAttributeDefinition ||
         link.type != ReqIfElementTypes.attributeDefinition ||
         link.dataTypeDefinition.type != _dataType) {
@@ -45,7 +46,6 @@ class ReqIfAttributeValue extends ReqIfElement {
           "Failed to parse document! Definition reference $_definitionReferenceId was not resolved correctly!\n\n$node");
     }
     _definition = link;
-    column = _definition.index;
   }
 
   final ReqIfElementTypes _dataType;
@@ -59,7 +59,7 @@ class ReqIfAttributeValue extends ReqIfElement {
 
   bool get isEditable => definition.isEditable;
 
-  int column = 0;
+  int get column => _definition.index;
 
   int get embeddedObjectCount => 0;
 
@@ -74,7 +74,8 @@ class ReqIfAttributeValueSimple extends ReqIfAttributeValue {
   ReqIfAttributeValueSimple.parse(
       {required super.parent,
       required xml.XmlElement element,
-      required super.document})
+      required super.document,
+      super.link})
       : super.parse(element: element) {
     _valueString = getRequiredAttribute(element, xmlNameValue);
   }
@@ -97,7 +98,10 @@ class ReqIfAttributeValueString extends ReqIfAttributeValueSimple {
   static const String xmlName = 'ATTRIBUTE-VALUE-STRING';
 
   ReqIfAttributeValueString.parse(
-      {required super.parent, required super.element, required super.document})
+      {required super.parent,
+      required super.element,
+      required super.document,
+      super.link})
       : super.parse();
 }
 
@@ -105,7 +109,10 @@ class ReqIfAttributeValueInteger extends ReqIfAttributeValueSimple {
   static const String xmlName = 'ATTRIBUTE-VALUE-INTEGER';
 
   ReqIfAttributeValueInteger.parse(
-      {required super.parent, required super.element, required super.document})
+      {required super.parent,
+      required super.element,
+      required super.document,
+      super.link})
       : super.parse();
 }
 
@@ -113,7 +120,10 @@ class ReqIfAttributeValueBool extends ReqIfAttributeValueSimple {
   static const String xmlName = 'ATTRIBUTE-VALUE-BOOLEAN';
 
   ReqIfAttributeValueBool.parse(
-      {required super.parent, required super.element, required super.document})
+      {required super.parent,
+      required super.element,
+      required super.document,
+      super.link})
       : super.parse();
 }
 
@@ -121,7 +131,10 @@ class ReqIfAttributeValueReal extends ReqIfAttributeValueSimple {
   static const String xmlName = 'ATTRIBUTE-VALUE-REAL';
 
   ReqIfAttributeValueReal.parse(
-      {required super.parent, required super.element, required super.document})
+      {required super.parent,
+      required super.element,
+      required super.document,
+      super.link})
       : super.parse();
 }
 
@@ -129,7 +142,10 @@ class ReqIfAttributeValueDate extends ReqIfAttributeValueSimple {
   static const String xmlName = 'ATTRIBUTE-VALUE-DATE';
 
   ReqIfAttributeValueDate.parse(
-      {required super.parent, required super.element, required super.document})
+      {required super.parent,
+      required super.element,
+      required super.document,
+      super.link})
       : super.parse();
 }
 
@@ -138,7 +154,8 @@ class ReqIfAttributeValueEnum extends ReqIfAttributeValue {
   ReqIfAttributeValueEnum.parse(
       {required super.parent,
       required xml.XmlElement element,
-      required super.document})
+      required super.document,
+      super.link})
       : _values = [],
         super.parse(element: element) {
     buildChildObjects(
@@ -165,6 +182,14 @@ class ReqIfAttributeValueEnum extends ReqIfAttributeValue {
   /// [i] must be smaller than length.
   String value(int i) {
     return _values[i].$1;
+  }
+
+  /// Gets the referenced id of the multi-valued enum field at index [i]
+  /// as string.
+  ///
+  /// [i] must be smaller than length.
+  String id(int i) {
+    return enumDefinition.valueToId(value(i));
   }
 
   /// Sets the value of the multi-valued enum field at index [i]
@@ -237,7 +262,8 @@ class ReqIfAttributeValueXhtml extends ReqIfAttributeValue {
   ReqIfAttributeValueXhtml.parse(
       {required super.parent,
       required xml.XmlElement element,
-      required super.document})
+      required super.document,
+      super.link})
       : super.parse(element: element) {
     final values = element.findAllElements(_xmlValueName);
     if (values.length != 1) {

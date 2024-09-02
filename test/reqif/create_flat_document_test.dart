@@ -192,15 +192,15 @@ void main() {
 
 const flatString = """\
 [1] | [0] | 1 | REQ_1 | [Heading] | Introduction | [Windows, Linux, MacOS] | 42 | [Draft] | Initial revision | 43.0 | 2023-11-22T11:42:13+01:00 | true
-[1] | [1] |  | REQ_2 | [Information] | This document serves as a test input for the ReqIF-editor. | [Windows, Linux, MacOS] | [Draft] | Initial revision
-[1] | [2] |  | REQ_3 | [Requirement] | The application must work on the windows operating system. | [Windows] | [Draft] | Initial revision
-[1] | [3] |  | REQ_4 | [Requirement] | The application must work on the linux operating system. | [Linux] | [Draft] | Initial revision
-[1] | [4] |  | REQ_5 | [Requirement] | The application must work on the MAC OS operating system. | [MacOS] | [Draft] | Initial revision
-[1] | [5] | 2 | REQ_6 | [Heading] | Functionality | [Windows, Linux, MacOS] | [Draft] | Initial revision
-[1] | [6] | 2.1 | REQ_11 | [Heading] | Import and export | [Windows, Linux, MacOS] | [Draft] | Initial revision
-[1] | [7] |  | REQ_7 | [Requirement] | The program must be able to load files conforming to ReqIf version 1.0. | [Windows, Linux, MacOS] | [Draft] | Initial revision
-[1] | [8] |  | REQ_8 | [Requirement] | The program must be able to save files conforming to ReqIf version 1.0.Some characters may need to be escaped: [brackets]\tSome non ascii characters: äö | [Windows, Linux, MacOS] | [Draft] | Initial revision
-[1] | [9] |  | REQ_9 | [Requirement] | A round trip testing strikethrough consisting of loading a file and saving it must produce equivalent output. Only these fields shall be modified:LAST-CHANGECOMMENTSOURCE-TOOL-ID | [Windows, Linux, MacOS] | [Draft] | Initial revision
-[1] | [10] | 2.2 | REQ_12 | [Heading] | Edit | [Windows, Linux, MacOS] | [Draft] | Initial revision
-[1] | [11] |  | REQ_10 | [Requirement] | Only contents in columns marked as editable can be modified. | [Windows, Linux, MacOS] | [Draft] | Initial revision <tag>
+[1] | [1] |  | REQ_2 | [Information] | This document serves as a test input for the ReqIF-editor. | [Windows, Linux, MacOS] |  | [Draft] | Initial revision |  |  | 
+[1] | [2] |  | REQ_3 | [Requirement] | The application must work on the windows operating system. | [Windows] |  | [Draft] | Initial revision |  |  | 
+[1] | [3] |  | REQ_4 | [Requirement] | The application must work on the linux operating system. | [Linux] |  | [Draft] | Initial revision |  |  | 
+[1] | [4] |  | REQ_5 | [Requirement] | The application must work on the MAC OS operating system. | [MacOS] |  | [Draft] | Initial revision |  |  | 
+[1] | [5] | 2 | REQ_6 | [Heading] | Functionality | [Windows, Linux, MacOS] |  | [Draft] | Initial revision |  |  | 
+[1] | [6] | 2.1 | REQ_11 | [Heading] | Import and export | [Windows, Linux, MacOS] |  | [Draft] | Initial revision |  |  | 
+[1] | [7] |  | REQ_7 | [Requirement] | The program must be able to load files conforming to ReqIf version 1.0. | [Windows, Linux, MacOS] |  | [Draft] | Initial revision |  |  | 
+[1] | [8] |  | REQ_8 | [Requirement] | The program must be able to save files conforming to ReqIf version 1.0.Some characters may need to be escaped: [brackets]\tSome non ascii characters: äö | [Windows, Linux, MacOS] |  | [Draft] | Initial revision |  |  | 
+[1] | [9] |  | REQ_9 | [Requirement] | A round trip testing strikethrough consisting of loading a file and saving it must produce equivalent output. Only these fields shall be modified:LAST-CHANGECOMMENTSOURCE-TOOL-ID | [Windows, Linux, MacOS] |  | [Draft] | Initial revision |  |  | 
+[1] | [10] | 2.2 | REQ_12 | [Heading] | Edit | [Windows, Linux, MacOS] |  | [Draft] | Initial revision |  |  | 
+[1] | [11] |  | REQ_10 | [Requirement] | Only contents in columns marked as editable can be modified. | [Windows, Linux, MacOS] |  | [Draft] | Initial revision <tag> |  |  | 
 """;

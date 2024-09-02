@@ -373,12 +373,20 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
     final int rowIndex = vicinity.row - 1;
     final int columnIndex = map.remap(vicinity.column - 1);
     final element = widget.part[rowIndex];
-    final value = element.object[columnIndex];
+    var value = element.object[columnIndex];
     final datatype = widget.part.type[columnIndex];
     CellAttributes? cellAttribute =
         element.type == ReqIfFlatDocumentElementType.heading
             ? CellAttributes.heading
             : null;
+    // replace with default value
+    if (value == null &&
+        datatype.hasDefaultValue &&
+        datatype.defaultValue!.type ==
+            ReqIfElementTypes.attributeValueEnumeration) {
+      cellAttribute = CellAttributes.defaultValue;
+      value = datatype.defaultValue;
+    }
     if (value == null) {
       return CellContents(child: null, attribute: cellAttribute);
     }
@@ -394,7 +402,10 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
         case ReqIfElementTypes.attributeValueEnumeration:
           return CellContents(
               child: _buildEditableEnumList(
-                  context, value as ReqIfAttributeValueEnum),
+                  context,
+                  value as ReqIfAttributeValueEnum,
+                  element,
+                  cellAttribute == CellAttributes.defaultValue),
               attribute: cellAttribute);
         case ReqIfElementTypes.attributeValueXhtml:
           value as ReqIfAttributeValueXhtml;
@@ -452,7 +463,10 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
   }
 
   Widget? _buildEditableEnumList(
-      BuildContext context, ReqIfAttributeValueEnum value) {
+      BuildContext context,
+      ReqIfAttributeValueEnum value,
+      ReqIfDocumentElement element,
+      bool isDefault) {
     final cache = _comboBoxDropDownLists[value.column];
     if (cache == null || cache.length != value.validValues.length) {
       throw ReqIfError("internal error: Cache seems to be invalid");
@@ -466,7 +480,13 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
             style: textTheme.bodyMedium,
             onChanged: (v) {
               if (v != null && v != value.value(i)) {
-                value.setValue(i, v);
+                if (isDefault) {
+                  var newValue =
+                      element.object.appendEnumValue(value.definitionId);
+                  newValue.setValue(i, v);
+                } else {
+                  value.setValue(i, v);
+                }
                 if (mounted) {
                   widget.wasModified();
                 }

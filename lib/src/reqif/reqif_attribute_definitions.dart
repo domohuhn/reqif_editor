@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // See LICENSE for the full text of the license
 
+import 'package:reqif_editor/src/reqif/reqif_attribute_default_value.dart';
+import 'package:reqif_editor/src/reqif/reqif_attribute_values.dart';
 import 'package:reqif_editor/src/reqif/reqif_common.dart';
 import 'package:reqif_editor/src/reqif/reqif_document.dart';
 import 'package:reqif_editor/src/reqif/reqif_error.dart';
@@ -14,6 +16,8 @@ class ReqIfAttributeDefinition extends ReqIfElementWithIdNameTimeEditable {
   ///   <ATTRIBUTE-DEFINITION-XXX>
   ///     <TYPE>
   ///       <DATATYPE-DEFINITION-XXX-REF>
+  ///     <DEFAULT-VALUE>
+  ///
   ReqIfAttributeDefinition.parse(
       xml.XmlElement element, ReqIfDocument document, this.index,
       [ReqIfElementTypes nodeType = ReqIfElementTypes.attributeDefinition])
@@ -37,6 +41,15 @@ class ReqIfAttributeDefinition extends ReqIfElementWithIdNameTimeEditable {
       throw ReqIfError(
           "Failed to parse document! LONG-NAME is mandatory for all AttributeDefinitions!\n\n$node");
     }
+
+    final defValue = node.findElements(ReqIfAttributeDefaultValue.xmlName);
+    if (defValue.length > 1) {
+      throw ReqIfError(
+          "Failed to parse document! A maximum of one ${ReqIfAttributeDefaultValue.xmlName} is allowed per node!\n\n$node");
+    }
+    for (final element in defValue) {
+      _defaultValue = ReqIfAttributeDefaultValue.parse(element, document, this);
+    }
   }
   final ReqIfElementTypes _dataType;
   ReqIfElementTypes get dataType => _dataType;
@@ -56,6 +69,13 @@ class ReqIfAttributeDefinition extends ReqIfElementWithIdNameTimeEditable {
   bool get isText =>
       dataType == ReqIfElementTypes.datatypeDefinitionXhtml ||
       dataType == ReqIfElementTypes.datatypeDefinitionString;
+
+  ReqIfAttributeDefaultValue? _defaultValue;
+
+  bool get hasDefaultValue => _defaultValue != null;
+
+  ReqIfAttributeValue? get defaultValue =>
+      hasDefaultValue ? _defaultValue!.value : null;
 }
 
 class ReqIfAttributeEnumDefinition extends ReqIfAttributeDefinition {

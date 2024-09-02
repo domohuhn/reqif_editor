@@ -15,6 +15,7 @@ import 'package:xml/xml.dart' as xml;
 void main() {
   final system = DocumentService();
   const inputFile = 'test/data/example1.reqif';
+  const inputFile2 = 'test/data/example4.reqif';
   const outputFile = 'test/data/example1_testoutput.reqif';
   final contents = system.readFileSync(inputFile);
   group('Roundtrip', () {
@@ -124,6 +125,7 @@ void main() {
         expect(col.lastChange.toIso8601String(), "2023-11-22T10:42:13.000Z");
         expect(col.name, "Type");
         expect(col.dataType, ReqIfElementTypes.datatypeDefinitionEnum);
+        expect(col.hasDefaultValue, false);
         expect(
             col.referencedDataTypeId, "_151231c6-6677-43ca-aa6c-a8130868fbc5");
         expect(col.dataTypeDefinition.identifier,
@@ -185,6 +187,34 @@ void main() {
     });
 
     test('add enum value', () {
+      final doc = readReqIFToXML(inputFile2, system);
+      var parsed = ReqIfDocument.parse(doc);
+      var val = parsed.specificationObjects.toList()[1];
+      //print(val.node.toString());
+      expect(val.children.length, 5);
+      expect(val[5], null);
+      final before = val.node.toString();
+      val.appendEnumValue('_290c1704-5c0d-4137-a133-8f6d3620dd96');
+      expect(val.children.length, 6);
+      expect(val[5] is ReqIfAttributeValueEnum, true);
+      var newValue = val[5] as ReqIfAttributeValueEnum;
+      expect(newValue.length, 1);
+      expect(newValue.isMultiValued, false);
+      expect(newValue.value(0), "Draft");
+      expect(
+          val.node.toString().substring(50, 1841), before.substring(50, 1841));
+      expect(val.node.toString().substring(1843, 2135),
+          """<ATTRIBUTE-VALUE-ENUMERATION>
+<DEFINITION>
+<ATTRIBUTE-DEFINITION-ENUMERATION-REF>_290c1704-5c0d-4137-a133-8f6d3620dd96</ATTRIBUTE-DEFINITION-ENUMERATION-REF>
+</DEFINITION>
+<VALUES>
+<ENUM-VALUE-REF>_ac760843-4a5e-4d19-a60a-28a67b6c10e9</ENUM-VALUE-REF>
+</VALUES>
+</ATTRIBUTE-VALUE-ENUMERATION>""");
+    });
+
+    test('add enum value to list', () {
       final doc = readReqIFToXML(inputFile, system);
       var parsed = ReqIfDocument.parse(doc);
       ReqIfAttributeValueEnum val = parsed
