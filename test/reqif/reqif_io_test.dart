@@ -193,7 +193,7 @@ void main() {
       //print(val.node.toString());
       expect(val.children.length, 5);
       expect(val[5], null);
-      final before = val.node.toString();
+      final before = val.node.toString().replaceAll('\r\n', '\n');
       val.appendEnumValue('_290c1704-5c0d-4137-a133-8f6d3620dd96');
       expect(val.children.length, 6);
       expect(val[5] is ReqIfAttributeValueEnum, true);
@@ -201,17 +201,17 @@ void main() {
       expect(newValue.length, 1);
       expect(newValue.isMultiValued, false);
       expect(newValue.value(0), "Draft");
-      expect(
-          val.node.toString().substring(50, 1841), before.substring(50, 1841));
-      expect(val.node.toString().substring(1843, 2135),
-          """<ATTRIBUTE-VALUE-ENUMERATION>
+      final after = val.node.toString().replaceAll('\r\n', '\n');
+      expect(after.substring(50, 1802), before.substring(50, 1802));
+      expect(after.substring(1802, 2095),
+          equalsIgnoringWhitespace("""<ATTRIBUTE-VALUE-ENUMERATION>
 <DEFINITION>
 <ATTRIBUTE-DEFINITION-ENUMERATION-REF>_290c1704-5c0d-4137-a133-8f6d3620dd96</ATTRIBUTE-DEFINITION-ENUMERATION-REF>
 </DEFINITION>
 <VALUES>
 <ENUM-VALUE-REF>_ac760843-4a5e-4d19-a60a-28a67b6c10e9</ENUM-VALUE-REF>
 </VALUES>
-</ATTRIBUTE-VALUE-ENUMERATION>""");
+</ATTRIBUTE-VALUE-ENUMERATION>"""));
     });
 
     test('add enum value to list', () {
