@@ -195,7 +195,7 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
       final bool rowEditable = element.isEditable && widget.isEditable;
       for (int i = 0; i < widget.part.columnCount; ++i) {
         final column = map.remap(i);
-        final attr = element.object[column];
+        final attr = element.object.valueOrDefault(column);
         if (attr == null) {
           continue;
         }

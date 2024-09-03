@@ -1,3 +1,7 @@
+## 0.5.1
+
+- Filter and search works with default values
+
 ## 0.5.0
 
 - Default values for enums are now displayed and editing them inserts them into the document.

@@ -3,6 +3,7 @@
 // See LICENSE for the full text of the license
 
 import 'package:reqif_editor/src/reqif/reqif_attribute_definitions.dart';
+import 'package:reqif_editor/src/reqif/reqif_attribute_values.dart';
 import 'package:reqif_editor/src/reqif/reqif_document.dart';
 import 'package:reqif_editor/src/reqif/reqif_error.dart';
 import 'package:reqif_editor/src/reqif/reqif_spec_hierarchy.dart';
@@ -18,8 +19,24 @@ enum ReqIfFlatDocumentElementType {
   normal
 }
 
+class ValueIterator implements Iterator<ReqIfAttributeValue?> {
+  int _current = -1;
+  final ReqIfSpecificationObject element;
+
+  ValueIterator(this.element);
+
+  @override
+  bool moveNext() {
+    _current++;
+    return _current < element.columnCount;
+  }
+
+  @override
+  ReqIfAttributeValue? get current => element.valueOrDefault(_current);
+}
+
 /// Represents an element
-class ReqIfDocumentElement {
+class ReqIfDocumentElement extends Iterable<ReqIfAttributeValue?> {
   /// Type of the node. If the value is heading, then the node would have children
   /// in a hierarchical representation.
   ReqIfFlatDocumentElementType type;
@@ -65,6 +82,9 @@ class ReqIfDocumentElement {
     buffer.write(object);
     return buffer.toString();
   }
+
+  @override
+  Iterator<ReqIfAttributeValue?> get iterator => ValueIterator(object);
 }
 
 /// A page is a set of document elements that are defined in the same
@@ -210,7 +230,10 @@ class ReqIfDocumentPart {
 
   bool _matches(ReqIfDocumentElement element, List<RegExp> filter) {
     List<bool> matches = filter.map((e) => e.pattern == "").toList();
-    for (final attribute in element.object.values) {
+    for (final attribute in element) {
+      if (attribute == null) {
+        continue;
+      }
       final index = attribute.column;
       final value = attribute;
       if (index < filter.length && filter[index].pattern != "") {
@@ -242,8 +265,8 @@ class ReqIfDocumentPart {
     final regex = RegExp(text, caseSensitive: caseSensitive);
     int count = 0;
     for (final val in elements) {
-      for (final attr in val.object.values) {
-        if (regex.hasMatch(attr.toStringWithNewlines())) {
+      for (final attr in val) {
+        if (attr != null && regex.hasMatch(attr.toStringWithNewlines())) {
           count += 1;
         }
       }
@@ -262,8 +285,8 @@ class ReqIfDocumentPart {
     int count = 0;
     int row = 0;
     for (final val in elements) {
-      for (final attr in val.object.values) {
-        if (regex.hasMatch(attr.toStringWithNewlines())) {
+      for (final attr in val) {
+        if (attr != null && regex.hasMatch(attr.toStringWithNewlines())) {
           if (count == position) {
             return (row, attr.column);
           }

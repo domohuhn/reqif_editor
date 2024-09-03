@@ -87,6 +87,23 @@ class ReqIfSpecificationObject extends ReqIfIdentifiable {
     return rv;
   }
 
+  // returns the value, the default value or nothing
+  ReqIfAttributeValue? valueOrDefault(int column) {
+    if (column < 0 || column >= attributeDefinitions.length) {
+      return null;
+    }
+    for (int i = 0; i < children.length; ++i) {
+      if ((children[i] as ReqIfAttributeValue).column == column) {
+        return children[i] as ReqIfAttributeValue;
+      }
+    }
+    final definition = attributeDefinition(column);
+    if (definition.hasDefaultValue) {
+      return definition.defaultValue;
+    }
+    return null;
+  }
+
   late String _specificationObjectTypeId;
   late ReqIfSpecificationObjectType _specificationObjectType;
 
@@ -97,7 +114,8 @@ class ReqIfSpecificationObject extends ReqIfIdentifiable {
   ReqIfSpecificationObjectType get objectType => _specificationObjectType;
   Iterable<ReqIfAttributeDefinition> get attributeDefinitions =>
       specificationObjectType.attributeDefinitions;
-  int get columnCount => attributeDefinitions.length;
+  int get columnCount => objectType.attributeCount;
+  ReqIfAttributeDefinition attributeDefinition(int i) => objectType[i];
   Iterable<ReqIfAttributeValue> get values =>
       children.map((e) => e as ReqIfAttributeValue);
 

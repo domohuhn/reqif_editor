@@ -59,6 +59,9 @@ class ReqIfSpecType extends ReqIfIdentifiable {
   Iterable<ReqIfAttributeDefinition> get attributeDefinitions =>
       children.map((e) => e as ReqIfAttributeDefinition);
 
+  /// The number of all attributes in the specification objects.
+  int get attributeCount => children.length;
+
   ReqIfAttributeDefinition operator [](int i) {
     return children[i] as ReqIfAttributeDefinition;
   }
