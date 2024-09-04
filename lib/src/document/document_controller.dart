@@ -493,7 +493,14 @@ class DocumentController with ChangeNotifier {
     }
     var contents = toSave.document.xmlString;
     if (_settings.lineEndings == LineEndings.carriageReturnLinefeed) {
-      contents = contents.replaceAll('\n', '\r\n');
+      contents = contents.replaceAll(RegExp('\r\n|\n'), '\r\n');
+    }
+    if (_settings.lineEndings == LineEndings.platform) {
+      contents =
+          contents.replaceAll(RegExp('\r\n|\n'), Platform.lineTerminator);
+    }
+    if (_settings.lineEndings == LineEndings.linefeed) {
+      contents = contents.replaceAll('\r\n', '\n');
     }
     if (outputPath != null) {
       await _service.write(outputPath, contents);

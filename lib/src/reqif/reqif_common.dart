@@ -303,7 +303,13 @@ enum LineEndings {
   carriageReturnLinefeed,
 
   /// Linux line endings using one byte 0x0A
-  linefeed
+  linefeed,
+
+  /// use whatever
+  platform,
+
+  /// use whatever
+  any,
 }
 
 class ReqIfHierarchicalPosition {

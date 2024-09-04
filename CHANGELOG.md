@@ -1,3 +1,8 @@
+## 0.5.2
+
+- Fixed version
+- Fixed line endings when saving files
+
 ## 0.5.1
 
 - Filter and search works with default values

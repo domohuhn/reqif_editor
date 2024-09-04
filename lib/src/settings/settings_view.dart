@@ -114,12 +114,20 @@ class SettingsView extends StatelessWidget {
         onChanged: controller.updateLineEndings,
         items: const [
           DropdownMenuItem(
+            value: LineEndings.any,
+            child: Text("any"),
+          ),
+          DropdownMenuItem(
             value: LineEndings.carriageReturnLinefeed,
             child: Text("CRLF"),
           ),
           DropdownMenuItem(
             value: LineEndings.linefeed,
             child: Text("LF"),
+          ),
+          DropdownMenuItem(
+            value: LineEndings.platform,
+            child: Text("platform"),
           ),
         ],
       ),
