@@ -3,9 +3,10 @@
 // See LICENSE for the full text of the license
 
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 import 'package:reqif_editor/src/core/loading_screen.dart';
+import 'package:reqif_editor/src/localization/app_localizations.dart';
 
 import 'package:reqif_editor/src/core/menu_bar.dart';
 import 'package:reqif_editor/src/document/document_controller.dart';
@@ -38,6 +39,7 @@ class ReqIfEditorApp extends StatelessWidget {
                     GlobalMaterialLocalizations.delegate,
                     GlobalWidgetsLocalizations.delegate,
                     GlobalCupertinoLocalizations.delegate,
+                    FlutterQuillLocalizations.delegate
                   ],
                   supportedLocales: const [
                     Locale('en', ''),

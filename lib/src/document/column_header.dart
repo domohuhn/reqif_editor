@@ -3,7 +3,7 @@
 // See LICENSE for the full text of the license
 
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:reqif_editor/src/localization/app_localizations.dart';
 
 /// Header for a column of the table. Can show text, or text + a textfield to edit the filter.
 ///

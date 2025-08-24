@@ -13,7 +13,7 @@ import 'package:reqif_editor/src/document/document_controller.dart';
 import 'package:reqif_editor/src/document/document_navigation.dart';
 import 'package:reqif_editor/src/document/document_top_bar.dart';
 import 'package:reqif_editor/src/document/reqif_spreadsheet.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:reqif_editor/src/localization/app_localizations.dart';
 import 'package:reqif_editor/src/reqif/conversions.dart';
 
 class ReqIfDocumentView extends StatefulWidget {

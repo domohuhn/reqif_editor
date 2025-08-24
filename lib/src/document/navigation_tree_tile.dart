@@ -5,8 +5,8 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_fancy_tree_view/flutter_fancy_tree_view.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:two_dimensional_scrollables/two_dimensional_scrollables.dart';
+import 'package:reqif_editor/src/localization/app_localizations.dart';
 import 'package:reqif_editor/src/document/document_controller.dart';
 import 'package:reqif_editor/src/document/navigation_tree_node.dart';
 import 'package:reqif_editor/src/reqif/reqif_error.dart';
@@ -21,10 +21,10 @@ class NavigationTreeTile extends StatefulWidget {
       required this.documentController,
       required this.width});
 
-  final TreeEntry<NavigationTreeNode> entry;
+  final TreeViewNode<NavigationTreeNode> entry;
   final VoidCallback onTap;
 
-  NavigationTreeNode get node => entry.node;
+  NavigationTreeNode get node => entry.content;
 
   @override
   State<NavigationTreeTile> createState() => _NavigationTreeTileState();
@@ -58,10 +58,10 @@ class _NavigationTreeTileState extends State<NavigationTreeTile> {
                 : const AssetImage('assets/images/document_closed.png'),
             radius: 16,
           )));
-    } else if (node.isPart) {
+    } /*else if (node.isPart) {
       children.add(FolderButton(
-        isOpen: widget.entry.hasChildren ? widget.entry.isExpanded : null,
-        onPressed: widget.entry.hasChildren ? widget.onTap : null,
+        isOpen: widget.entry.children.isNotEmpty ? widget.entry.isExpanded : null,
+        onPressed: widget.entry.children.isNotEmpty ? widget.onTap : null,
         openedIcon: Icon(
           Icons.data_object,
           color: Theme.of(context).colorScheme.primary,
@@ -73,8 +73,8 @@ class _NavigationTreeTileState extends State<NavigationTreeTile> {
       ));
     } else {
       children.add(FolderButton(
-        isOpen: widget.entry.hasChildren ? widget.entry.isExpanded : null,
-        onPressed: widget.entry.hasChildren ? widget.onTap : null,
+        isOpen: widget.entry.children.isNotEmpty ? widget.entry.isExpanded : null,
+        onPressed: widget.entry.children.isNotEmpty ? widget.onTap : null,
         openedIcon: Icon(
           Icons.data_array,
           color: Theme.of(context).colorScheme.primary,
@@ -84,7 +84,7 @@ class _NavigationTreeTileState extends State<NavigationTreeTile> {
           color: Theme.of(context).colorScheme.tertiary,
         ),
       ));
-    }
+    }*/
     if (node.isFile || node.isPart) {
       children.add(Container(
           width: max(widget.width - widthReduction, 20),
@@ -126,13 +126,13 @@ class _NavigationTreeTileState extends State<NavigationTreeTile> {
           widget.onTap();
         }
       },
-      child: TreeIndentation(
+      /*  child: TreeIndentation(
         entry: widget.entry,
         guide: const IndentGuide.connectingLines(indent: indentAmount),
         child: Row(
           children: children,
         ),
-      ),
+      ),*/
     );
   }
 

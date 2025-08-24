@@ -6,7 +6,7 @@ import 'dart:ui';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:reqif_editor/src/localization/app_localizations.dart';
 import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:reqif_editor/src/core/menu_entry.dart';
@@ -151,7 +151,7 @@ class _TopMenuBarState extends State<TopMenuBar> with OpenDocument<TopMenuBar> {
           showAboutDialog(
             context: context,
             applicationName: AppLocalizations.of(context)!.appTitle,
-            applicationVersion: '0.5.2',
+            applicationVersion: '0.6.0',
           );
         },
       ),

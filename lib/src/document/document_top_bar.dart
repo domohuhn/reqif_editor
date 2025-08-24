@@ -4,7 +4,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:reqif_editor/src/localization/app_localizations.dart';
 
 class DocumentTopBar extends StatelessWidget {
   final QuillController controller;
@@ -57,10 +57,9 @@ class DocumentTopBar extends StatelessWidget {
           VerticalDivider(
               thickness: 3.0,
               color: Theme.of(context).colorScheme.onSurfaceVariant),
-          QuillToolbar.simple(
-            configurations: QuillSimpleToolbarConfigurations(
-                controller: controller,
-                sharedConfigurations: const QuillSharedConfigurations(),
+          QuillSimpleToolbar(
+            controller: controller,
+            config: QuillSimpleToolbarConfig(
                 buttonOptions: const QuillSimpleToolbarButtonOptions(),
                 showAlignmentButtons: false,
                 showCodeBlock: false,

@@ -82,11 +82,10 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
 
   Widget _buildQuillEditor() {
     return QuillEditor.basic(
-      configurations: QuillEditorConfigurations(
-        controller: widget.editorController,
+      controller: widget.editorController,
+      config: QuillEditorConfig(
         autoFocus: true,
         expands: true,
-        sharedConfigurations: const QuillSharedConfigurations(),
       ),
       focusNode: editorFocusNode,
     );
@@ -348,7 +347,12 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
   CellContents _wrapWithPrefix(ReqIfDocumentElement element, Widget child,
       CellAttributes? attributes, bool wrap) {
     if (!wrap || element.prefix == null) {
-      return CellContents(attribute: attributes, child: child);
+      return CellContents(
+          attribute: attributes,
+          child: Container(
+              alignment: Alignment.topLeft,
+              padding: const EdgeInsets.fromLTRB(5, 5, 5, 0),
+              child: child));
     }
 
     return CellContents(

@@ -8,7 +8,7 @@ issue_tracker: https://github.com/domohuhn/reqif_editor/issues
 # Prevent accidental publishing to pub.dev.
 publish_to: 'none'
 
-version: 0.5.1
+version: 0.6.0
 
 environment:
   sdk: '>=3.2.3 <4.0.0'
@@ -18,13 +18,12 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
-  xml: ^6.0.0
-  file_picker: ^8.0.0
-  flutter_quill: ^9.3.0
+  xml: ^6.6.1
+  file_picker: ^10.3.2
+  flutter_quill: ^11.4.1
   uuid: ^4.2.2
   shared_preferences: ^2.2.2
-  two_dimensional_scrollables: ^0.3.0
-  flutter_fancy_tree_view: ^1.4.1
+  two_dimensional_scrollables: ^0.3.7
   path: ^1.8.3
   loading_animation_widget: ^1.2.1
 
@@ -32,7 +31,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
 
-  flutter_lints: ^4.0.0
+  flutter_lints: ^6.0.0
   flutter_oss_licenses: ^3.0.0
 
 flutter:

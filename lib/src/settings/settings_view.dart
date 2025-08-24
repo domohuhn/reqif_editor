@@ -4,7 +4,7 @@
 
 import 'package:flutter/material.dart';
 
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:reqif_editor/src/localization/app_localizations.dart';
 import 'package:reqif_editor/src/reqif/reqif_common.dart';
 import 'settings_controller.dart';
 

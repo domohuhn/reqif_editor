@@ -6,7 +6,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:reqif_editor/src/document/document_controller.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:reqif_editor/src/localization/app_localizations.dart';
 
 class DocumentBottomBar extends StatefulWidget {
   final DocumentController controller;

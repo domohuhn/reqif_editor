@@ -56,6 +56,7 @@ class ReqIfDocumentElement extends Iterable<ReqIfAttributeValue?> {
 
   /// This value is set to true if the reqif document has marked this row as editable.
   bool isEditable;
+
   ReqIfDocumentElement(
       {required this.type,
       required this.object,

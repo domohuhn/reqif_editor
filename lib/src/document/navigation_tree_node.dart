@@ -5,6 +5,7 @@
 import 'package:reqif_editor/src/document/document_controller.dart';
 import 'package:reqif_editor/src/reqif/flat_document.dart';
 import 'package:reqif_editor/src/reqif/reqif_error.dart';
+import 'package:two_dimensional_scrollables/two_dimensional_scrollables.dart';
 
 class NavigationTreeNode {
   const NavigationTreeNode({
@@ -81,6 +82,17 @@ class NavigationTreeNode {
   @override
   String toString() {
     return 'NODE: $displayText';
+  }
+
+  static List<TreeViewNode<NavigationTreeNode>> convertNavigationTree(
+      List<NavigationTreeNode> roots) {
+    List<TreeViewNode<NavigationTreeNode>> rv = [];
+    for (final child in roots) {
+      final nextChildren = convertNavigationTree(child.children);
+      rv.add(TreeViewNode<NavigationTreeNode>(child,
+          children: nextChildren, expanded: true));
+    }
+    return rv;
   }
 
   static List<NavigationTreeNode> buildNavigationTree(
