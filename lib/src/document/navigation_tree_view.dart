@@ -3,76 +3,14 @@
 // See LICENSE for the full text of the license
 
 import 'package:flutter/material.dart';
+import 'dart:math';
 import 'package:two_dimensional_scrollables/two_dimensional_scrollables.dart';
 import 'package:reqif_editor/src/document/document_controller.dart';
 import 'package:reqif_editor/src/document/navigation_tree_node.dart';
-//import 'package:reqif_editor/src/document/navigation_tree_tile.dart';
+import 'package:reqif_editor/src/localization/app_localizations.dart';
+import 'package:reqif_editor/src/reqif/reqif_error.dart';
 
 import 'package:flutter/gestures.dart';
-
-/*
-class NavigationTreeView extends StatefulWidget {
-  final DocumentController controller;
-  final double width;
-  const NavigationTreeView(
-      {super.key, required this.controller, required this.width});
-
-  @override
-  State<NavigationTreeView> createState() => _NavigationTreeViewState();
-}
-
-class _NavigationTreeViewState extends State<NavigationTreeView> {
-  late List<NavigationTreeNode> roots;
- // late TreeController<NavigationTreeNode> treeController;
-  final List<int> lastOutlineLengths = [];
-
-  @override
-  void initState() {
-    super.initState();
-    _buildTree();
-  }
-
-  @override
-  void dispose() {
-  //  treeController.dispose();
-    super.dispose();
-  }
-
-  void _buildTree() {
-    roots = NavigationTreeNode.buildNavigationTree(widget.controller);
-   // treeController = TreeController<NavigationTreeNode>(
-   //   roots: roots,
-   //   childrenProvider: (NavigationTreeNode node) => node.children,
-   // );
-   // treeController.expandAll();
-  }
-
-  void _updateTree() {
-    if (widget.controller.length == roots.length) {
-      return;
-    }
-  //  treeController.dispose();
-    _buildTree();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    _updateTree();
-    return Text("TODO");/*TreeView<NavigationTreeNode>(
-      treeController: treeController,
-      nodeBuilder: (BuildContext context, TreeEntry<NavigationTreeNode> entry) {
-        return NavigationTreeTile(
-          key: ValueKey(entry.node),
-          entry: entry,
-          onTap: () => treeController.toggleExpansion(entry.node),
-          documentController: widget.controller,
-          width: widget.width,
-        );
-      },
-    );*/
-  }
-}
-*/
 
 class NavigationTreeView extends StatefulWidget {
   final DocumentController controller;
@@ -83,6 +21,14 @@ class NavigationTreeView extends StatefulWidget {
 
   @override
   State<NavigationTreeView> createState() => TreeExampleState();
+
+  void setHeaderColumn(int docId, int partId, (String, int) heading) {
+    controller.setHeaderColumn(docId, partId, heading);
+  }
+
+  void forceRedraw() {
+    controller.forceRedraw();
+  }
 }
 
 class TreeExampleState extends State<NavigationTreeView> {
@@ -97,6 +43,15 @@ class TreeExampleState extends State<NavigationTreeView> {
   void _buildTree() {
     _tree = NavigationTreeNode.convertNavigationTree(
         NavigationTreeNode.buildNavigationTree(widget.controller));
+    disposeTextEditingControllers();
+    for (final documentNode in _tree) {
+      _textEditingControllers.add(TextEditingController());
+      if (documentNode.content.isFile &&
+          documentNode.content.document.comment != null) {
+        _textEditingControllers.last.text =
+            documentNode.content.document.comment!;
+      }
+    }
   }
 
   void _updateTree() {
@@ -135,6 +90,12 @@ class TreeExampleState extends State<NavigationTreeView> {
     };
   }
 
+  static const double filePadding = 90;
+  static const double indentAmount = 24;
+
+  double widthReduction(TreeViewNode<NavigationTreeNode> node) =>
+      node.content.isFile ? filePadding : filePadding + indentAmount;
+
   Widget _treeNodeBuilder(
     BuildContext context,
     TreeViewNode<NavigationTreeNode> node,
@@ -144,27 +105,48 @@ class TreeExampleState extends State<NavigationTreeView> {
     final displayText = node.content.displayText ?? "null";
     const double iconSize = 20;
     const double indentationWidth = 8.0;
-    return Row(
-      children: <Widget>[
-        SizedBox(width: indentationWidth * node.depth! + indentationWidth),
-        if (isParentNode)
-          TreeView.wrapChildToToggleNode(
-              node: node,
-              child: SizedBox.square(
+    return SizedBox(
+        width: widget.width,
+        child: Row(
+          children: <Widget>[
+            SizedBox(width: indentationWidth * node.depth! + indentationWidth),
+            if (isParentNode)
+              TreeView.wrapChildToToggleNode(
+                  node: node,
+                  child: SizedBox.square(
+                    dimension: iconSize,
+                    child: _getLeadingIcon(
+                        node.content.isFile,
+                        node.content.isPart,
+                        isParentNode,
+                        node.isExpanded,
+                        iconSize),
+                  ))
+            else
+              SizedBox.square(
                 dimension: iconSize,
                 child: _getLeadingIcon(node.content.isFile, node.content.isPart,
-                    isParentNode, node.isExpanded, iconSize),
-              ))
-        else
-          SizedBox.square(
-            dimension: iconSize,
-            child: _getLeadingIcon(node.content.isFile, node.content.isPart,
-                isParentNode, true, iconSize),
-          ),
-        const SizedBox(width: indentationWidth),
-        Text(displayText),
-      ],
-    );
+                    isParentNode, true, iconSize),
+              ),
+            const SizedBox(width: indentationWidth),
+            Container(
+                width: max(widget.width - widthReduction(node), 20),
+                decoration: const BoxDecoration(),
+                clipBehavior: Clip.hardEdge,
+                child: Text(
+                  displayText,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                )),
+            if (node.content.isFile || node.content.isPart) const Spacer(),
+            if (node.content.isFile || node.content.isPart)
+              IconButton(
+                  onPressed: () {
+                    _dialogBuilder(context, node.content);
+                  },
+                  icon: const Icon(Icons.settings))
+          ],
+        ));
   }
 
   Widget _getLeadingIcon(
@@ -199,7 +181,30 @@ class TreeExampleState extends State<NavigationTreeView> {
     }
   }
 
-  Widget _getTree() {
+  Span _treeRowBuilder(TreeViewNode<NavigationTreeNode> node) {
+    if (_selectedNode == node) {
+      return TreeRow(
+        extent: FixedTreeRowExtent(
+          node.children.isNotEmpty ? 60.0 : 50.0,
+        ),
+        recognizerFactories: _getTapRecognizer(node),
+        backgroundDecoration: TreeRowDecoration(
+          color: Theme.of(context).colorScheme.inversePrimary,
+        ),
+        foregroundDecoration: const TreeRowDecoration(
+          border: TreeRowBorder.all(BorderSide()),
+        ),
+      );
+    }
+    return TreeRow(
+      extent: FixedTreeRowExtent(
+        node.children.isNotEmpty ? 60.0 : 50.0,
+      ),
+      recognizerFactories: _getTapRecognizer(node),
+    );
+  }
+
+  Widget _getTreeView() {
     return Scrollbar(
       controller: horizontalController,
       thumbVisibility: true,
@@ -221,31 +226,7 @@ class TreeExampleState extends State<NavigationTreeView> {
             });
           },
           treeNodeBuilder: _treeNodeBuilder,
-
-          treeRowBuilder: (TreeViewNode<NavigationTreeNode> node) {
-            if (_selectedNode == node) {
-              return TreeRow(
-                extent: FixedTreeRowExtent(
-                  node.children.isNotEmpty ? 60.0 : 50.0,
-                ),
-                recognizerFactories: _getTapRecognizer(node),
-                backgroundDecoration: TreeRowDecoration(
-                  color: Theme.of(context).colorScheme.inversePrimary,
-                ),
-                foregroundDecoration: const TreeRowDecoration(
-                  border: TreeRowBorder.all(BorderSide()),
-                ),
-              );
-            }
-            return TreeRow(
-              extent: FixedTreeRowExtent(
-                node.children.isNotEmpty ? 60.0 : 50.0,
-              ),
-              recognizerFactories: _getTapRecognizer(node),
-            );
-          },
-          // No internal indentation, the custom treeNodeBuilder applies its
-          // own indentation to decorate in the indented space.
+          treeRowBuilder: _treeRowBuilder,
           indentation: TreeViewIndentationType.none,
         ),
       ),
@@ -266,6 +247,7 @@ class TreeExampleState extends State<NavigationTreeView> {
   void dispose() {
     _verticalController.dispose();
     horizontalController.dispose();
+    disposeTextEditingControllers();
     super.dispose();
   }
 
@@ -275,7 +257,182 @@ class TreeExampleState extends State<NavigationTreeView> {
     if (_tree.isEmpty) {
       return _wrapInBox(Text(""));
     } else {
-      return _wrapInBox(_getTree());
+      return _wrapInBox(_getTreeView());
     }
+  }
+
+  final List<TextEditingController> _textEditingControllers = [];
+  void disposeTextEditingControllers() {
+    for (final ctrl in _textEditingControllers) {
+      ctrl.dispose();
+    }
+    _textEditingControllers.clear();
+  }
+
+  Widget _buildFileCommentEditor(
+      BuildContext context, NavigationTreeNode node) {
+    final textTheme = Theme.of(context).textTheme;
+    return Column(mainAxisSize: MainAxisSize.min, children: [
+      Text(AppLocalizations.of(context)!.modalEditFileText),
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+        child: TextField(
+          style: textTheme.bodySmall,
+          controller: _textEditingControllers[node.document.index],
+          onChanged: (value) {
+            node.document.comment = value;
+          },
+          decoration: InputDecoration(
+            border: const OutlineInputBorder(gapPadding: 1.0),
+            hintText: AppLocalizations.of(context)!.comment,
+            labelText: AppLocalizations.of(context)!.comment,
+          ),
+        ),
+      )
+    ]);
+  }
+
+  Widget _buildPartDialogContents(
+      BuildContext context, NavigationTreeNode part) {
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
+    final parent = part.parent;
+    if (parent == null || !parent.isFile) {
+      throw ReqIfError("Internal error: navigation tree is built wrong!");
+    }
+    final headerColumn = parent.document.headings;
+    final documentPart = part.part;
+    final partNumber = documentPart.index;
+    List<DropdownMenuItem<String>> dropDownWidgets = [];
+    for (final name in documentPart.columnNames) {
+      dropDownWidgets
+          .add(DropdownMenuItem<String>(value: name, child: Text(name)));
+    }
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(AppLocalizations.of(context)!.modalEditPartText),
+        Row(mainAxisSize: MainAxisSize.min, children: [
+          Padding(
+              padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
+              child: Text(AppLocalizations.of(context)!.headingsTooltip)),
+          Tooltip(
+              message: AppLocalizations.of(context)!.headingsTooltip,
+              child: DropdownButton<String>(
+                  items: dropDownWidgets,
+                  style: textTheme.bodySmall,
+                  onChanged: (v) {
+                    if (v != null && v != headerColumn[partNumber].$1) {
+                      setState(() {
+                        int idx = dropDownWidgets
+                            .indexWhere((element) => element.value == v);
+                        if (idx >= 0 &&
+                            idx < dropDownWidgets.length &&
+                            dropDownWidgets[idx].value != null) {
+                          widget.setHeaderColumn(parent.document.index,
+                              partNumber, (dropDownWidgets[idx].value!, idx));
+                        }
+                      });
+                    }
+                  },
+                  value: headerColumn[partNumber].$1))
+        ]),
+        Row(mainAxisSize: MainAxisSize.max, children: [
+          Text(AppLocalizations.of(context)!.columnOrder),
+          const Spacer(),
+          Text(AppLocalizations.of(context)!.editable)
+        ]),
+        _buildReorderBox(context, part)
+      ],
+    );
+  }
+
+  Widget _buildReorderBox(BuildContext context, NavigationTreeNode part) {
+    final documentPart = part.part;
+    final partNumber = documentPart.index;
+    final document = part.document;
+    final map = document.columnMapping[partNumber];
+    final attributes =
+        documentPart.attributeDefinitions.toList(growable: false);
+    return Container(
+        margin: const EdgeInsets.fromLTRB(0, 16, 0, 16),
+        height: 300,
+        width: 500,
+        decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.secondaryContainer,
+            border: Border.all(width: 2)),
+        child: ListView.builder(
+          itemCount: documentPart.columnCount,
+          itemBuilder: (BuildContext ctx, int index) {
+            final column = map.remap(index);
+            return Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                    onPressed: () {
+                      widget.controller.moveColumn(
+                          document: document.index,
+                          part: partNumber,
+                          column: index,
+                          move: -1);
+                    },
+                    icon: const Icon(Icons.keyboard_arrow_up)),
+                IconButton(
+                    onPressed: () {
+                      widget.controller.moveColumn(
+                          document: document.index,
+                          part: partNumber,
+                          column: index,
+                          move: 1);
+                    },
+                    icon: const Icon(Icons.keyboard_arrow_down)),
+                Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 8, 0),
+                    child: Text(documentPart.columnNames[column])),
+                const Spacer(),
+                Checkbox.adaptive(
+                    value: attributes[column].isEditable,
+                    onChanged: (val) {
+                      if (val != null && val != attributes[column].isEditable) {
+                        attributes[column].editable = val;
+                        widget.forceRedraw();
+                      }
+                    })
+              ],
+            );
+          },
+        ));
+  }
+
+  Future<void> _dialogBuilder(BuildContext context, NavigationTreeNode node) {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Row(children: [
+            _getLeadingIcon(node.isFile, node.isPart, false, false, 20.0),
+            Text(node.isFile
+                ? node.document.flatDocument.title
+                : node.part.name ??
+                    "${AppLocalizations.of(context)!.part} ${node.part.index}")
+          ]),
+          content: node.isFile
+              ? _buildFileCommentEditor(context, node)
+              : _buildPartDialogContents(context, node),
+          actions: <Widget>[
+            TextButton(
+              style: TextButton.styleFrom(
+                textStyle: Theme.of(context).textTheme.labelLarge,
+              ),
+              child: Text(AppLocalizations.of(context)!.close),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }

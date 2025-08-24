@@ -27,7 +27,7 @@ class ReqIfDocumentView extends StatefulWidget {
 }
 
 class _ReqIfDocumentViewState extends State<ReqIfDocumentView> {
-  static const double minWidthNavBar = 100;
+  static const double minWidthNavBar = 150;
   double widthNavBar = 350;
   double heightEditor = 350;
   static const double heightNavBar = 40;
