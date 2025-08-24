@@ -12,7 +12,7 @@ mixin OpenDocument<T extends StatefulWidget> on State<T> {
   void openPath(DocumentController documentController, String path) {
     Navigator.pushNamed(context, LoadingScreen.routeName);
     documentController.loadDocument(path, _showLoadError).then((value) {
-      if (value) {
+      if (value && mounted) {
         Navigator.pop(context);
         Navigator.popAndPushNamed(context, ReqIfDocumentView.routeName);
       }

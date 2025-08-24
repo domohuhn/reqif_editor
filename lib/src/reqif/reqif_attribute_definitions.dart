@@ -13,10 +13,10 @@ class ReqIfAttributeDefinition extends ReqIfElementWithIdNameTimeEditable {
   /// [node] must be ATTRIBUTE-DEFINITION-XXX
   ///
   /// children:
-  ///   <ATTRIBUTE-DEFINITION-XXX>
-  ///     <TYPE>
-  ///       <DATATYPE-DEFINITION-XXX-REF>
-  ///     <DEFAULT-VALUE>
+  ///   ATTRIBUTE-DEFINITION-XXX
+  ///     TYPE
+  ///       DATATYPE-DEFINITION-XXX-REF
+  ///     DEFAULT-VALUE
   ///
   ReqIfAttributeDefinition.parse(
       xml.XmlElement element, ReqIfDocument document, this.index,

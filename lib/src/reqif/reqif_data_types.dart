@@ -173,9 +173,9 @@ class ReqIfDataTypeEnum extends ReqIfIdentifiable {
   /// [node] must be DATATYPE-DEFINITION-ENUMERATION
   ///
   /// it must have children:
-  /// <DATATYPE-DEFINITION-ENUMERATION>
-  ///   <SPECIFIED-VALUES>
-  ///     <ENUM-VALUE>
+  /// DATATYPE-DEFINITION-ENUMERATION
+  ///   SPECIFIED-VALUES
+  ///     ENUM-VALUE
   ReqIfDataTypeEnum.parse(xml.XmlElement node)
       : _validValues = [],
         super.parse(node, ReqIfElementTypes.datatypeDefinitionEnum) {
@@ -259,9 +259,9 @@ class ReqIfDataTypeEnumValue extends ReqIfIdentifiable {
   /// [node] must be ENUM-VALUE
   ///
   /// it must have children:
-  /// <ENUM-VALUE>
-  ///   <PROPERTIES>
-  ///     <EMBEDDED-VALUE>
+  /// ENUM-VALUE
+  ///   PROPERTIES
+  ///     EMBEDDED-VALUE
   ///
   ReqIfDataTypeEnumValue.parse(xml.XmlElement node)
       : super.parse(node, ReqIfElementTypes.datatypeEnumValue) {

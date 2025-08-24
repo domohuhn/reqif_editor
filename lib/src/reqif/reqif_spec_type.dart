@@ -13,10 +13,10 @@ class ReqIfSpecType extends ReqIfIdentifiable {
   /// [node] must have the given tag.
   ///
   /// Children:
-  /// <SPEC-ATTRIBUTES>
-  ///   <ATTRIBUTE-DEFINITION-XXX>
-  ///     <TYPE>
-  ///       <DATATYPE-DEFINITION-XXX-REF>
+  /// SPEC-ATTRIBUTES
+  ///   ATTRIBUTE-DEFINITION-XXX
+  ///     TYPE
+  ///       DATATYPE-DEFINITION-XXX-REF
   ///
   ReqIfSpecType.parse(xml.XmlElement node, ReqIfDocument document,
       ReqIfElementTypes type, String xmlName)

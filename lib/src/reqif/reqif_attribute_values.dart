@@ -17,10 +17,10 @@ class ReqIfAttributeValue extends ReqIfElement {
   /// [node] must be ATTRIBUTE-VALUE-XXX
   ///
   /// children:
-  /// <ATTRIBUTE-VALUE-XXX>
-  ///   <DEFINITION>
-  ///     <ATTRIBUTE-DEFINITION-XXX-REF>
-  ///   <VALUES> or <THE-VALUE>
+  /// ATTRIBUTE-VALUE-XXX
+  ///   DEFINITION
+  ///     ATTRIBUTE-DEFINITION-XXX-REF
+  ///   VALUES or THE-VALUE
   ReqIfAttributeValue.parse(
       {required this.parent,
       required xml.XmlElement element,
