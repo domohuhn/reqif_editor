@@ -96,4 +96,23 @@ class SettingsController with ChangeNotifier {
     await _settingsService.setLastOpenedFiles(_files);
     notifyListeners();
   }
+
+  /// Updates and persists the column order of the file.
+  Future<void> updateFileColumnOrder(String path, String order) async {
+    if (path.isEmpty) return;
+    if (_files.updateColumnOrder(path, order)) {
+      await _settingsService.setLastOpenedFiles(_files);
+    }
+    notifyListeners();
+  }
+
+  /// Gets the file column order for a given path if present
+  String fileColumnOrder(String path) {
+    for (final f in _files.files) {
+      if (f.path == path) {
+        return f.columnOrder;
+      }
+    }
+    return "{}";
+  }
 }

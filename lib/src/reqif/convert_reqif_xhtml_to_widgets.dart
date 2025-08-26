@@ -3,7 +3,7 @@
 // See LICENSE for the full text of the license
 
 import 'package:flutter/material.dart';
-import 'package:reqif_editor/src/document/document_controller.dart';
+import 'package:reqif_editor/src/document/document_data.dart';
 import 'package:xml/xml.dart' as xml;
 import 'package:reqif_editor/src/reqif/convert_common.dart';
 import 'package:reqif_editor/src/reqif/bullet_list.dart';

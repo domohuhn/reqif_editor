@@ -5,8 +5,9 @@
 class FileData {
   String title;
   String path;
+  String columnOrder;
   DateTime lastUsed;
-  FileData(this.title, this.path, this.lastUsed);
+  FileData(this.title, this.path, this.lastUsed, this.columnOrder);
 }
 
 /// A sorted list of the last used files.
@@ -20,9 +21,9 @@ class LastOpenedFiles {
 
   /// Adds or updates the file, sorts the list and removes excess entries.
   void addFile(String title, String path) {
-    var idx = _files.indexWhere((element) => element.path == path);
+    final idx = _files.indexWhere((element) => element.path == path);
     if (idx < 0) {
-      _files.add(FileData(title, path, DateTime.now()));
+      _files.add(FileData(title, path, DateTime.now(), '{}'));
     } else {
       _files[idx].title = title;
       _files[idx].lastUsed = DateTime.now();
@@ -31,5 +32,17 @@ class LastOpenedFiles {
     if (_files.length > maxFilesToKeep) {
       _files.removeRange(maxFilesToKeep, _files.length);
     }
+  }
+
+  /// Updates the oder of columns to display.
+  ///
+  /// Returns true if data was updated
+  bool updateColumnOrder(String path, String order) {
+    final idx = _files.indexWhere((element) => element.path == path);
+    final inRange = idx >= 0 && idx < _files.length;
+    if (inRange) {
+      _files[idx].columnOrder = order;
+    }
+    return inRange;
   }
 }

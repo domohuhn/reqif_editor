@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:reqif_editor/src/document/column_header.dart';
 import 'package:reqif_editor/src/document/document_controller.dart';
+import 'package:reqif_editor/src/document/document_data.dart';
 import 'package:reqif_editor/src/document/resizable_table_view.dart';
 import 'package:reqif_editor/src/reqif/convert_reqif_xhtml_to_widgets.dart';
 import 'package:reqif_editor/src/reqif/flat_document.dart';

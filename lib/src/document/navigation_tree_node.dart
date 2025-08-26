@@ -3,6 +3,7 @@
 // See LICENSE for the full text of the license
 
 import 'package:reqif_editor/src/document/document_controller.dart';
+import 'package:reqif_editor/src/document/document_data.dart';
 import 'package:reqif_editor/src/reqif/flat_document.dart';
 import 'package:reqif_editor/src/reqif/reqif_error.dart';
 import 'package:two_dimensional_scrollables/two_dimensional_scrollables.dart';

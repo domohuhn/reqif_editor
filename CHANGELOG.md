@@ -1,7 +1,9 @@
-## 0.5.2
+## 0.6.0
 
 - Fixed version
 - Fixed line endings when saving files
+- Upgraded all dependencies
+- The custom order of the columns of a document is stored in the persistent settings database
 
 ## 0.5.1
 

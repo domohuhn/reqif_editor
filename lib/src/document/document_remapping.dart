@@ -1,3 +1,8 @@
+// Copyright 2025, domohuhn.
+// SPDX-License-Identifier: BSD-3-Clause
+// See LICENSE for the full text of the license
+
+import 'dart:convert';
 import 'dart:math';
 
 void moveDataInList<T>(List<T> data, int index, int move) {
@@ -19,21 +24,6 @@ void moveDataInList<T>(List<T> data, int index, int move) {
     }
   }
 }
-
-class ColumnData {
-  int original = 0;
-  int mergeTarget = 0;
-  bool visible = true;
-  bool merge = false;
-}
-
-// requirements:
-// can reorder columns
-// provides column count (+merges)
-// holds column widths and heights
-// provides reordered random access to widths and heights
-// can compute widths and heights
-// can create the widgets and merge cols
 
 class ColumnMappings {
   final List<int> mappings;
@@ -61,5 +51,50 @@ class ColumnMappings {
   /// [move] less than zero moves the column to an earlier position
   void moveColumn(int column, int move) {
     moveDataInList<int>(mappings, column, move);
+  }
+
+  /// Creates a json fragment as string to serialize the document order.
+  String toJsonFragment(int part) {
+    StringBuffer rv = StringBuffer('"$part":');
+    rv.write(json.encode(mappings));
+    return rv.toString();
+  }
+
+  /// Reads the [data] from a json object by searching for [part].
+  void fromJson(dynamic data, int part) {
+    try {
+      final key = "$part";
+      if (data is Map) {
+        if (data.containsKey(key)) {
+          final list = data[key];
+          if (list is List) {
+            if (list.length == mappings.length) {
+              for (int i = 0; i < list.length; ++i) {
+                mappings[i] = list[i];
+                if (mappings.length <= mappings[i]) {
+                  throw RangeError.range(mappings[i], 0, mappings.length);
+                }
+              }
+            }
+          }
+        }
+      }
+      for (int i = 0; i < mappings.length; ++i) {
+        for (int k = i + 1; k < mappings.length; ++k) {
+          if (mappings[i] == mappings[k]) {
+            // duplicate mappings are invalid
+            throw RangeError.range(mappings[i], 0, mappings.length);
+          }
+        }
+      }
+    } catch (id) {
+      reset();
+    }
+  }
+
+  void reset() {
+    for (int i = 0; i < mappings.length; ++i) {
+      mappings[i] = i;
+    }
   }
 }
