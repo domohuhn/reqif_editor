@@ -65,7 +65,7 @@ class DocumentController with ChangeNotifier {
       visibleDocumentNumber -= 1;
     }
     _sanitizeValues();
-    notifyListeners();
+    triggerRebuild();
   }
 
   void _sanitizeValues() {
@@ -281,7 +281,16 @@ class DocumentController with ChangeNotifier {
       return;
     }
     documents[document].moveColumn(part: part, column: column, move: move);
-    notifyListeners();
+    documentWasModified(document);
+  }
+
+  void resetColumnOrder({required int document, required int part}) {
+    if (document < 0 || document >= length) {
+      return;
+    }
+    if (documents[document].resetColumnOrder(part)) {
+      documentWasModified(document);
+    }
   }
 }
 

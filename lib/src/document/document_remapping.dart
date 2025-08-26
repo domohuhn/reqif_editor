@@ -92,9 +92,22 @@ class ColumnMappings {
     }
   }
 
-  void reset() {
+  bool isNormalOrder() {
+    for (int i = 0; i < mappings.length; ++i) {
+      if (mappings[i] != i) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  bool reset() {
+    if (isNormalOrder()) {
+      return false;
+    }
     for (int i = 0; i < mappings.length; ++i) {
       mappings[i] = i;
     }
+    return true;
   }
 }

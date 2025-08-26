@@ -374,6 +374,12 @@ abstract class AppLocalizations {
   /// **'Order of columns:'**
   String get columnOrder;
 
+  /// Text for the button to reset the order of columns
+  ///
+  /// In en, this message translates to:
+  /// **'Reset order of columns'**
+  String get resetColumnOrder;
+
   /// text above column reorder widget editable column
   ///
   /// In en, this message translates to:

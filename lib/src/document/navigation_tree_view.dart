@@ -26,6 +26,10 @@ class NavigationTreeView extends StatefulWidget {
     controller.setHeaderColumn(docId, partId, heading);
   }
 
+  void documentWasModified(int idx) {
+    controller.documentWasModified(idx);
+  }
+
   void forceRedraw() {
     controller.forceRedraw();
   }
@@ -281,6 +285,9 @@ class TreeExampleState extends State<NavigationTreeView> {
           controller: _textEditingControllers[node.document.index],
           onChanged: (value) {
             node.document.comment = value;
+            if (mounted) {
+              widget.documentWasModified(node.document.index);
+            }
           },
           decoration: InputDecoration(
             border: const OutlineInputBorder(gapPadding: 1.0),
@@ -343,7 +350,14 @@ class TreeExampleState extends State<NavigationTreeView> {
           const Spacer(),
           Text(AppLocalizations.of(context)!.editable)
         ]),
-        _buildReorderBox(context, part)
+        _buildReorderBox(context, part),
+        TextButton(
+          child: Text(AppLocalizations.of(context)!.resetColumnOrder),
+          onPressed: () {
+            widget.controller.resetColumnOrder(
+                document: part.document.index, part: partNumber);
+          },
+        )
       ],
     );
   }
@@ -411,11 +425,13 @@ class TreeExampleState extends State<NavigationTreeView> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Row(children: [
-            _getLeadingIcon(node.isFile, node.isPart, false, false, 20.0),
-            Text(node.isFile
-                ? node.document.flatDocument.title
-                : node.part.name ??
-                    "${AppLocalizations.of(context)!.part} ${node.part.index}")
+            _getLeadingIcon(node.isFile, node.isPart, false, true, 20.0),
+            Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 0, 0),
+                child: Text(node.isFile
+                    ? node.document.flatDocument.title
+                    : node.part.name ??
+                        "${AppLocalizations.of(context)!.part} ${node.part.index}"))
           ]),
           content: node.isFile
               ? _buildFileCommentEditor(context, node)

@@ -184,6 +184,10 @@
   "@columnOrder": {
     "description": "text above column reorder widget"
   },
+  "resetColumnOrder": "Reset order of columns",
+  "@resetColumnOrder": {
+    "description": "Text for the button to reset the order of columns"
+  },
   "editable": "Editable",
   "@editable": {
     "description": "text above column reorder widget editable column"

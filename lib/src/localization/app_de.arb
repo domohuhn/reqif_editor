@@ -47,6 +47,7 @@
   "toggleSearch": "Suche umschalten",
   "lastUsed": "Zuletzt geöffnet",
   "columnOrder": "Reihenfolge der Spalten:",
+  "resetColumnOrder": "Reihenfolge der Spalten zurücksetzen",
   "editable": "Editierbar",
   "openRecent": "Zuletzt geöffnet",
   "noMatches": "Ausdruck nicht gefunden"

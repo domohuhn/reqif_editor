@@ -205,10 +205,20 @@ class DocumentData {
   }
 
   /// Reset the column ordering
-  void resetColumnOrder() {
+  void resetAllColumnOrders() {
     for (int i = 0; i < columnMapping.length; ++i) {
       columnMapping[i].reset();
     }
+  }
+
+  /// Reset the column ordering for the given [part].
+  ///
+  /// Returns true if values were changed.
+  bool resetColumnOrder(int part) {
+    if (part < columnMapping.length) {
+      return columnMapping[part].reset();
+    }
+    return false;
   }
 
   void _initializeFilterControllers() {

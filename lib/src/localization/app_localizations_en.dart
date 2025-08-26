@@ -150,6 +150,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get columnOrder => 'Order of columns:';
 
   @override
+  String get resetColumnOrder => 'Reset order of columns';
+
+  @override
   String get editable => 'Editable';
 
   @override

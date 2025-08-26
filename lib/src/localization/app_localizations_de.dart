@@ -152,6 +152,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get columnOrder => 'Reihenfolge der Spalten:';
 
   @override
+  String get resetColumnOrder => 'Reihenfolge der Spalten zurücksetzen';
+
+  @override
   String get editable => 'Editierbar';
 
   @override
