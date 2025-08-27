@@ -9,6 +9,9 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
+  String get disableSpellCheck => '';
+
+  @override
   String get appTitle => 'ReqIf Editor';
 
   @override
@@ -154,6 +157,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get editable => 'Editable';
+
+  @override
+  String get visible => 'Visible';
+
+  @override
+  String get resetVisibility => 'Reset visibility';
 
   @override
   String get lastUsed => 'Last used';

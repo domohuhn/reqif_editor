@@ -98,6 +98,12 @@ abstract class AppLocalizations {
     Locale('en')
   ];
 
+  /// Provides a string to disable spellcheck in the json. NOT FOR USE IN THE APPLICATION
+  ///
+  /// In en, this message translates to:
+  /// **''**
+  String get disableSpellCheck;
+
   /// The title of the application
   ///
   /// In en, this message translates to:
@@ -380,11 +386,23 @@ abstract class AppLocalizations {
   /// **'Reset order of columns'**
   String get resetColumnOrder;
 
-  /// text above column reorder widget editable column
+  /// text above the 'column reorder widget' column that can set columns to editable
   ///
   /// In en, this message translates to:
   /// **'Editable'**
   String get editable;
+
+  /// text above the 'column reorder widget' column that can set columns to visible
+  ///
+  /// In en, this message translates to:
+  /// **'Visible'**
+  String get visible;
+
+  /// Text for the button to reset the visibility of columns
+  ///
+  /// In en, this message translates to:
+  /// **'Reset visibility'**
+  String get resetVisibility;
 
   /// text for last used field
   ///

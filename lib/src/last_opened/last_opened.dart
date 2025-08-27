@@ -6,8 +6,10 @@ class FileData {
   String title;
   String path;
   String columnOrder;
+  String columnVisibility;
   DateTime lastUsed;
-  FileData(this.title, this.path, this.lastUsed, this.columnOrder);
+  FileData(this.title, this.path, this.lastUsed, this.columnOrder,
+      this.columnVisibility);
 }
 
 /// A sorted list of the last used files.
@@ -23,7 +25,7 @@ class LastOpenedFiles {
   void addFile(String title, String path) {
     final idx = _files.indexWhere((element) => element.path == path);
     if (idx < 0) {
-      _files.add(FileData(title, path, DateTime.now(), '{}'));
+      _files.add(FileData(title, path, DateTime.now(), '{}', '{}'));
     } else {
       _files[idx].title = title;
       _files[idx].lastUsed = DateTime.now();
@@ -34,15 +36,35 @@ class LastOpenedFiles {
     }
   }
 
-  /// Updates the oder of columns to display.
+  /// Updates the order of columns to display.
   ///
   /// Returns true if data was updated
   bool updateColumnOrder(String path, String order) {
     final idx = _files.indexWhere((element) => element.path == path);
     final inRange = idx >= 0 && idx < _files.length;
+    var updated = false;
     if (inRange) {
-      _files[idx].columnOrder = order;
+      if (_files[idx].columnOrder != order) {
+        _files[idx].columnOrder = order;
+        updated = true;
+      }
     }
-    return inRange;
+    return updated;
+  }
+
+  /// Updates the visibility of columns to display.
+  ///
+  /// Returns true if data was updated
+  bool updateColumnVisibility(String path, String visibility) {
+    final idx = _files.indexWhere((element) => element.path == path);
+    final inRange = idx >= 0 && idx < _files.length;
+    var updated = false;
+    if (inRange) {
+      if (_files[idx].columnVisibility != visibility) {
+        _files[idx].columnVisibility = visibility;
+        updated = true;
+      }
+    }
+    return updated;
   }
 }

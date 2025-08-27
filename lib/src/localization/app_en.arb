@@ -1,5 +1,9 @@
 {
   "@@locale": "en",
+  "disableSpellCheck":"",
+  "@disableSpellCheck": {
+    "description": "Provides a string to disable spellcheck in the json. NOT FOR USE IN THE APPLICATION"
+  },
   "appTitle": "ReqIf Editor",
   "@appTitle": {
     "description": "The title of the application"
@@ -190,7 +194,15 @@
   },
   "editable": "Editable",
   "@editable": {
-    "description": "text above column reorder widget editable column"
+    "description": "text above the 'column reorder widget' column that can set columns to editable"
+  },
+  "visible": "Visible",
+  "@visible": {
+    "description": "text above the 'column reorder widget' column that can set columns to visible"
+  },
+  "resetVisibility": "Reset visibility",
+  "@resetVisibility": {
+    "description": "Text for the button to reset the visibility of columns"
   },
   "lastUsed": "Last used",
   "@lastUsed": {

@@ -1,6 +1,7 @@
 {
   "@@locale": "de",
   "@@x-template": "app_en.arb",
+  "disableSpellCheck":"/* cSpell:disable */",
   "appTitle": "ReqIf Editor",
   "file": "Datei",
   "about": "Über",
@@ -49,6 +50,8 @@
   "columnOrder": "Reihenfolge der Spalten:",
   "resetColumnOrder": "Reihenfolge der Spalten zurücksetzen",
   "editable": "Editierbar",
+  "visible": "Sichtbar",
+  "resetVisibility": "Sichtbarkeit zurücksetzen",
   "openRecent": "Zuletzt geöffnet",
   "noMatches": "Ausdruck nicht gefunden"
 }

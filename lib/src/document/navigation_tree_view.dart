@@ -96,6 +96,7 @@ class TreeExampleState extends State<NavigationTreeView> {
 
   static const double filePadding = 90;
   static const double indentAmount = 24;
+  static const double widthVisibleColumn = 60;
 
   double widthReduction(TreeViewNode<NavigationTreeNode> node) =>
       node.content.isFile ? filePadding : filePadding + indentAmount;
@@ -315,7 +316,8 @@ class TreeExampleState extends State<NavigationTreeView> {
       dropDownWidgets
           .add(DropdownMenuItem<String>(value: name, child: Text(name)));
     }
-    return Column(
+    return SingleChildScrollView(
+        child: Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -348,6 +350,9 @@ class TreeExampleState extends State<NavigationTreeView> {
         Row(mainAxisSize: MainAxisSize.max, children: [
           Text(AppLocalizations.of(context)!.columnOrder),
           const Spacer(),
+          SizedBox(
+              width: widthVisibleColumn,
+              child: Text(AppLocalizations.of(context)!.visible)),
           Text(AppLocalizations.of(context)!.editable)
         ]),
         _buildReorderBox(context, part),
@@ -357,9 +362,16 @@ class TreeExampleState extends State<NavigationTreeView> {
             widget.controller.resetColumnOrder(
                 document: part.document.index, part: partNumber);
           },
+        ),
+        TextButton(
+          child: Text(AppLocalizations.of(context)!.resetVisibility),
+          onPressed: () {
+            widget.controller.resetVisibility(
+                document: part.document.index, part: partNumber);
+          },
         )
       ],
-    );
+    ));
   }
 
   Widget _buildReorderBox(BuildContext context, NavigationTreeNode part) {
@@ -405,10 +417,29 @@ class TreeExampleState extends State<NavigationTreeView> {
                     padding: const EdgeInsets.fromLTRB(16, 0, 8, 0),
                     child: Text(documentPart.columnNames[column])),
                 const Spacer(),
+                SizedBox(
+                    width: widthVisibleColumn + indentAmount,
+                    child: Checkbox.adaptive(
+                        value: map.isVisible(index),
+                        onChanged: (val) {
+                          print(
+                              "CHANGED col: $column idx: $index - vis   ${map.isVisible(column)} , ${map.isVisible(index)}");
+                          if (val != null &&
+                              val != map.isVisible(index) &&
+                              mounted) {
+                            widget.controller.setColumnVisibility(
+                                document: document.index,
+                                part: partNumber,
+                                column: index,
+                                visible: val);
+                          }
+                        })),
                 Checkbox.adaptive(
                     value: attributes[column].isEditable,
                     onChanged: (val) {
-                      if (val != null && val != attributes[column].isEditable) {
+                      if (val != null &&
+                          val != attributes[column].isEditable &&
+                          mounted) {
                         attributes[column].editable = val;
                         widget.forceRedraw();
                       }

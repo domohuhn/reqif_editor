@@ -9,6 +9,9 @@ class AppLocalizationsDe extends AppLocalizations {
   AppLocalizationsDe([String locale = 'de']) : super(locale);
 
   @override
+  String get disableSpellCheck => '/* cSpell:disable */';
+
+  @override
   String get appTitle => 'ReqIf Editor';
 
   @override
@@ -156,6 +159,12 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get editable => 'Editierbar';
+
+  @override
+  String get visible => 'Sichtbar';
+
+  @override
+  String get resetVisibility => 'Sichtbarkeit zurücksetzen';
 
   @override
   String get lastUsed => 'Zuletzt geöffnet';

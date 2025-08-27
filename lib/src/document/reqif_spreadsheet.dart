@@ -136,9 +136,10 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
     }
     _fillCache();
     final documentPart = flatDocument[widget.partNumber];
+    final map = widget.data.columnMapping[widget.partNumber];
     return ResizableTableView(
         rowCount: documentPart.rowCount,
-        columnCount: documentPart.columnCount,
+        columnCount: map.visibleColumnCount(),
         cellBuilder: _buildCell,
         columnHeaderBuilder: _buildColumnHeader,
         initialRowHeights: _estimateInitialRowHeights,
@@ -302,7 +303,7 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
       return;
     }
     final map = widget.data.columnMapping[widget.partNumber];
-    final int columnIndex = map.remap(position.column - 1);
+    final int columnIndex = map.remapWithVisibility(position.column - 1);
     final int rowIndex = position.row - 1;
     final element = widget.part[rowIndex];
     var value = element.object[columnIndex];
@@ -330,7 +331,7 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
       return null;
     }
     final map = widget.data.columnMapping[widget.partNumber];
-    final int columnIndex = map.remap(vicinity.column - 1);
+    final int columnIndex = map.remapWithVisibility(vicinity.column - 1);
     final datatype = widget.part.type[columnIndex];
     final partNumber = widget.partNumber;
     final data = widget.data;
@@ -376,7 +377,7 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
     }
     final map = widget.data.columnMapping[widget.partNumber];
     final int rowIndex = vicinity.row - 1;
-    final int columnIndex = map.remap(vicinity.column - 1);
+    final int columnIndex = map.remapWithVisibility(vicinity.column - 1);
     final element = widget.part[rowIndex];
     var value = element.object[columnIndex];
     final datatype = widget.part.type[columnIndex];

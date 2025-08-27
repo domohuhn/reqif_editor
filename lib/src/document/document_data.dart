@@ -164,8 +164,9 @@ class DocumentData {
 
   void _initializeLists() {
     for (int i = 0; i < flatDocument.partCount; ++i) {
-      partColumnWidths.add([]);
+      _partColumnWidths.add([]);
       partRowHeights.add([]);
+      _partFilteredColumnWidths.add([]);
     }
   }
 
@@ -183,7 +184,19 @@ class DocumentData {
     try {
       final data = jsonDecode(strData);
       for (int i = 0; i < columnMapping.length; ++i) {
-        columnMapping[i].fromJson(data, i);
+        columnMapping[i].orderFromJson(data, i);
+      }
+    } catch (e) {
+      // do nothing on failure - we use the default order
+    }
+  }
+
+  /// Initializes the column visibility from a json string given in [strData]
+  void columnVisibilityFromJson(String strData) {
+    try {
+      final data = jsonDecode(strData);
+      for (int i = 0; i < columnMapping.length; ++i) {
+        columnMapping[i].visibilityFromJson(data, i);
       }
     } catch (e) {
       // do nothing on failure - we use the default order
@@ -195,7 +208,7 @@ class DocumentData {
     StringBuffer rv = StringBuffer('{');
     for (int i = 0; i < columnMapping.length; ++i) {
       bool isLast = (i + 1) == columnMapping.length;
-      rv.write(columnMapping[i].toJsonFragment(i));
+      rv.write(columnMapping[i].orderToJsonFragment(i));
       if (!isLast) {
         rv.write(',');
       }
@@ -207,16 +220,40 @@ class DocumentData {
   /// Reset the column ordering
   void resetAllColumnOrders() {
     for (int i = 0; i < columnMapping.length; ++i) {
-      columnMapping[i].reset();
+      columnMapping[i].resetOrder();
     }
   }
 
-  /// Reset the column ordering for the given [part].
+  /// Resets the column ordering for the given [part].
   ///
   /// Returns true if values were changed.
   bool resetColumnOrder(int part) {
     if (part < columnMapping.length) {
-      return columnMapping[part].reset();
+      return columnMapping[part].resetOrder();
+    }
+    return false;
+  }
+
+  /// Serializes the column visibility to a json string
+  String columnVisibilityToJson() {
+    StringBuffer rv = StringBuffer('{');
+    for (int i = 0; i < columnMapping.length; ++i) {
+      bool isLast = (i + 1) == columnMapping.length;
+      rv.write(columnMapping[i].visibilityToJsonFragment(i));
+      if (!isLast) {
+        rv.write(',');
+      }
+    }
+    rv.write('}');
+    return rv.toString();
+  }
+
+  /// Resets the column visibility for the given [part].
+  ///
+  /// Returns true if values were changed.
+  bool resetColumnVisibility(int part) {
+    if (part < columnMapping.length) {
+      return columnMapping[part].resetVisibility();
     }
     return false;
   }
@@ -232,7 +269,13 @@ class DocumentData {
   }
 
   /// column widths per part
-  final List<List<double>> partColumnWidths = <List<double>>[];
+  List<List<double>> get partColumnWidths => _partFilteredColumnWidths;
+
+  /// column widths per part
+  final List<List<double>> _partColumnWidths = <List<double>>[];
+
+  /// filtered column widths per part - invisible columns are removed
+  final List<List<double>> _partFilteredColumnWidths = <List<double>>[];
 
   /// row heights per part
   final List<List<double>> partRowHeights = <List<double>>[];
@@ -294,8 +337,9 @@ class DocumentData {
       part.$2.applyFilter(
           active, partFilterControllers[part.$1].map((e) => e.text).toList());
     }
-    partColumnWidths.clear();
+    _partColumnWidths.clear();
     partRowHeights.clear();
+    _partFilteredColumnWidths.clear();
     _initializeLists();
 
     for (int i = 0; i < flatDocument.parts.length; ++i) {
@@ -326,11 +370,73 @@ class DocumentData {
   void moveColumn({required int part, required int column, required int move}) {
     if (part >= columnMapping.length ||
         part < 0 ||
-        part >= partColumnWidths.length) {
+        part >= _partColumnWidths.length) {
       return;
     }
+    backwardsCopyVisibleColumnsToList<double>(_partColumnWidths[part],
+        _partFilteredColumnWidths[part], columnMapping[part]);
     columnMapping[part].moveColumn(column, move);
-    moveDataInList<double>(partColumnWidths[part], column + 1, move);
+    moveDataInList<double>(_partColumnWidths[part], column + 1, move);
+    copyVisibleColumnsToList<double>(_partFilteredColumnWidths[part],
+        _partColumnWidths[part], columnMapping[part]);
     searchData[part].update();
+  }
+
+  void setColumnVisibility(
+      {required int part, required int column, required bool visible}) {
+    if (part >= columnMapping.length ||
+        part < 0 ||
+        part >= _partColumnWidths.length) {
+      return;
+    }
+    backwardsCopyVisibleColumnsToList<double>(_partColumnWidths[part],
+        _partFilteredColumnWidths[part], columnMapping[part]);
+    columnMapping[part].setVisibility(column, visible);
+    copyVisibleColumnsToList<double>(_partFilteredColumnWidths[part],
+        _partColumnWidths[part], columnMapping[part]);
+    searchData[part].update();
+  }
+}
+
+void backwardsCopyVisibleColumnsToList<T>(
+    List<T> allData, List<T> visibleDataList, ColumnMappings map) {
+  // the first column is the border - it is not tracked by the mappings
+  // TODO TODO TODO
+  if (visibleDataList.length > allData.length) {
+    List<int> maps = [];
+    allData.clear();
+    allData.addAll(visibleDataList);
+    maps.add(0);
+    for (int i = 1; i < visibleDataList.length; i++) {
+      maps.add(map.remapWithVisibility(i - 1) + 1);
+    }
+    for (int i = 0; i < visibleDataList.length; i++) {
+      allData[maps[i]] = visibleDataList[i];
+    }
+  } else {
+    allData[0] = visibleDataList[0];
+    print("0 : ${visibleDataList[0]}");
+    for (int i = 1; i < visibleDataList.length; i++) {
+      allData[map.remapWithVisibility(i - 1) + 1] = visibleDataList[i];
+      print("$i : ${visibleDataList[i]}");
+    }
+  }
+}
+
+void copyVisibleColumnsToList<T>(
+    List<T> destination, List<T> source, ColumnMappings map) {
+  // the first column is the border - it is not tracked by the mappings
+  final visibleCount = map.visibleColumnCount() + 1;
+  if (visibleCount != destination.length) {
+    destination.clear();
+    destination.add(source[0]);
+    for (int i = 1; i < visibleCount; i++) {
+      destination.add(source[map.remapWithVisibility(i - 1) + 1]);
+    }
+  } else {
+    destination[0] == source[0];
+    for (int i = 1; i < destination.length; i++) {
+      destination[i] = source[map.remapWithVisibility(i - 1) + 1];
+    }
   }
 }

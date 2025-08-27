@@ -43,8 +43,10 @@ class DocumentController with ChangeNotifier {
     }
     final flat = ReqIfFlatDocument.buildFlatDocument(doc);
     final columnOrder = _settings.fileColumnOrder(path);
+    final columnVisibility = _settings.fileColumnVisibility(path);
     final output = DocumentData(path, doc, flat, documents.length, _service);
     output.columnOrderFromJson(columnOrder);
+    output.columnVisibilityFromJson(columnVisibility);
     documents.add(output);
     _settings.addOpenedFile(path, flat.title);
     notifyListeners();
@@ -127,16 +129,14 @@ class DocumentController with ChangeNotifier {
       contents = contents.replaceAll('\r\n', '\n');
     }
     if (outputPath != null) {
-      await _service.write(outputPath, contents);
       toSave.path = outputPath;
       await _settings.addOpenedFile(toSave.path, toSave.title);
-      await _settings.updateFileColumnOrder(
-          toSave.path, toSave.columnOrderToJson());
-    } else {
-      await _service.write(toSave.path, contents);
-      await _settings.updateFileColumnOrder(
-          toSave.path, toSave.columnOrderToJson());
     }
+    await _service.write(toSave.path, contents);
+    await _settings.updateFileColumnOrder(
+        toSave.path, toSave.columnOrderToJson());
+    await _settings.updateFileColumnVisibility(
+        toSave.path, toSave.columnVisibilityToJson());
     toSave.modified = false;
   }
 
@@ -284,11 +284,33 @@ class DocumentController with ChangeNotifier {
     documentWasModified(document);
   }
 
+  void setColumnVisibility(
+      {required int document,
+      required int part,
+      required int column,
+      required bool visible}) {
+    if (document < 0 || document >= length) {
+      return;
+    }
+    documents[document]
+        .setColumnVisibility(part: part, column: column, visible: visible);
+    documentWasModified(document);
+  }
+
   void resetColumnOrder({required int document, required int part}) {
     if (document < 0 || document >= length) {
       return;
     }
     if (documents[document].resetColumnOrder(part)) {
+      documentWasModified(document);
+    }
+  }
+
+  void resetVisibility({required int document, required int part}) {
+    if (document < 0 || document >= length) {
+      return;
+    }
+    if (documents[document].resetColumnVisibility(part)) {
       documentWasModified(document);
     }
   }

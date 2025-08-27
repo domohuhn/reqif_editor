@@ -115,4 +115,24 @@ class SettingsController with ChangeNotifier {
     }
     return "{}";
   }
+
+  /// Updates and persists the column visibility of the file.
+  Future<void> updateFileColumnVisibility(
+      String path, String visibility) async {
+    if (path.isEmpty) return;
+    if (_files.updateColumnVisibility(path, visibility)) {
+      await _settingsService.setLastOpenedFiles(_files);
+    }
+    notifyListeners();
+  }
+
+  /// Gets the file column order for a given path if present
+  String fileColumnVisibility(String path) {
+    for (final f in _files.files) {
+      if (f.path == path) {
+        return f.columnVisibility;
+      }
+    }
+    return "{}";
+  }
 }

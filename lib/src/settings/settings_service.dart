@@ -161,6 +161,10 @@ class LocalSettingsService extends SettingsService {
     await _preferences.setStringList(key, values);
   }
 
+  Future<void> setColumnVisibilityList(String key, List<String> values) async {
+    await _preferences.setStringList(key, values);
+  }
+
   List<String> readStringList(String key) {
     return _preferences.getStringList(key) ?? <String>[];
   }
@@ -175,6 +179,8 @@ class LocalSettingsService extends SettingsService {
   static const String _keyLastOpenedTitle = 'lastOpenedTitle';
   static const String _keyLastOpenedDate = 'lastOpenedDate';
   static const String _keyLastOpenedColumnOrder = 'lastOpenedColumnOrder';
+  static const String _keyLastOpenedColumnVisibility =
+      'lastOpenedColumnVisibility';
 
   /// Gets the last opened files
   @override
@@ -183,13 +189,15 @@ class LocalSettingsService extends SettingsService {
     final titles = readStringList(_keyLastOpenedTitle);
     final times = readDateTimeList(_keyLastOpenedDate);
     final columnOrder = readStringList(_keyLastOpenedColumnOrder);
+    final columnVisibility = readStringList(_keyLastOpenedColumnVisibility);
     if (paths.length != titles.length || paths.length != times.length) {
       return LastOpenedFiles([]);
     }
     List<FileData> data = [];
     for (int i = 0; i < paths.length; ++i) {
       final order = i < columnOrder.length ? columnOrder[i] : "{}";
-      data.add(FileData(titles[i], paths[i], times[i], order));
+      final visible = i < columnVisibility.length ? columnVisibility[i] : "{}";
+      data.add(FileData(titles[i], paths[i], times[i], order, visible));
     }
     return LastOpenedFiles(data);
   }
@@ -200,16 +208,20 @@ class LocalSettingsService extends SettingsService {
     List<String> paths = [];
     List<String> titles = [];
     List<String> columnOrder = [];
+    List<String> columnVisibility = [];
     List<DateTime> times = [];
     for (final file in files.files) {
       paths.add(file.path);
       titles.add(file.title);
       times.add(file.lastUsed);
       columnOrder.add(file.columnOrder);
+      columnVisibility.add(file.columnVisibility);
     }
     await setStringList(_keyLastOpenedPath, paths);
     await setStringList(_keyLastOpenedTitle, titles);
     await setDateTimeList(_keyLastOpenedDate, times);
     await setColumnOrderList(_keyLastOpenedColumnOrder, columnOrder);
+    await setColumnVisibilityList(
+        _keyLastOpenedColumnVisibility, columnVisibility);
   }
 }
