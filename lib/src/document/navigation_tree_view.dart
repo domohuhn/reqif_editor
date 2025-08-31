@@ -43,6 +43,7 @@ class NavigationTreeViewState extends State<NavigationTreeView> {
 
   List<TreeViewNode<NavigationTreeNode>> _tree =
       <TreeViewNode<NavigationTreeNode>>[];
+  String _errorText = "";
 
   void _buildTree() {
     try {
@@ -59,6 +60,7 @@ class NavigationTreeViewState extends State<NavigationTreeView> {
       }
     } catch (e) {
       _tree.clear();
+      _errorText = e.toString();
     }
   }
 
@@ -265,7 +267,7 @@ class NavigationTreeViewState extends State<NavigationTreeView> {
   Widget build(BuildContext context) {
     _updateTree();
     if (_tree.isEmpty) {
-      return _wrapInBox(Text(""));
+      return _wrapInBox(Text("Error: no data - '$_errorText'"));
     } else {
       return _wrapInBox(_getTreeView());
     }

@@ -168,10 +168,9 @@ class DocumentData {
   }
 
   void _initializeSelectionAndSearchData() {
-    for (int i = 0; i < flatDocument.partCount; ++i) {
+    for (int i = 0; i < partModels.length; ++i) {
       partSelections.add(const TableVicinity(column: -1, row: -1));
-      searchData.add(ReqIfSearchController(
-          part: flatDocument[i], partNumber: i, map: partModels.last));
+      searchData.add(ReqIfSearchController(partModels[i]));
     }
   }
 
@@ -300,8 +299,8 @@ class DocumentData {
     double rv = 0.0;
     if (partNo < partModels.length) {
       final model = partModels[partNo];
-      // row 0 is fixed at top -> add one to start and target
-      final limit = min(rowIndex + 1, model.rows);
+      // row 0 is fixed at top -> add one to start
+      final limit = min(rowIndex, model.rows);
       for (int i = 1; i < limit; ++i) {
         rv += model.rowHeight(i);
       }

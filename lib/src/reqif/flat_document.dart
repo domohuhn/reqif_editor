@@ -258,46 +258,6 @@ class ReqIfDocumentPart {
     }
     return (false, -1);
   }
-
-  int countMatches(String text, bool caseSensitive) {
-    if (text == "") {
-      return 0;
-    }
-    final regex = RegExp(text, caseSensitive: caseSensitive);
-    int count = 0;
-    for (final val in elements) {
-      for (final attr in val) {
-        if (attr != null && regex.hasMatch(attr.toStringWithNewlines())) {
-          count += 1;
-        }
-      }
-    }
-    return count;
-  }
-
-  /// Finds the indices for match at [position] in the list of all matches.
-  /// returns (row,column).
-  /// Will return -1 if not found.
-  (int, int) matchAt(String text, bool caseSensitive, int position) {
-    if (text == "") {
-      return (-1, -1);
-    }
-    final regex = RegExp(text, caseSensitive: caseSensitive);
-    int count = 0;
-    int row = 0;
-    for (final val in elements) {
-      for (final attr in val) {
-        if (attr != null && regex.hasMatch(attr.toStringWithNewlines())) {
-          if (count == position) {
-            return (row, attr.column);
-          }
-          count += 1;
-        }
-      }
-      row += 1;
-    }
-    return (-1, -1);
-  }
 }
 
 /// The ReqIf document in a flat representation without having to handle the hierarchical elements

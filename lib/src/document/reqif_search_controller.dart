@@ -6,7 +6,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:reqif_editor/src/document/model/table_model.dart';
-import 'package:reqif_editor/src/reqif/flat_document.dart';
+import 'package:reqif_editor/src/reqif/reqif_attribute_values.dart';
 import 'package:two_dimensional_scrollables/two_dimensional_scrollables.dart';
 
 class ReqIfSearchController {
@@ -15,12 +15,10 @@ class ReqIfSearchController {
   int matches = 0;
   int currentMatch = -1;
   bool caseSensitive = false;
-  final int partNumber;
-  ReqIfDocumentPart part;
   TableModel map;
+  List<TableVicinity> allMatches = [];
 
-  ReqIfSearchController(
-      {required this.part, required this.partNumber, required this.map});
+  ReqIfSearchController(this.map);
 
   void update() {
     String filter = searchController.text;
@@ -29,37 +27,57 @@ class ReqIfSearchController {
     updateSelectionAndFindMatchRow(currentMatch, filter);
   }
 
+  void _fillList(String text) {
+    allMatches.clear();
+    final regex = RegExp(text, caseSensitive: caseSensitive);
+    for (int row = 1; row < map.rows; row++) {
+      for (int col = 1; col < map.columns; col++) {
+        final position = TableVicinity(row: row, column: col);
+        final cell = map[position];
+        if (cell != null && cell.content.isNotEmpty) {
+          for (final attr in cell.content) {
+            if (attr is ReqIfAttributeValue &&
+                regex.hasMatch(attr.toStringWithNewlines())) {
+              allMatches.add(position);
+            }
+          }
+        }
+      }
+    }
+  }
+
   void countMatches(String text) {
     if (text == "") {
+      allMatches.clear();
       matches = 0;
       currentMatch = -1;
       matchPosition = const TableVicinity(column: -1, row: -1);
       return;
     }
-    matches = part.countMatches(text, caseSensitive);
-    if (matches == 0) {
+    _fillList(text);
+    matches = allMatches.length;
+    if (allMatches.isEmpty) {
       currentMatch = -1;
       matchPosition = const TableVicinity(column: -1, row: -1);
     }
   }
 
   int updateSelectionAndFindMatchRow(int matchNumber, String text) {
-    if (text == "") {
+    if (text == "" || matches == 0) {
       matches = 0;
       currentMatch = -1;
       matchPosition = const TableVicinity(column: -1, row: -1);
       return -1;
     }
-    final position =
-        part.matchAt(text, caseSensitive, min(matchNumber, matches - 1));
-    if (position.$1 < 0) {
+    final matchIdx = max(0, min(matchNumber, matches - 1));
+    final position = allMatches[matchIdx];
+    if (position.row < 0) {
       matches = 0;
       currentMatch = -1;
       matchPosition = const TableVicinity(column: -1, row: -1);
       return -1;
     }
-    matchPosition = map.inverseMap(
-        TableVicinity(row: position.$1 + 1, column: position.$2 + 1));
-    return position.$1;
+    matchPosition = position;
+    return position.row;
   }
 }
