@@ -82,4 +82,37 @@ abstract class FinalModelWithExtends extends FinalModel {
       heights[row] = height;
     }
   }
+
+  /// Sets the [widths] of all columns without applying any sorting or filtering.
+  @override
+  void setAllColumnWidthsWithoutMap(List<double> widthsArg) {
+    if (widths.length != widthsArg.length) {
+      throw RangeError.value(widthsArg.length, "List have different sizes",
+          "The model has ${widths.length} columns, but you tried to set widths for ${widthsArg.length} in setAllColumnWidthsWithoutMap()");
+    }
+    widths = widthsArg;
+  }
+
+  /// Sets the [heights] of all rows without applying any sorting or filtering.
+  @override
+  void setAllRowHeightsWithoutMap(List<double> heightsArg) {
+    if (heights.length != heightsArg.length) {
+      throw RangeError.value(heightsArg.length, "List have different sizes",
+          "The model has ${heights.length} rows, but you tried to set heights for ${heightsArg.length} in setAllRowHeightsWithoutMap()");
+    }
+    heights = heightsArg;
+  }
+
+  void resize(
+      {required int columns,
+      required int rows,
+      double defaultWidth = 100,
+      double defaultHeight = 100}) {
+    if (columns != widths.length) {
+      widths = List<double>.filled(columns, defaultWidth);
+    }
+    if (rows != heights.length) {
+      heights = List<double>.filled(rows, defaultHeight);
+    }
+  }
 }

@@ -44,9 +44,8 @@ class DocumentController with ChangeNotifier {
     final flat = ReqIfFlatDocument.buildFlatDocument(doc);
     final columnOrder = _settings.fileColumnOrder(path);
     final columnVisibility = _settings.fileColumnVisibility(path);
-    final output = DocumentData(path, doc, flat, documents.length, _service);
-    output.columnOrderFromJson(columnOrder);
-    output.columnVisibilityFromJson(columnVisibility);
+    final output = DocumentData(path, doc, flat, documents.length, _service,
+        columnOrder: columnOrder, columnVisibility: columnVisibility);
     documents.add(output);
     _settings.addOpenedFile(path, flat.title);
     notifyListeners();
@@ -196,12 +195,6 @@ class DocumentController with ChangeNotifier {
   DocumentData operator [](int idx) {
     return documents[idx];
   }
-
-  List<double> get columnWidths => documents[visibleDocumentNumber]
-      .partColumnWidths[visibleDocumentPartNumber];
-
-  List<double> get rowHeights => documents[visibleDocumentNumber]
-      .partRowHeights[visibleDocumentPartNumber];
 
   ScrollController get horizontalScrollController =>
       _horizontalScrollController;

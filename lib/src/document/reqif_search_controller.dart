@@ -5,7 +5,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:reqif_editor/src/document/document_remapping.dart';
+import 'package:reqif_editor/src/document/model/table_model.dart';
 import 'package:reqif_editor/src/reqif/flat_document.dart';
 import 'package:two_dimensional_scrollables/two_dimensional_scrollables.dart';
 
@@ -17,7 +17,7 @@ class ReqIfSearchController {
   bool caseSensitive = false;
   final int partNumber;
   ReqIfDocumentPart part;
-  ColumnMappings map;
+  TableModel map;
 
   ReqIfSearchController(
       {required this.part, required this.partNumber, required this.map});
@@ -58,8 +58,8 @@ class ReqIfSearchController {
       matchPosition = const TableVicinity(column: -1, row: -1);
       return -1;
     }
-    matchPosition = TableVicinity(
-        row: position.$1 + 1, column: map.inverse(position.$2) + 1);
+    matchPosition = map.inverseMap(
+        TableVicinity(row: position.$1 + 1, column: position.$2 + 1));
     return position.$1;
   }
 }

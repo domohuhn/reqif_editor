@@ -9,9 +9,11 @@ import 'package:flutter_quill/flutter_quill.dart';
 import 'package:reqif_editor/src/document/column_header.dart';
 import 'package:reqif_editor/src/document/document_controller.dart';
 import 'package:reqif_editor/src/document/document_data.dart';
+import 'package:reqif_editor/src/document/model/table_model.dart';
 import 'package:reqif_editor/src/document/resizable_table_view.dart';
 import 'package:reqif_editor/src/reqif/convert_reqif_xhtml_to_widgets.dart';
 import 'package:reqif_editor/src/reqif/flat_document.dart';
+import 'package:reqif_editor/src/reqif/reqif_attribute_definitions.dart';
 import 'package:reqif_editor/src/reqif/reqif_attribute_values.dart';
 import 'package:reqif_editor/src/reqif/reqif_common.dart';
 import 'package:reqif_editor/src/reqif/reqif_data_types.dart';
@@ -135,18 +137,14 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
           "in document ${flatDocument.title}");
     }
     _fillCache();
-    final documentPart = flatDocument[widget.partNumber];
-    final map = widget.data.columnMapping[widget.partNumber];
     return ResizableTableView(
-        rowCount: documentPart.rowCount,
-        columnCount: map.visibleColumnCount(),
         cellBuilder: _buildCell,
         columnHeaderBuilder: _buildColumnHeader,
         initialRowHeights: _estimateInitialRowHeights,
         initialColumnWidths: _estimateInitialColumnWidths,
         onSelectionChanged: _onSelectionChanged,
-        columnWidthsProvider: () => widget.controller.columnWidths,
-        rowHeightsProvider: () => widget.controller.rowHeights,
+        model: widget.controller.documents[widget.document]
+            .partModels[widget.partNumber],
         selection: _selected,
         rowPositionBuilder: _buildRowPosition,
         selectAble: !quillSelected,
@@ -183,19 +181,26 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
   List<double> _columnWidths = [];
   List<double> _rowHeights = [];
 
+  /// The width of the first column. This column is fixed and contains the line number.
+  static const double _rowNumberIndicatorWidth = 64;
+
+  /// The height of the first row. This row is fixed and contains the headings.
+  /// Only relevant if the user did not provide a builder for the column headers.
+  static const double _columnHeaderHeight = 72;
+
   void _estimateInitialColumnWidthAndHeight() {
     List<double> columnWidths = [];
     List<double> rowHeights = [];
-    rowHeights.add(defaultRowHeight + 32);
-    final map = widget.data.columnMapping[widget.partNumber];
+    rowHeights.add(_columnHeaderHeight);
     for (int i = 0; i < widget.part.columnCount; ++i) {
       columnWidths.add(defaultColumnWidth);
     }
     for (final element in widget.part.elements) {
+      bool rowHasEmbeddedObjects = false;
       double rowHeight = defaultRowHeight;
       final bool rowEditable = element.isEditable && widget.isEditable;
       for (int i = 0; i < widget.part.columnCount; ++i) {
-        final column = map.remap(i);
+        final column = i;
         final attr = element.object.valueOrDefault(column);
         if (attr == null) {
           continue;
@@ -231,7 +236,8 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
             columnWidth = max(columnWidth, size.width + defaultTextPadding);
             rowHeight = max(rowHeight, size.height + defaultTextPadding);
             if (attr.embeddedObjectCount > 0) {
-              rowHeight += maxTextLineWidth * attr.embeddedObjectCount;
+              rowHasEmbeddedObjects = true;
+              rowHeight += columnWidth * attr.embeddedObjectCount;
             }
           default:
             final text = attr.toString();
@@ -246,9 +252,13 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
         }
         columnWidths[i] = columnWidth;
       }
-      rowHeights.add(1.2 * rowHeight);
+      if (!rowHasEmbeddedObjects) {
+        rowHeight += 10;
+      }
+      rowHeights.add(rowHeight);
     }
-    final int columnWithPrefix = widget.controller.headingsColumn;
+    columnWidths.insert(0, _rowNumberIndicatorWidth);
+    final int columnWithPrefix = widget.controller.headingsColumn + 1;
     if (columnWithPrefix < columnWidths.length) {
       columnWidths[columnWithPrefix] += 40;
     }
@@ -302,8 +312,8 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
       _onQuillEditorChange(null);
       return;
     }
-    final map = widget.data.columnMapping[widget.partNumber];
-    final int columnIndex = map.remapWithVisibility(position.column - 1);
+    final model = widget.data.partModels[widget.partNumber];
+    final int columnIndex = model.map(position).column - 1;
     final int rowIndex = position.row - 1;
     final element = widget.part[rowIndex];
     var value = element.object[columnIndex];
@@ -330,8 +340,11 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
     if (!widget.hasData || !widget.hasPart) {
       return null;
     }
-    final map = widget.data.columnMapping[widget.partNumber];
-    final int columnIndex = map.remapWithVisibility(vicinity.column - 1);
+    final model = widget.data.partModels[widget.partNumber];
+    final int columnIndex = model.map(vicinity).column - 1;
+    if (columnIndex < 0 || widget.part.type.attributeCount < columnIndex) {
+      return null;
+    }
     final datatype = widget.part.type[columnIndex];
     final partNumber = widget.partNumber;
     final data = widget.data;
@@ -346,9 +359,9 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
     return null;
   }
 
-  CellContents _wrapWithPrefix(ReqIfDocumentElement element, Widget child,
-      CellAttributes? attributes, bool wrap) {
-    if (!wrap || element.prefix == null) {
+  CellContents _wrapWithPrefix(
+      String? prefix, Widget child, CellAttributes? attributes, bool wrap) {
+    if (!wrap || prefix == null) {
       return CellContents(
           attribute: attributes,
           child: Container(
@@ -364,48 +377,113 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
             Container(
                 alignment: Alignment.topLeft,
                 padding: const EdgeInsets.fromLTRB(5, 5, 8, 0),
-                child: Text(element.prefix!)),
+                child: Text(prefix)),
             child
           ],
         ));
   }
 
+  CellAttributes? _getCellAttributes(Cell content) {
+    if (content.isDefaultValue) {
+      return CellAttributes.defaultValue;
+    }
+    if (content.isHeading) {
+      return CellAttributes.heading;
+    }
+    return null;
+  }
+
   CellContents? _buildCell(
-      BuildContext context, dynamic vicinity, bool selected) {
+      BuildContext context, TableVicinity vicinity, bool selected) {
     if (!widget.hasData || !widget.hasPart) {
       return null;
     }
-    final map = widget.data.columnMapping[widget.partNumber];
-    final int rowIndex = vicinity.row - 1;
-    final int columnIndex = map.remapWithVisibility(vicinity.column - 1);
-    final element = widget.part[rowIndex];
-    var value = element.object[columnIndex];
-    final datatype = widget.part.type[columnIndex];
-    CellAttributes? cellAttribute =
-        element.type == ReqIfFlatDocumentElementType.heading
-            ? CellAttributes.heading
-            : null;
-    // replace with default value
-    if (value == null &&
-        datatype.hasDefaultValue &&
-        datatype.defaultValue!.type ==
-            ReqIfElementTypes.attributeValueEnumeration) {
-      cellAttribute = CellAttributes.defaultValue;
-      value = datatype.defaultValue;
+    final model = widget.data.partModels[widget.partNumber];
+    final cellContent = model[vicinity];
+    if (cellContent == null || cellContent.content.isEmpty) {
+      final element = model.getRow(vicinity.row);
+      if (element is ReqIfDocumentElement &&
+          element.type == ReqIfFlatDocumentElementType.heading) {
+        return CellContents(child: null, attribute: CellAttributes.heading);
+      } else {
+        return null;
+      }
     }
-    if (value == null) {
-      return CellContents(child: null, attribute: cellAttribute);
+    var type = cellContent.type;
+    if (type is! ReqIfAttributeDefinition) {
+      return null;
     }
 
-    final bool wrapWithPrefix =
-        widget.controller.headingsColumn == columnIndex &&
-            element.type == ReqIfFlatDocumentElementType.heading;
-    if (((datatype.isEditable && element.isEditable && widget.isEditable) ||
-            widget.forceEditable) &&
-        value.embeddedObjectCount == 0) {
-      /// marked as editable by document
+    CellAttributes? cellAttribute = _getCellAttributes(cellContent);
+    bool wrapWithPrefix =
+        widget.controller.headingsColumn == (cellContent.column - 1) &&
+            cellContent.isHeading;
+
+    final bool isEditable =
+        ((type.isEditable && cellContent.isEditable && widget.isEditable) ||
+                widget.forceEditable) &&
+            cellContent.content.length == 1 &&
+            cellContent.content.first is ReqIfAttributeValue &&
+            cellContent.content.first.embeddedObjectCount == 0;
+
+    if (isEditable) {
+      return _buildEditableCell(cellContent, model, vicinity, context,
+          cellAttribute, selected, wrapWithPrefix);
+    }
+    return _buildConstantCell(cellContent, wrapWithPrefix, cellAttribute);
+  }
+
+  CellContents? _buildConstantCell(
+      Cell cellContent, bool wrapWithPrefix, CellAttributes? cellAttribute) {
+    List<Widget> children = [];
+    for (final content in cellContent.content) {
+      if (content == null || content is! ReqIfAttributeValue) {
+        continue;
+      }
+      final value = content;
       switch (value.type) {
         case ReqIfElementTypes.attributeValueEnumeration:
+          Widget? tmp = _buildConstEnumList(value as ReqIfAttributeValueEnum);
+          if (tmp != null) {
+            children.add(tmp);
+            wrapWithPrefix = false;
+          }
+        case ReqIfElementTypes.attributeValueXhtml:
+          children.add(Center(
+              child: XHtmlToWidgetsConverter(
+            node: value.node,
+            cache: widget.data,
+          )));
+        default:
+          children.add(Center(child: Text(value.toString())));
+      }
+    }
+    if (children.length == 1) {
+      return _wrapWithPrefix(
+          cellContent.prefix, children.first, cellAttribute, wrapWithPrefix);
+    } else if (children.isEmpty) {
+      return null;
+    } else {
+      return _wrapWithPrefix(cellContent.prefix, Row(children: children),
+          cellAttribute, wrapWithPrefix);
+    }
+  }
+
+  CellContents? _buildEditableCell(
+      Cell cellContent,
+      TableModel model,
+      TableVicinity vicinity,
+      BuildContext context,
+      CellAttributes? cellAttribute,
+      bool selected,
+      bool wrapWithPrefix) {
+    final value = cellContent.content.first as ReqIfAttributeValue;
+
+    /// marked as editable by document
+    switch (value.type) {
+      case ReqIfElementTypes.attributeValueEnumeration:
+        final element = model.getRow(vicinity.row);
+        if (element is ReqIfDocumentElement) {
           return CellContents(
               child: _buildEditableEnumList(
                   context,
@@ -413,41 +491,24 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
                   element,
                   cellAttribute == CellAttributes.defaultValue),
               attribute: cellAttribute);
-        case ReqIfElementTypes.attributeValueXhtml:
-          value as ReqIfAttributeValueXhtml;
-          if (selected) {
-            return CellContents(child: _buildQuillEditor());
-          }
-          return CellContents(
-              child: Center(
-                  child: XHtmlToWidgetsConverter(
-                node: value.node,
-                cache: widget.data,
-              )),
-              attribute: cellAttribute);
-        default:
-          return _wrapWithPrefix(
-              element, Text(value.toString()), cellAttribute, wrapWithPrefix);
-      }
-    }
-    switch (value.type) {
-      case ReqIfElementTypes.attributeValueEnumeration:
-        return CellContents(
-            child: _buildConstEnumList(value as ReqIfAttributeValueEnum),
-            attribute: cellAttribute);
+        } else {
+          return null;
+        }
       case ReqIfElementTypes.attributeValueXhtml:
-        return _wrapWithPrefix(
-            element,
-            Center(
+        value as ReqIfAttributeValueXhtml;
+        if (selected) {
+          return CellContents(child: _buildQuillEditor());
+        }
+        return CellContents(
+            child: Center(
                 child: XHtmlToWidgetsConverter(
               node: value.node,
               cache: widget.data,
             )),
-            cellAttribute,
-            wrapWithPrefix);
+            attribute: cellAttribute);
       default:
-        return _wrapWithPrefix(
-            element, Text(value.toString()), cellAttribute, wrapWithPrefix);
+        return _wrapWithPrefix(cellContent.prefix, Text(value.toString()),
+            cellAttribute, wrapWithPrefix);
     }
   }
 

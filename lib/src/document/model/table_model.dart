@@ -22,6 +22,9 @@ class Cell {
   /// cells or rows.
   List<dynamic> content;
 
+  /// A prefix text for rows that are headings
+  String? prefix;
+
   /// The cells contents are selected.
   bool selected;
 
@@ -31,10 +34,19 @@ class Cell {
   /// Is a default value
   bool isDefaultValue;
 
+  /// cell is editable
+  bool isEditable;
+
+  /// cell is a Heading
+  bool isHeading;
+
   Cell(this.row, this.column, this.type, this.content,
       {this.selected = false,
       this.matches = false,
-      this.isDefaultValue = false});
+      this.isDefaultValue = false,
+      this.isEditable = false,
+      this.isHeading = false,
+      this.prefix});
 }
 
 /// Wrapper for an int that encodes the reference system into the type system.
@@ -70,6 +82,12 @@ abstract class TableModel {
   /// Sets the [height] of the [row]
   void setRowHeight(DisplayRow row, double height);
 
+  /// Sets the [widths] of all columns without applying any sorting or filtering.
+  void setAllColumnWidthsWithoutMap(List<double> widths);
+
+  /// Sets the [heights] of all rows without applying any sorting or filtering.
+  void setAllRowHeightsWithoutMap(List<double> heights);
+
   /// Gets the position of the selected element or null if nothing is selected.
   TableVicinity? get selected;
 
@@ -92,6 +110,15 @@ abstract class TableModel {
   /// column 1, we get 0 as return value. (Using this example, all pairs are 0->1, 1->2, 2->0).
   TableVicinity inverseMap(TableVicinity position);
 
+  /// Returns the data for a row.
+  dynamic getRow(DisplayRow row);
+
   /// Models can be chained. Use this method to get the base model
   TableModel get baseModel;
+
+  /// Returns true if the cell sizes have been initialized
+  bool get cellSizesInitialized;
+
+  /// Sets the property describing if the cell sizes have been initialized
+  set cellSizesInitialized(bool v);
 }

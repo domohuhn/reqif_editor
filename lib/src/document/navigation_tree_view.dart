@@ -20,7 +20,7 @@ class NavigationTreeView extends StatefulWidget {
       {super.key, required this.controller, required this.width});
 
   @override
-  State<NavigationTreeView> createState() => TreeExampleState();
+  State<NavigationTreeView> createState() => NavigationTreeViewState();
 
   void setHeaderColumn(int docId, int partId, (String, int) heading) {
     controller.setHeaderColumn(docId, partId, heading);
@@ -35,7 +35,7 @@ class NavigationTreeView extends StatefulWidget {
   }
 }
 
-class TreeExampleState extends State<NavigationTreeView> {
+class NavigationTreeViewState extends State<NavigationTreeView> {
   final TreeViewController treeController = TreeViewController();
   final ScrollController horizontalController = ScrollController();
   TreeViewNode<NavigationTreeNode>? _selectedNode;
@@ -45,16 +45,20 @@ class TreeExampleState extends State<NavigationTreeView> {
       <TreeViewNode<NavigationTreeNode>>[];
 
   void _buildTree() {
-    _tree = NavigationTreeNode.convertNavigationTree(
-        NavigationTreeNode.buildNavigationTree(widget.controller));
-    disposeTextEditingControllers();
-    for (final documentNode in _tree) {
-      _textEditingControllers.add(TextEditingController());
-      if (documentNode.content.isFile &&
-          documentNode.content.document.comment != null) {
-        _textEditingControllers.last.text =
-            documentNode.content.document.comment!;
+    try {
+      _tree = NavigationTreeNode.convertNavigationTree(
+          NavigationTreeNode.buildNavigationTree(widget.controller));
+      disposeTextEditingControllers();
+      for (final documentNode in _tree) {
+        _textEditingControllers.add(TextEditingController());
+        if (documentNode.content.isFile &&
+            documentNode.content.document.comment != null) {
+          _textEditingControllers.last.text =
+              documentNode.content.document.comment!;
+        }
       }
+    } catch (e) {
+      _tree.clear();
     }
   }
 
@@ -110,8 +114,9 @@ class TreeExampleState extends State<NavigationTreeView> {
     final displayText = node.content.displayText ?? "null";
     const double iconSize = 20;
     const double indentationWidth = 8.0;
+    const double widthReductionToPreventScrollbar = 5;
     return SizedBox(
-        width: widget.width,
+        width: widget.width - widthReductionToPreventScrollbar,
         child: Row(
           children: <Widget>[
             SizedBox(width: indentationWidth * node.depth! + indentationWidth),
@@ -378,7 +383,8 @@ class TreeExampleState extends State<NavigationTreeView> {
     final documentPart = part.part;
     final partNumber = documentPart.index;
     final document = part.document;
-    final map = document.columnMapping[partNumber];
+    final filter = document.partColumnFilter[partNumber];
+    final map = document.partColumnOrder[partNumber];
     final attributes =
         documentPart.attributeDefinitions.toList(growable: false);
     return Container(
@@ -391,7 +397,10 @@ class TreeExampleState extends State<NavigationTreeView> {
         child: ListView.builder(
           itemCount: documentPart.columnCount,
           itemBuilder: (BuildContext ctx, int index) {
-            final column = map.remap(index);
+            final int realModelIndex = index + 1;
+            final column =
+                map.map(TableVicinity(row: 0, column: realModelIndex)).column -
+                    1;
             return Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -400,7 +409,7 @@ class TreeExampleState extends State<NavigationTreeView> {
                       widget.controller.moveColumn(
                           document: document.index,
                           part: partNumber,
-                          column: index,
+                          column: realModelIndex,
                           move: -1);
                     },
                     icon: const Icon(Icons.keyboard_arrow_up)),
@@ -409,7 +418,7 @@ class TreeExampleState extends State<NavigationTreeView> {
                       widget.controller.moveColumn(
                           document: document.index,
                           part: partNumber,
-                          column: index,
+                          column: realModelIndex,
                           move: 1);
                     },
                     icon: const Icon(Icons.keyboard_arrow_down)),
@@ -420,17 +429,15 @@ class TreeExampleState extends State<NavigationTreeView> {
                 SizedBox(
                     width: widthVisibleColumn + indentAmount,
                     child: Checkbox.adaptive(
-                        value: map.isVisible(index),
+                        value: filter.isVisible(realModelIndex),
                         onChanged: (val) {
-                          print(
-                              "CHANGED col: $column idx: $index - vis   ${map.isVisible(column)} , ${map.isVisible(index)}");
                           if (val != null &&
-                              val != map.isVisible(index) &&
+                              val != filter.isVisible(realModelIndex) &&
                               mounted) {
                             widget.controller.setColumnVisibility(
                                 document: document.index,
                                 part: partNumber,
-                                column: index,
+                                column: realModelIndex,
                                 visible: val);
                           }
                         })),

@@ -41,6 +41,11 @@ class BaseSortModel implements TableModel {
   // From here on: methods that can be reused
   // by deriving models.
   // -----------------------------
+
+  /// Returns the data for a row.
+  @override
+  dynamic getRow(DisplayRow row) => _nextModel.getRow(mapRow(row));
+
   @override
   DisplayColumn get columns => _nextModel.columns;
 
@@ -54,12 +59,20 @@ class BaseSortModel implements TableModel {
   int get totalColumns => _nextModel.totalColumns;
 
   @override
+  bool get cellSizesInitialized => _nextModel.cellSizesInitialized;
+
+  @override
+  set cellSizesInitialized(bool v) => _nextModel.cellSizesInitialized = v;
+
+  @override
   Cell? operator [](TableVicinity position) {
     return _nextModel[mapOneStep(position)];
   }
 
   @override
-  TableModel get baseModel => _nextModel;
+  TableModel get baseModel {
+    return _nextModel.baseModel;
+  }
 
   @override
   double columnWidth(DisplayColumn column) {
@@ -80,6 +93,16 @@ class BaseSortModel implements TableModel {
   void setRowHeight(DisplayRow row, double height) {
     _nextModel.setRowHeight(mapRow(row), height);
   }
+
+  /// Sets the [widths] of all columns without applying any sorting or filtering.
+  @override
+  void setAllColumnWidthsWithoutMap(List<double> widths) =>
+      _nextModel.setAllColumnWidthsWithoutMap(widths);
+
+  /// Sets the [heights] of all rows without applying any sorting or filtering.
+  @override
+  void setAllRowHeightsWithoutMap(List<double> heights) =>
+      _nextModel.setAllRowHeightsWithoutMap(heights);
 
   TableVicinity mapOneStep(TableVicinity displayPosition) => TableVicinity(
       row: mapRow(displayPosition.row),

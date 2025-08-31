@@ -5,6 +5,7 @@
 import 'package:reqif_editor/src/document/model/final_model.dart';
 import 'package:reqif_editor/src/document/model/table_model.dart';
 import 'package:reqif_editor/src/reqif/flat_document.dart';
+import 'package:reqif_editor/src/reqif/reqif_common.dart';
 import 'package:two_dimensional_scrollables/two_dimensional_scrollables.dart'
     show TableVicinity;
 
@@ -14,6 +15,7 @@ class ReqIfModel extends FinalModelWithExtends {
 
   ReqIfModel(this.part, {super.defaultWidth, super.defaultHeight})
       : columnNames = part.columnNames,
+        cellSizesInitialized = false,
         super(columns: part.columnCount + 1, rows: part.rowCount + 1);
 
   Cell? _buildTitleCell(int row, int col) {
@@ -38,6 +40,16 @@ class ReqIfModel extends FinalModelWithExtends {
     return null;
   }
 
+  /// Returns the data for a row.
+  @override
+  dynamic getRow(DisplayRow row) {
+    final int rowIndex = row - 1;
+    if (row <= 0 || rowIndex < 0 || rowIndex >= part.rowCount) {
+      return null;
+    }
+    return part[rowIndex];
+  }
+
   @override
   Cell? operator [](TableVicinity position) {
     if (position.row <= 0 || position.column <= 0) {
@@ -50,7 +62,10 @@ class ReqIfModel extends FinalModelWithExtends {
       var value = element.object[columnIndex];
       final datatype = part.type[columnIndex];
       bool isDefault = false;
-      if (value == null && datatype.hasDefaultValue) {
+      if (value == null &&
+          datatype.hasDefaultValue &&
+          datatype.defaultValue!.type ==
+              ReqIfElementTypes.attributeValueEnumeration) {
         value = datatype.defaultValue;
         isDefault = true;
       }
@@ -58,8 +73,22 @@ class ReqIfModel extends FinalModelWithExtends {
         return null;
       }
       return Cell(position.row, position.column, datatype, [value],
-          matches: false, isDefaultValue: isDefault, selected: false);
+          matches: false,
+          isDefaultValue: isDefault,
+          selected: false,
+          isEditable: element.isEditable,
+          isHeading: element.type == ReqIfFlatDocumentElementType.heading,
+          prefix: element.prefix);
     }
     return null;
   }
+
+  /// call this whenever the size of the underlying model changes
+  void onSizeChange() {
+    cellSizesInitialized = false;
+    resize(columns: part.columnCount + 1, rows: part.rowCount + 1);
+  }
+
+  @override
+  bool cellSizesInitialized;
 }

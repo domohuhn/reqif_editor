@@ -5,6 +5,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:reqif_editor/src/core/resizable_box.dart';
+import 'package:reqif_editor/src/document/model/table_model.dart';
 import 'package:two_dimensional_scrollables/two_dimensional_scrollables.dart';
 
 enum CellAttributes { heading, added, removed, modified, normal, defaultValue }
@@ -42,16 +43,13 @@ class ResizableTableView extends StatefulWidget {
       this.selection,
       this.initialRowHeights,
       this.cellBuilder,
-      required this.rowCount,
-      required this.columnCount,
       required this.selectAble,
       this.defaultColumnWidth = 160,
       this.minColumnWidth = 100,
       this.defaultRowHeight = 40,
       this.minRowHeight = 40,
       this.borderWidth = 3.0,
-      this.columnWidthsProvider,
-      this.rowHeightsProvider,
+      required this.model,
       this.scrollControllerBuilder,
       this.rowPositionBuilder,
       required this.searchPosition});
@@ -97,6 +95,9 @@ class ResizableTableView extends StatefulWidget {
   /// The return value [vicinity] must range from [1, rowCount] and [1, colCount] inclusive.
   final TableVicinity Function()? searchPosition;
 
+  /// The model that contains the data for the cells.
+  final TableModel model;
+
   /// If this function is provided, it is called once to initialize the widths of the resizable columns.
   /// Column 0 is always fixed and contains the current row number.
   ///
@@ -111,12 +112,6 @@ class ResizableTableView extends StatefulWidget {
   /// The callback should return a list with length rowCount+1 if [columnHeaderBuilder] is provided, otherwise rowCount.
   /// If not enough entries are returned, then the rest of the list is filled with the default value.
   final List<double> Function()? initialRowHeights;
-
-  /// The number of rows in the data
-  final int rowCount;
-
-  /// The number of columns in the data
-  final int columnCount;
 
   /// The initial column width if [columnWidths] is not provided.
   final double defaultColumnWidth;
@@ -137,16 +132,6 @@ class ResizableTableView extends StatefulWidget {
 
   final bool selectAble;
 
-  /// A callback to access the list where the actual column widths are stored.
-  /// The widget will either use the list provided by the callback
-  /// or create a new one if it is null.
-  final List<double> Function()? columnWidthsProvider;
-
-  /// A callback to access the list where the actual row heights are stored.
-  /// The widget will either use the list provided by the callback
-  /// or create a new one if it is null.
-  final List<double> Function()? rowHeightsProvider;
-
   final TableViewScrollControllers Function()? scrollControllerBuilder;
 
   @override
@@ -157,39 +142,15 @@ class _ResizableTableViewState extends State<ResizableTableView> {
   late final ScrollController _verticalController;
   late final ScrollController _horizontalController;
 
-  final List<double> _columnWidths = <double>[];
-  final List<double> _rowHeights = <double>[];
-
-  List<double> get columnWidths {
-    if (widget.columnWidthsProvider != null) {
-      return widget.columnWidthsProvider!();
-    }
-    return _columnWidths;
-  }
-
-  List<double> get rowHeights {
-    if (widget.rowHeightsProvider != null) {
-      return widget.rowHeightsProvider!();
-    }
-    return _rowHeights;
-  }
-
-  /// The width of the first column. This column is fixed and contains the line number.
-  static const double _rowNumberIndicatorWidth = 64;
-
-  /// The height of the first row. This row is fixed and contains the headings.
-  /// Only relevant if the user did not provide a builder for the column headers.
-  static const double _columnHeaderHeight = 64;
-
   void _fillColumnWidthsWithDefaultWidth() {
-    for (int i = columnWidths.length; i <= widget.columnCount; ++i) {
-      columnWidths.add(widget.defaultColumnWidth);
+    for (int i = 0; i <= widget.model.columns; ++i) {
+      widget.model.setColumnWidth(i, widget.defaultColumnWidth);
     }
   }
 
   void _fillRowHeightsWithDefaultHeight() {
-    for (int i = rowHeights.length; i <= widget.rowCount; ++i) {
-      rowHeights.add(widget.defaultRowHeight);
+    for (int i = 0; i <= widget.model.rows; ++i) {
+      widget.model.setRowHeight(i, widget.defaultRowHeight);
     }
   }
 
@@ -215,25 +176,20 @@ class _ResizableTableViewState extends State<ResizableTableView> {
   }
 
   void ensureSizesInitialized() {
-    if (columnWidths.isEmpty) {
-      columnWidths.add(_rowNumberIndicatorWidth);
+    if (!widget.model.cellSizesInitialized) {
       if (widget.initialColumnWidths != null) {
-        columnWidths.addAll(widget.initialColumnWidths!());
-      }
-    }
-    if (columnWidths.length < widget.columnCount) {
-      _fillColumnWidthsWithDefaultWidth();
-    }
-    if (rowHeights.isEmpty) {
-      if (widget.columnHeaderBuilder == null) {
-        rowHeights.add(_columnHeaderHeight);
+        final widths = widget.initialColumnWidths!();
+        widget.model.setAllColumnWidthsWithoutMap(widths);
+      } else {
+        _fillColumnWidthsWithDefaultWidth();
       }
       if (widget.initialRowHeights != null) {
-        rowHeights.addAll(widget.initialRowHeights!());
+        final heights = widget.initialRowHeights!();
+        widget.model.setAllRowHeightsWithoutMap(heights);
+      } else {
+        _fillRowHeightsWithDefaultHeight();
       }
-    }
-    if (rowHeights.length < widget.rowCount) {
-      _fillRowHeightsWithDefaultHeight();
+      widget.model.cellSizesInitialized = true;
     }
   }
 
@@ -248,9 +204,9 @@ class _ResizableTableViewState extends State<ResizableTableView> {
       horizontalDetails:
           ScrollableDetails.horizontal(controller: _horizontalController),
       cellBuilder: _buildCell,
-      columnCount: widget.columnCount + 1,
+      columnCount: widget.model.columns,
       columnBuilder: _buildColumnSpan,
-      rowCount: widget.rowCount + 1,
+      rowCount: widget.model.rows,
       rowBuilder: _buildRowSpan,
     );
 
@@ -323,11 +279,13 @@ class _ResizableTableViewState extends State<ResizableTableView> {
       bool horizontal = true,
       bool vertical = true,
       bool tapDetection = true}) {
-    if (column < columnWidths.length && row < rowHeights.length) {
+    if (column < widget.model.columns && row < widget.model.rows) {
+      var width = widget.model.columnWidth(column);
+      var height = widget.model.rowHeight(row);
       return _wrapInClickDetection(
           child: ResizableBox(
-              width: columnWidths[column],
-              height: rowHeights[row],
+              width: width,
+              height: height,
               widthBorder: widget.borderWidth,
               borderColor: borderColor,
               onHorizontalDragStart: horizontal
@@ -338,9 +296,9 @@ class _ResizableTableViewState extends State<ResizableTableView> {
               onHorizontalDragUpdate: horizontal
                   ? (details) {
                       setState(() {
-                        columnWidths[column] += details.delta.dx;
-                        columnWidths[column] =
-                            max(widget.minColumnWidth, columnWidths[column]);
+                        width += details.delta.dx;
+                        width = max(widget.minColumnWidth, width);
+                        widget.model.setColumnWidth(column, width);
                       });
                     }
                   : null,
@@ -352,9 +310,9 @@ class _ResizableTableViewState extends State<ResizableTableView> {
               onVerticalDragUpdate: vertical
                   ? (details) {
                       setState(() {
-                        rowHeights[row] += details.delta.dy;
-                        rowHeights[row] =
-                            max(widget.minRowHeight, rowHeights[row]);
+                        height += details.delta.dy;
+                        height = max(widget.minRowHeight, height);
+                        widget.model.setRowHeight(row, height);
                       });
                     }
                   : null,
@@ -499,8 +457,8 @@ class _ResizableTableViewState extends State<ResizableTableView> {
         leading: BorderSide.none,
       ),
     );
-    final double selectedWidth = index < columnWidths.length
-        ? columnWidths[index]
+    final double selectedWidth = index < widget.model.columns
+        ? widget.model.columnWidth(index)
         : widget.minColumnWidth;
     return TableSpan(
       backgroundDecoration: decoration,
@@ -515,8 +473,9 @@ class _ResizableTableViewState extends State<ResizableTableView> {
         leading: BorderSide.none,
       ),
     );
-    final double height =
-        index < rowHeights.length ? rowHeights[index] : widget.minRowHeight;
+    final double height = index < widget.model.rows
+        ? widget.model.rowHeight(index)
+        : widget.minRowHeight;
     return TableSpan(
       backgroundDecoration: decoration,
       extent: FixedTableSpanExtent(height),

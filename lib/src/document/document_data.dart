@@ -4,13 +4,16 @@
 
 import 'dart:io';
 import 'dart:convert';
-
-import 'package:path/path.dart';
 import 'dart:math';
 
+import 'package:path/path.dart';
+
 import 'package:flutter/material.dart';
-import 'package:reqif_editor/src/document/document_remapping.dart';
 import 'package:reqif_editor/src/document/document_service.dart';
+import 'package:reqif_editor/src/document/model/filter_column_model.dart';
+import 'package:reqif_editor/src/document/model/reqif_model.dart';
+import 'package:reqif_editor/src/document/model/sort_column_model.dart';
+import 'package:reqif_editor/src/document/model/table_model.dart';
 import 'package:reqif_editor/src/document/reqif_search_controller.dart';
 import 'package:reqif_editor/src/reqif/flat_document.dart';
 import 'package:reqif_editor/src/reqif/reqif_document.dart';
@@ -24,11 +27,13 @@ class DocumentData {
   bool modified = false;
   int index;
   DocumentData(
-      this.path, this.document, this.flatDocument, this.index, this.service) {
+      this.path, this.document, this.flatDocument, this.index, this.service,
+      {required String columnOrder, required String columnVisibility}) {
     _initializeHeadings();
     _initializeTexts();
     _initializeIds();
-    _initializeLists();
+    initializePartModels(
+        columnOrder: columnOrder, columnVisibility: columnVisibility);
     _initializeSelectionAndSearchData();
     _initializeFilterControllers();
   }
@@ -162,53 +167,47 @@ class DocumentData {
     }
   }
 
-  void _initializeLists() {
-    for (int i = 0; i < flatDocument.partCount; ++i) {
-      _partColumnWidths.add([]);
-      partRowHeights.add([]);
-      _partFilteredColumnWidths.add([]);
-    }
-  }
-
   void _initializeSelectionAndSearchData() {
     for (int i = 0; i < flatDocument.partCount; ++i) {
       partSelections.add(const TableVicinity(column: -1, row: -1));
-      columnMapping.add(ColumnMappings(flatDocument[i].columnCount));
       searchData.add(ReqIfSearchController(
-          part: flatDocument[i], partNumber: i, map: columnMapping.last));
+          part: flatDocument[i], partNumber: i, map: partModels.last));
     }
   }
 
   /// Initializes the column ordering from a json string given in [strData]
-  void columnOrderFromJson(String strData) {
+  void _columnOrderFromJson(String strData) {
     try {
       final data = jsonDecode(strData);
-      for (int i = 0; i < columnMapping.length; ++i) {
-        columnMapping[i].orderFromJson(data, i);
+      for (int i = 0; i < partColumnOrder.length; ++i) {
+        partColumnOrder[i].fromJson(data, "$i");
       }
     } catch (e) {
-      // do nothing on failure - we use the default order
+      resetAllColumnOrders();
     }
   }
 
   /// Initializes the column visibility from a json string given in [strData]
-  void columnVisibilityFromJson(String strData) {
+  void _columnVisibilityFromJson(String strData) {
     try {
       final data = jsonDecode(strData);
-      for (int i = 0; i < columnMapping.length; ++i) {
-        columnMapping[i].visibilityFromJson(data, i);
+      for (int i = 0; i < partColumnFilter.length; ++i) {
+        partColumnFilter[i].visibilityFromJson(data, "$i");
       }
     } catch (e) {
-      // do nothing on failure - we use the default order
+      for (int i = 0; i < partColumnFilter.length; ++i) {
+        resetColumnVisibility(i);
+      }
     }
   }
 
   /// Serializes the column ordering to a json string
   String columnOrderToJson() {
     StringBuffer rv = StringBuffer('{');
-    for (int i = 0; i < columnMapping.length; ++i) {
-      bool isLast = (i + 1) == columnMapping.length;
-      rv.write(columnMapping[i].orderToJsonFragment(i));
+    for (int i = 0; i < partColumnOrder.length; ++i) {
+      bool isLast = (i + 1) == partColumnOrder.length;
+      rv.write('"$i":');
+      rv.write(partColumnOrder[i].toJson());
       if (!isLast) {
         rv.write(',');
       }
@@ -219,8 +218,8 @@ class DocumentData {
 
   /// Reset the column ordering
   void resetAllColumnOrders() {
-    for (int i = 0; i < columnMapping.length; ++i) {
-      columnMapping[i].resetOrder();
+    for (int i = 0; i < partColumnOrder.length; ++i) {
+      partColumnOrder[i].resetOrder();
     }
   }
 
@@ -228,8 +227,8 @@ class DocumentData {
   ///
   /// Returns true if values were changed.
   bool resetColumnOrder(int part) {
-    if (part < columnMapping.length) {
-      return columnMapping[part].resetOrder();
+    if (part < partColumnOrder.length) {
+      return partColumnOrder[part].resetOrder();
     }
     return false;
   }
@@ -237,9 +236,10 @@ class DocumentData {
   /// Serializes the column visibility to a json string
   String columnVisibilityToJson() {
     StringBuffer rv = StringBuffer('{');
-    for (int i = 0; i < columnMapping.length; ++i) {
-      bool isLast = (i + 1) == columnMapping.length;
-      rv.write(columnMapping[i].visibilityToJsonFragment(i));
+    for (int i = 0; i < partColumnFilter.length; ++i) {
+      bool isLast = (i + 1) == partColumnFilter.length;
+      rv.write('"$i":');
+      rv.write(partColumnFilter[i].toJson());
       if (!isLast) {
         rv.write(',');
       }
@@ -252,8 +252,8 @@ class DocumentData {
   ///
   /// Returns true if values were changed.
   bool resetColumnVisibility(int part) {
-    if (part < columnMapping.length) {
-      return columnMapping[part].resetVisibility();
+    if (part < partColumnFilter.length) {
+      return partColumnFilter[part].resetVisibility();
     }
     return false;
   }
@@ -268,17 +268,26 @@ class DocumentData {
     }
   }
 
-  /// column widths per part
-  List<List<double>> get partColumnWidths => _partFilteredColumnWidths;
+  List<SortColumnModel> partColumnOrder = [];
+  List<FilterColumnModel> partColumnFilter = [];
+  List<TableModel> partModels = [];
 
-  /// column widths per part
-  final List<List<double>> _partColumnWidths = <List<double>>[];
-
-  /// filtered column widths per part - invisible columns are removed
-  final List<List<double>> _partFilteredColumnWidths = <List<double>>[];
-
-  /// row heights per part
-  final List<List<double>> partRowHeights = <List<double>>[];
+  void initializePartModels(
+      {required String columnOrder, required String columnVisibility}) {
+    partColumnOrder.clear();
+    partColumnFilter.clear();
+    partModels.clear();
+    for (int i = 0; i < flatDocument.partCount; ++i) {
+      final dataModel = ReqIfModel(flatDocument[i]);
+      final order = SortColumnModel(dataModel);
+      final visibility = FilterColumnModel(order);
+      partColumnOrder.add(order);
+      partColumnFilter.add(visibility);
+      partModels.add(visibility);
+    }
+    _columnOrderFromJson(columnOrder);
+    _columnVisibilityFromJson(columnVisibility);
+  }
 
   /// Text editing controllers per part.
   ///
@@ -287,14 +296,14 @@ class DocumentData {
       <List<TextEditingController>>[];
 
   /// [idx] is the position in the data model.
-  double getRowOffset(int partNo, int idx) {
+  double getRowOffset(int partNo, int rowIndex) {
     double rv = 0.0;
-    if (partNo < partRowHeights.length) {
-      final rowHeights = partRowHeights[partNo];
+    if (partNo < partModels.length) {
+      final model = partModels[partNo];
       // row 0 is fixed at top -> add one to start and target
-      final limit = min(idx + 1, rowHeights.length);
+      final limit = min(rowIndex + 1, model.rows);
       for (int i = 1; i < limit; ++i) {
-        rv += rowHeights[i];
+        rv += model.rowHeight(i);
       }
     }
     return rv;
@@ -337,20 +346,19 @@ class DocumentData {
       part.$2.applyFilter(
           active, partFilterControllers[part.$1].map((e) => e.text).toList());
     }
-    _partColumnWidths.clear();
-    partRowHeights.clear();
-    _partFilteredColumnWidths.clear();
-    _initializeLists();
 
     for (int i = 0; i < flatDocument.parts.length; ++i) {
       partSelections[i] = const TableVicinity(column: -1, row: -1);
+      final model = partModels[i].baseModel;
+      if (model is ReqIfModel) {
+        model.onSizeChange();
+      }
       searchData[i].update();
     }
   }
 
   final List<TableVicinity> partSelections = [];
   final List<ReqIfSearchController> searchData = [];
-  final List<ColumnMappings> columnMapping = [];
 
   void countMatches(int partNumber, String text) {
     if (partNumber < flatDocument.partCount) {
@@ -368,75 +376,23 @@ class DocumentData {
   }
 
   void moveColumn({required int part, required int column, required int move}) {
-    if (part >= columnMapping.length ||
+    if (part >= partColumnOrder.length ||
         part < 0 ||
-        part >= _partColumnWidths.length) {
+        part >= partColumnOrder.length) {
       return;
     }
-    backwardsCopyVisibleColumnsToList<double>(_partColumnWidths[part],
-        _partFilteredColumnWidths[part], columnMapping[part]);
-    columnMapping[part].moveColumn(column, move);
-    moveDataInList<double>(_partColumnWidths[part], column + 1, move);
-    copyVisibleColumnsToList<double>(_partFilteredColumnWidths[part],
-        _partColumnWidths[part], columnMapping[part]);
+    partColumnOrder[part].moveColumn(column, move);
     searchData[part].update();
   }
 
   void setColumnVisibility(
       {required int part, required int column, required bool visible}) {
-    if (part >= columnMapping.length ||
+    if (part >= partColumnFilter.length ||
         part < 0 ||
-        part >= _partColumnWidths.length) {
+        part >= partColumnFilter.length) {
       return;
     }
-    backwardsCopyVisibleColumnsToList<double>(_partColumnWidths[part],
-        _partFilteredColumnWidths[part], columnMapping[part]);
-    columnMapping[part].setVisibility(column, visible);
-    copyVisibleColumnsToList<double>(_partFilteredColumnWidths[part],
-        _partColumnWidths[part], columnMapping[part]);
+    partColumnFilter[part].setVisibility(column, visible);
     searchData[part].update();
-  }
-}
-
-void backwardsCopyVisibleColumnsToList<T>(
-    List<T> allData, List<T> visibleDataList, ColumnMappings map) {
-  // the first column is the border - it is not tracked by the mappings
-  // TODO TODO TODO
-  if (visibleDataList.length > allData.length) {
-    List<int> maps = [];
-    allData.clear();
-    allData.addAll(visibleDataList);
-    maps.add(0);
-    for (int i = 1; i < visibleDataList.length; i++) {
-      maps.add(map.remapWithVisibility(i - 1) + 1);
-    }
-    for (int i = 0; i < visibleDataList.length; i++) {
-      allData[maps[i]] = visibleDataList[i];
-    }
-  } else {
-    allData[0] = visibleDataList[0];
-    print("0 : ${visibleDataList[0]}");
-    for (int i = 1; i < visibleDataList.length; i++) {
-      allData[map.remapWithVisibility(i - 1) + 1] = visibleDataList[i];
-      print("$i : ${visibleDataList[i]}");
-    }
-  }
-}
-
-void copyVisibleColumnsToList<T>(
-    List<T> destination, List<T> source, ColumnMappings map) {
-  // the first column is the border - it is not tracked by the mappings
-  final visibleCount = map.visibleColumnCount() + 1;
-  if (visibleCount != destination.length) {
-    destination.clear();
-    destination.add(source[0]);
-    for (int i = 1; i < visibleCount; i++) {
-      destination.add(source[map.remapWithVisibility(i - 1) + 1]);
-    }
-  } else {
-    destination[0] == source[0];
-    for (int i = 1; i < destination.length; i++) {
-      destination[i] = source[map.remapWithVisibility(i - 1) + 1];
-    }
   }
 }
