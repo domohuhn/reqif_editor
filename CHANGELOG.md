@@ -1,9 +1,10 @@
 ## 0.6.0
 
-- Fixed version
-- Fixed line endings when saving files
-- Upgraded all dependencies
 - The custom order of the columns of a document is stored in the persistent settings database
+- The visibility of columns can be modified
+- Integer, Bools, and Real values can be modified
+- bugfix: Fixed reported version in the about dialog
+- bugfix: Fixed line endings when saving files
 
 ## 0.5.1
 

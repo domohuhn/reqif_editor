@@ -125,6 +125,14 @@ class ReqIfAttributeValueBool extends ReqIfAttributeValueSimple {
       required super.document,
       super.link})
       : super.parse();
+
+  bool value() {
+    return valueString == "true";
+  }
+
+  void setValue(bool value) {
+    valueString = value.toString();
+  }
 }
 
 class ReqIfAttributeValueReal extends ReqIfAttributeValueSimple {

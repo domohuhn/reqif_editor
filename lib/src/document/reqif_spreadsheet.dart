@@ -5,6 +5,8 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart'
+    show TextInputFormatter, FilteringTextInputFormatter;
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:reqif_editor/src/document/column_header.dart';
 import 'package:reqif_editor/src/document/document_controller.dart';
@@ -77,6 +79,7 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
 
   @override
   void dispose() {
+    _numberInputController.dispose();
     super.dispose();
   }
 
@@ -96,6 +99,7 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
 
   /// Cache for combo boxes
   final List<List<DropdownMenuItem<String>>?> _comboBoxDropDownLists = [];
+  final List<DropdownMenuItem<bool>> _comboBoxDropDownBool = [];
 
   void _fillComboBoxLists() {
     _comboBoxDropDownLists.clear();
@@ -117,6 +121,11 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
     }
     assert(_comboBoxDropDownLists.length ==
         widget.part.type.attributeDefinitions.length);
+    _comboBoxDropDownBool.clear();
+    _comboBoxDropDownBool
+        .add(DropdownMenuItem<bool>(value: true, child: Text("true")));
+    _comboBoxDropDownBool
+        .add(DropdownMenuItem<bool>(value: false, child: Text("false")));
   }
 
   void _fillCache() {
@@ -294,6 +303,35 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
     widget.onNewQuillEditor(node);
   }
 
+  bool _editableIntegerWasSelected = false;
+  ReqIfAttributeValueInteger? _selectedIntegerValue;
+
+  bool _editableRealWasSelected = false;
+  ReqIfAttributeValueReal? _selectedRealValue;
+  final TextEditingController _numberInputController = TextEditingController();
+
+  void _updateIntegerValue() {
+    if (_editableIntegerWasSelected &&
+        _selectedIntegerValue != null &&
+        _numberInputController.text != _selectedIntegerValue!.valueString) {
+      _selectedIntegerValue!.valueString = _numberInputController.text;
+      if (mounted) {
+        widget.wasModified();
+      }
+    }
+  }
+
+  void _updateRealValue() {
+    if (_editableRealWasSelected &&
+        _selectedRealValue != null &&
+        _numberInputController.text != _selectedRealValue!.valueString) {
+      _selectedRealValue!.valueString = _numberInputController.text;
+      if (mounted) {
+        widget.wasModified();
+      }
+    }
+  }
+
   void _onSelectionChanged(TableVicinity position, CellState state) {
     if (!widget.hasData || !widget.hasPart) {
       return;
@@ -321,11 +359,34 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
     final bool isEditable =
         ((datatype.isEditable && element.isEditable && widget.isEditable) ||
             widget.forceEditable);
+    _updateIntegerValue();
+    _selectedIntegerValue = null;
+    _editableIntegerWasSelected = false;
+    if (value != null &&
+        isEditable &&
+        value.type == ReqIfElementTypes.attributeValueInteger) {
+      value as ReqIfAttributeValueInteger;
+      _numberInputController.text = value.valueString;
+      _editableIntegerWasSelected = true;
+      _selectedIntegerValue = value;
+    }
+    _updateRealValue();
+    _selectedRealValue = null;
+    _editableRealWasSelected = false;
+    if (value != null &&
+        isEditable &&
+        value.type == ReqIfElementTypes.attributeValueReal) {
+      value as ReqIfAttributeValueReal;
+      _numberInputController.text = value.valueString;
+      _editableRealWasSelected = true;
+      _selectedRealValue = value;
+    }
     if (value == null &&
         isEditable &&
         datatype.dataType == ReqIfElementTypes.datatypeDefinitionXhtml) {
       value = element.object.appendXhtmlValue(datatype.identifier);
     }
+
     if (value == null ||
         !isEditable ||
         value.embeddedObjectCount != 0 ||
@@ -464,8 +525,13 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
     } else if (children.isEmpty) {
       return null;
     } else {
-      return _wrapWithPrefix(cellContent.prefix, Row(children: children),
-          cellAttribute, wrapWithPrefix);
+      return _wrapWithPrefix(
+          cellContent.prefix,
+          Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: children),
+          cellAttribute,
+          wrapWithPrefix);
     }
   }
 
@@ -506,9 +572,69 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
               cache: widget.data,
             )),
             attribute: cellAttribute);
+      case ReqIfElementTypes.attributeValueBoolean:
+        value as ReqIfAttributeValueBool;
+        if (selected) {
+          return CellContents(child: _buildEditableBool(context, value));
+        }
+        return _wrapWithPrefix(
+            cellContent.prefix,
+            Center(child: Text(value.toString())),
+            cellAttribute,
+            wrapWithPrefix);
+      case ReqIfElementTypes.attributeValueInteger:
+        value as ReqIfAttributeValueInteger;
+        if (selected) {
+          return CellContents(
+              child: Center(
+                  child: TextField(
+            keyboardType: TextInputType.number,
+            controller: _numberInputController,
+            inputFormatters: <TextInputFormatter>[
+              FilteringTextInputFormatter.allow(RegExp(r'^[+-]?[0123456789]*'))
+            ],
+            onChanged: (v) {
+              if (v != value.valueString) {
+                _updateIntegerValue();
+              }
+            },
+          )));
+        }
+        return _wrapWithPrefix(
+            cellContent.prefix,
+            Center(child: Text(value.toString())),
+            cellAttribute,
+            wrapWithPrefix);
+      case ReqIfElementTypes.attributeValueReal:
+        value as ReqIfAttributeValueReal;
+        if (selected) {
+          return CellContents(
+              child: Center(
+                  child: TextField(
+            keyboardType: TextInputType.number,
+            controller: _numberInputController,
+            inputFormatters: <TextInputFormatter>[
+              FilteringTextInputFormatter.allow(
+                  RegExp(r'^[+-]?[0123456789]*\.?[0123456789]*'))
+            ],
+            onChanged: (v) {
+              if (v != value.valueString) {
+                _updateRealValue();
+              }
+            },
+          )));
+        }
+        return _wrapWithPrefix(
+            cellContent.prefix,
+            Center(child: Text(value.toString())),
+            cellAttribute,
+            wrapWithPrefix);
       default:
-        return _wrapWithPrefix(cellContent.prefix, Text(value.toString()),
-            cellAttribute, wrapWithPrefix);
+        return _wrapWithPrefix(
+            cellContent.prefix,
+            Center(child: Text(value.toString())),
+            cellAttribute,
+            wrapWithPrefix);
     }
   }
 
@@ -518,8 +644,10 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
       for (int i = 0; i < value.length; ++i) {
         values.add(Text(value.value(i)));
       }
-      return Padding(
-          padding: const EdgeInsets.all(5), child: Column(children: values));
+      return Container(
+          alignment: Alignment.topCenter,
+          padding: const EdgeInsets.all(5),
+          child: Column(children: values));
     } else if (value.length == 1) {
       return Container(
           alignment: Alignment.topCenter,
@@ -569,5 +697,30 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
       return Column(children: values);
     }
     return null;
+  }
+
+  Widget? _buildEditableBool(
+      BuildContext context, ReqIfAttributeValueBool value) {
+    final cache = _comboBoxDropDownBool;
+    if (cache.length != 2) {
+      throw ReqIfError("internal error: Cache seems to be invalid");
+    }
+    final textTheme = Theme.of(context).textTheme;
+    final button = DropdownButton<bool>(
+        items: cache,
+        style: textTheme.bodyMedium,
+        onChanged: (v) {
+          if (v != null && v != value.value()) {
+            // TODO default values
+            value.setValue(v);
+            if (mounted) {
+              widget.wasModified();
+            }
+          }
+          final focus = FocusScope.of(context);
+          focus.unfocus();
+        },
+        value: value.value());
+    return Container(alignment: Alignment.topCenter, child: button);
   }
 }
