@@ -56,6 +56,7 @@ class FilterColumnModel extends BaseSortModel {
   @override
   void onColumnMoved(int column, int move) {
     moveColumn(column, move);
+    parent?.onColumnMoved(column, move);
   }
 
   /// Creates a json fragment as string to serialize the document order.
@@ -74,7 +75,14 @@ class FilterColumnModel extends BaseSortModel {
   /// Sets the visibility of [column] to [visible].
   void setVisibility(int column, bool visible) {
     if (column >= 0 && column < _visible.length) {
+      if (!visible && _visible[column]) {
+        parent?.onColumnRemoved(inverseMapColumn(column));
+      }
+      final inserted = visible && !_visible[column];
       _visible[column] = visible;
+      if (inserted) {
+        parent?.onColumnInserted(inverseMapColumn(column));
+      }
     }
   }
 

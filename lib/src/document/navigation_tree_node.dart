@@ -67,7 +67,7 @@ class NavigationTreeNode {
       final p = part;
       final doc = document;
       final index = p.index;
-      final headerColumn = doc.headings[index].$2;
+      final headerColumn = doc.headingsColumn(index);
       final value = element.object[headerColumn];
       if (value == null) {
         return null;

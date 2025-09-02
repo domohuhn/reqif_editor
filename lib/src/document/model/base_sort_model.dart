@@ -32,10 +32,25 @@ class BaseSortModel implements TableModel {
   DisplayRow inverseMapRow(int row) => row;
 
   /// Called by child models in case rows or columns are sorted
-  void onRowMoved(int row, int move) {}
+  void onRowMoved(int row, int move) {
+    parent?.onRowMoved(row, move);
+  }
 
   /// Called by child models in case rows or columns are sorted
-  void onColumnMoved(int column, int move) {}
+  void onColumnMoved(int column, int move) {
+    parent?.onColumnMoved(column, move);
+  }
+
+  /// Called by child models in case the visibility of columns changes
+  void onColumnInserted(DisplayColumn insert) {
+    parent?.onColumnInserted(insert);
+  }
+
+  void onColumnRemoved(DisplayColumn removed) {
+    parent?.onColumnRemoved(removed);
+  }
+
+  TableModel get nextModel => _nextModel;
 
   // -----------------------------
   // From here on: methods that can be reused

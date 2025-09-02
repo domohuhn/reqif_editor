@@ -32,6 +32,8 @@
   "part": "Kapitel",
   "headingsTooltip": "Spalte mit den Überschriften",
   "headings": "Überschriften:",
+  "mergeWith": "zusammenfassen mit:",
+  "mergeTooltip": "Spalte, deren Text mit den Überschriften zusammengefasst werden soll",
   "modalEditFileText": "Metadaten der Datei:",
   "modalEditPartText": "Eigenschaften dieses Kapitels:",
   "section": "Abschnitt",

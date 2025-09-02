@@ -44,8 +44,11 @@ class DocumentController with ChangeNotifier {
     final flat = ReqIfFlatDocument.buildFlatDocument(doc);
     final columnOrder = _settings.fileColumnOrder(path);
     final columnVisibility = _settings.fileColumnVisibility(path);
+    final columnMergeOptions = _settings.fileColumnMerge(path);
     final output = DocumentData(path, doc, flat, documents.length, _service,
-        columnOrder: columnOrder, columnVisibility: columnVisibility);
+        columnOrder: columnOrder,
+        columnVisibility: columnVisibility,
+        mergeData: columnMergeOptions);
     documents.add(output);
     _settings.addOpenedFile(path, flat.title);
     notifyListeners();
@@ -136,6 +139,8 @@ class DocumentController with ChangeNotifier {
         toSave.path, toSave.columnOrderToJson());
     await _settings.updateFileColumnVisibility(
         toSave.path, toSave.columnVisibilityToJson());
+    await _settings.updateFileColumnMerge(
+        toSave.path, toSave.columnMergeToJson());
     toSave.modified = false;
   }
 
@@ -179,18 +184,104 @@ class DocumentController with ChangeNotifier {
       _visibleDocumentPartNumber <
           documents[visibleDocumentNumber].flatDocument.partCount;
 
-  void setHeaderColumn(int docId, int partId, (String, int) heading) {
+  void setHeaderColumn(int docId, int partId, String heading) {
     assert(docId < documents.length);
     assert(partId < documents[docId].flatDocument.partCount);
-    documents[docId].headings[partId] = heading;
+    documents[docId].partColumnMerge[partId].mergeSourceColumnName = heading;
     notifyListeners();
+  }
+
+  void _makeMergeColumnsVisible(int docId, int partId) {
+    if (docId >= documents.length ||
+        partId >= documents[docId].flatDocument.partCount) {
+      return;
+    }
+    final model = documents[docId].partColumnMerge[partId];
+    final order = documents[docId].partColumnOrder[partId];
+    final visibility = documents[docId].partColumnFilter[partId];
+    final names = documents[docId].flatDocument[partId].columnNames;
+    final String source = model.mergeSourceColumnName;
+    final String target = model.mergeTargetColumnName;
+    final int sourceIdx =
+        order.inverseMapColumn(names.indexWhere((v) => v == source) + 1);
+    final int targetIdx =
+        order.inverseMapColumn(names.indexWhere((v) => v == target) + 1);
+    visibility.setVisibility(sourceIdx, true);
+    visibility.setVisibility(targetIdx, true);
+  }
+
+  void setMergeActive(int docId, int partId, bool value) {
+    if (docId >= documents.length ||
+        partId >= documents[docId].flatDocument.partCount) {
+      return;
+    }
+    if (value) {
+      _makeMergeColumnsVisible(docId, partId);
+    }
+    documents[docId].partColumnMerge[partId].mergeActive = value;
+    notifyListeners();
+  }
+
+  bool mergeActive(int docId, int partId) {
+    if (docId >= documents.length ||
+        partId >= documents[docId].flatDocument.partCount) {
+      return false;
+    }
+    return documents[docId].partColumnMerge[partId].mergeActive;
+  }
+
+  void setMergeColumns(int docId, int partId, String? source, String? target) {
+    if (docId >= documents.length ||
+        partId >= documents[docId].flatDocument.partCount) {
+      return;
+    }
+    documents[docId]
+        .partColumnMerge[partId]
+        .setMergeOptions(source: source, target: target);
+    if (mergeActive(docId, partId)) {
+      _makeMergeColumnsVisible(docId, partId);
+    }
+    documents[docId]
+        .partColumnMerge[partId]
+        .setMergeOptions(source: source, target: target);
+    notifyListeners();
+  }
+
+  // gets the index of the column to merge without any reordering.
+  // returns an empty string if not set
+  String columnMergeTarget(int docId, int partId) {
+    if (docId >= documents.length ||
+        partId >= documents[docId].flatDocument.partCount) {
+      return "";
+    }
+    final model = documents[docId].partColumnMerge[partId];
+    return model.mergeTargetColumnName;
+  }
+
+  // gets the index of the column to merge without any reordering.
+  // returns an empty string if not set
+  String columnMergeSource(int docId, int partId) {
+    if (docId >= documents.length ||
+        partId >= documents[docId].flatDocument.partCount) {
+      return "";
+    }
+    final model = documents[docId].partColumnMerge[partId];
+    return model.mergeSourceColumnName;
   }
 
   ReqIfDocumentPart get visiblePart =>
       documents[visibleDocumentNumber].flatDocument[visibleDocumentPartNumber];
   DocumentData get visibleData => documents[visibleDocumentNumber];
-  int get headingsColumn =>
-      documents[visibleDocumentNumber].headings[visibleDocumentPartNumber].$2;
+  int get headingsColumn {
+    if (visibleDocumentNumber < 0 ||
+        visibleDocumentNumber >= documents.length ||
+        visibleDocumentPartNumber < 0 ||
+        visibleDocumentPartNumber >
+            documents[visibleDocumentNumber].flatDocument.partCount) {
+      return -1;
+    }
+    return visibleData.headingsColumn(visibleDocumentPartNumber);
+  }
 
   DocumentData operator [](int idx) {
     return documents[idx];
@@ -291,19 +382,38 @@ class DocumentController with ChangeNotifier {
   }
 
   void resetColumnOrder({required int document, required int part}) {
-    if (document < 0 || document >= length) {
-      return;
-    }
-    if (documents[document].resetColumnOrder(part)) {
-      documentWasModified(document);
-    }
+    _resetAndFixMergeColumns(
+        document: document,
+        part: part,
+        cb: () => documents[document].resetColumnOrder(part));
   }
 
   void resetVisibility({required int document, required int part}) {
-    if (document < 0 || document >= length) {
+    _resetAndFixMergeColumns(
+        document: document,
+        part: part,
+        cb: () => documents[document].resetColumnVisibility(part));
+  }
+
+  void _resetAndFixMergeColumns(
+      {required int document, required int part, required bool Function() cb}) {
+    if (document < 0 ||
+        document >= length ||
+        part < 0 ||
+        part >= documents[document].flatDocument.partCount) {
       return;
     }
-    if (documents[document].resetColumnVisibility(part)) {
+    final mergeModel = documents[document].partColumnMerge[part];
+    final visibilityModel = documents[document].partColumnFilter[part];
+    final int mergeSource = visibilityModel
+        .map(TableVicinity(row: 0, column: mergeModel.mergeSource))
+        .column;
+    final int mergeTarget = visibilityModel
+        .map(TableVicinity(row: 0, column: mergeModel.mergeTarget))
+        .column;
+    if (cb()) {
+      mergeModel.setMergeColumnNumbers(
+          source: mergeSource, target: mergeTarget);
       documentWasModified(document);
     }
   }

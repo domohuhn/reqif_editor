@@ -117,6 +117,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get headings => 'Headings:';
 
   @override
+  String get mergeWith => 'merge with:';
+
+  @override
+  String get mergeTooltip => 'Column with the text to merge with the Headings';
+
+  @override
   String get openDocuments => 'Open documents';
 
   @override

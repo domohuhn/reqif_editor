@@ -7,9 +7,10 @@ class FileData {
   String path;
   String columnOrder;
   String columnVisibility;
+  String mergeOptions;
   DateTime lastUsed;
   FileData(this.title, this.path, this.lastUsed, this.columnOrder,
-      this.columnVisibility);
+      this.columnVisibility, this.mergeOptions);
 }
 
 /// A sorted list of the last used files.
@@ -25,7 +26,7 @@ class LastOpenedFiles {
   void addFile(String title, String path) {
     final idx = _files.indexWhere((element) => element.path == path);
     if (idx < 0) {
-      _files.add(FileData(title, path, DateTime.now(), '{}', '{}'));
+      _files.add(FileData(title, path, DateTime.now(), '{}', '{}', '{}'));
     } else {
       _files[idx].title = title;
       _files[idx].lastUsed = DateTime.now();
@@ -62,6 +63,22 @@ class LastOpenedFiles {
     if (inRange) {
       if (_files[idx].columnVisibility != visibility) {
         _files[idx].columnVisibility = visibility;
+        updated = true;
+      }
+    }
+    return updated;
+  }
+
+  /// Updates the merge options of columns.
+  ///
+  /// Returns true if data was updated
+  bool updateColumnMergeOptions(String path, String options) {
+    final idx = _files.indexWhere((element) => element.path == path);
+    final inRange = idx >= 0 && idx < _files.length;
+    var updated = false;
+    if (inRange) {
+      if (_files[idx].mergeOptions != options) {
+        _files[idx].mergeOptions = options;
         updated = true;
       }
     }

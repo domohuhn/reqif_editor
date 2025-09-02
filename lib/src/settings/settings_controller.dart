@@ -135,4 +135,23 @@ class SettingsController with ChangeNotifier {
     }
     return "{}";
   }
+
+  /// Updates and persists the column merge options of the file.
+  Future<void> updateFileColumnMerge(String path, String options) async {
+    if (path.isEmpty) return;
+    if (_files.updateColumnMergeOptions(path, options)) {
+      await _settingsService.setLastOpenedFiles(_files);
+    }
+    notifyListeners();
+  }
+
+  /// Gets the file column merge settings for a given path if present
+  String fileColumnMerge(String path) {
+    for (final f in _files.files) {
+      if (f.path == path) {
+        return f.mergeOptions;
+      }
+    }
+    return "{}";
+  }
 }

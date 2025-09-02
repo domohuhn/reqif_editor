@@ -457,7 +457,7 @@ class _ResizableTableViewState extends State<ResizableTableView> {
         leading: BorderSide.none,
       ),
     );
-    final double selectedWidth = index < widget.model.columns
+    final double selectedWidth = index >= 0 && index < widget.model.columns
         ? widget.model.columnWidth(index)
         : widget.minColumnWidth;
     return TableSpan(
@@ -473,7 +473,7 @@ class _ResizableTableViewState extends State<ResizableTableView> {
         leading: BorderSide.none,
       ),
     );
-    final double height = index < widget.model.rows
+    final double height = index >= 0 && index < widget.model.rows
         ? widget.model.rowHeight(index)
         : widget.minRowHeight;
     return TableSpan(

@@ -33,21 +33,21 @@ void main() async {
       expect(rv, '{"0":[0,1,2,3,4,5,6,7,8,9,10]}');
 
       const input = '{"0":[10,9,8,7,6,5,4,3,2,1,0]}';
-      controller.documents[0]
-          .initializePartModels(columnOrder: input, columnVisibility: "");
+      controller.documents[0].initializePartModels(
+          columnOrder: input, columnVisibility: "", mergeData: "");
       final rv2 = controller.documents[0].columnOrderToJson();
       expect(rv2, input);
 
       // verify no exceptions are thrown on malformed input
       const input2 = 'aa';
-      controller.documents[0]
-          .initializePartModels(columnOrder: input2, columnVisibility: "");
+      controller.documents[0].initializePartModels(
+          columnOrder: input2, columnVisibility: "", mergeData: "");
       const input3 = '';
-      controller.documents[0]
-          .initializePartModels(columnOrder: input3, columnVisibility: "");
+      controller.documents[0].initializePartModels(
+          columnOrder: input3, columnVisibility: "", mergeData: "");
       const input4 = '{"0":';
-      controller.documents[0]
-          .initializePartModels(columnOrder: input4, columnVisibility: "");
+      controller.documents[0].initializePartModels(
+          columnOrder: input4, columnVisibility: "", mergeData: "");
     });
   });
 }

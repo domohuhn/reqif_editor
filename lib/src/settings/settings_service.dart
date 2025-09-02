@@ -165,6 +165,10 @@ class LocalSettingsService extends SettingsService {
     await _preferences.setStringList(key, values);
   }
 
+  Future<void> setColumnMergeList(String key, List<String> values) async {
+    await _preferences.setStringList(key, values);
+  }
+
   List<String> readStringList(String key) {
     return _preferences.getStringList(key) ?? <String>[];
   }
@@ -181,6 +185,7 @@ class LocalSettingsService extends SettingsService {
   static const String _keyLastOpenedColumnOrder = 'lastOpenedColumnOrder';
   static const String _keyLastOpenedColumnVisibility =
       'lastOpenedColumnVisibility';
+  static const String _keyLastOpenedColumnMerge = 'lastOpenedColumnMerge';
 
   /// Gets the last opened files
   @override
@@ -190,6 +195,7 @@ class LocalSettingsService extends SettingsService {
     final times = readDateTimeList(_keyLastOpenedDate);
     final columnOrder = readStringList(_keyLastOpenedColumnOrder);
     final columnVisibility = readStringList(_keyLastOpenedColumnVisibility);
+    final columnMerge = readStringList(_keyLastOpenedColumnMerge);
     if (paths.length != titles.length || paths.length != times.length) {
       return LastOpenedFiles([]);
     }
@@ -197,7 +203,9 @@ class LocalSettingsService extends SettingsService {
     for (int i = 0; i < paths.length; ++i) {
       final order = i < columnOrder.length ? columnOrder[i] : "{}";
       final visible = i < columnVisibility.length ? columnVisibility[i] : "{}";
-      data.add(FileData(titles[i], paths[i], times[i], order, visible));
+      final mergeOptions = i < columnMerge.length ? columnMerge[i] : "{}";
+      data.add(FileData(
+          titles[i], paths[i], times[i], order, visible, mergeOptions));
     }
     return LastOpenedFiles(data);
   }
@@ -209,6 +217,7 @@ class LocalSettingsService extends SettingsService {
     List<String> titles = [];
     List<String> columnOrder = [];
     List<String> columnVisibility = [];
+    List<String> columnMergeOptions = [];
     List<DateTime> times = [];
     for (final file in files.files) {
       paths.add(file.path);
@@ -216,6 +225,7 @@ class LocalSettingsService extends SettingsService {
       times.add(file.lastUsed);
       columnOrder.add(file.columnOrder);
       columnVisibility.add(file.columnVisibility);
+      columnMergeOptions.add(file.mergeOptions);
     }
     await setStringList(_keyLastOpenedPath, paths);
     await setStringList(_keyLastOpenedTitle, titles);
@@ -223,5 +233,6 @@ class LocalSettingsService extends SettingsService {
     await setColumnOrderList(_keyLastOpenedColumnOrder, columnOrder);
     await setColumnVisibilityList(
         _keyLastOpenedColumnVisibility, columnVisibility);
+    await setColumnMergeList(_keyLastOpenedColumnMerge, columnMergeOptions);
   }
 }

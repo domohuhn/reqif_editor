@@ -140,6 +140,14 @@
   "@headings": {
     "description": "Text in front of dropdown for headings"
   },
+  "mergeWith": "merge with:",
+  "@mergeWith": {
+    "description": "Text after the button to active row merging, and in front of dropdown for headings"
+  },
+  "mergeTooltip": "Column with the text to merge with the Headings",
+  "@mergeTooltip": {
+    "description": "Tooltip for box to select the merge text column"
+  },
   "openDocuments": "Open documents",
   "@openDocuments": {
     "description": "description for open documents"

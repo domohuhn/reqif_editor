@@ -1,5 +1,6 @@
 ## 0.6.0
 
+- For a better experience when working with files exported by DOORs, it is now possible to merge two columns in the display.
 - The custom order of the columns of a document is stored in the persistent settings database
 - The visibility of columns can be modified
 - Integer, Bools, and Real values can be modified

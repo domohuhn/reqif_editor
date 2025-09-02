@@ -119,6 +119,13 @@ class AppLocalizationsDe extends AppLocalizations {
   String get headings => 'Überschriften:';
 
   @override
+  String get mergeWith => 'zusammenfassen mit:';
+
+  @override
+  String get mergeTooltip =>
+      'Spalte, deren Text mit den Überschriften zusammengefasst werden soll';
+
+  @override
   String get openDocuments => 'Offene Dokumente';
 
   @override

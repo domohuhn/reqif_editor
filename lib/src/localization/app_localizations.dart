@@ -308,6 +308,18 @@ abstract class AppLocalizations {
   /// **'Headings:'**
   String get headings;
 
+  /// Text after the button to active row merging, and in front of dropdown for headings
+  ///
+  /// In en, this message translates to:
+  /// **'merge with:'**
+  String get mergeWith;
+
+  /// Tooltip for box to select the merge text column
+  ///
+  /// In en, this message translates to:
+  /// **'Column with the text to merge with the Headings'**
+  String get mergeTooltip;
+
   /// description for open documents
   ///
   /// In en, this message translates to:

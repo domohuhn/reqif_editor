@@ -5,6 +5,8 @@
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:reqif_editor/src/document/model/column_merge_model.dart'
+    show ColumnMergeModel;
 import 'package:reqif_editor/src/document/model/filter_column_model.dart';
 import 'package:reqif_editor/src/document/model/sort_column_model.dart';
 import 'package:reqif_editor/src/document/model/sort_row_model.dart';
@@ -246,6 +248,76 @@ void main() {
 
       expect(v1!.column, 0);
       expect(v2!.column, 4);
+    });
+  });
+
+  group("merge models", () {
+    test("toJson", () {
+      ColumnMergeModel model = ColumnMergeModel(simpleModel);
+      expect(model.toJson(), '{"active":false,"source":"","target":""}');
+      model.setMergeOptions(
+          active: true,
+          source: "(row: 0, column: 1)",
+          target: "(row: 0, column: 3)");
+      expect(model.toJson(),
+          '{"active":true,"source":"(row: 0, column: 1)","target":"(row: 0, column: 3)"}');
+      expect(model.mergeSource, 1);
+      expect(model.mergeTarget, 3);
+      model.resetMerging();
+      expect(model.toJson(), '{"active":false,"source":"","target":""}');
+    });
+    test("fromJson", () {
+      ColumnMergeModel model = ColumnMergeModel(simpleModel);
+      const inputFragment = '{"active":true,"source":"1","target":"3"}';
+      const input = '{"0":$inputFragment}';
+      final data = jsonDecode(input);
+      model.fromJson(data, "0");
+      expect(model.toJson(), inputFragment);
+    });
+
+    test("inactive", () {
+      ColumnMergeModel model = ColumnMergeModel(simpleModel);
+      for (int i = 0; i < simpleModel.columns; ++i) {
+        final input = TableVicinity(row: 1, column: i);
+        final output = model.map(input);
+        expect(input, output);
+        expect(model.columnWidth(i), 50 * (i + 1));
+        expect(model[input]!.column, i);
+        expect(model[input]!.content.length, 1);
+      }
+    });
+
+    test("merge active", () {
+      ColumnMergeModel model = ColumnMergeModel(simpleModel);
+      model.setMergeOptions(
+          active: true,
+          source: "(row: 0, column: 1)",
+          target: "(row: 0, column: 3)");
+      expect(model.columns, simpleModel.columns - 1);
+      expect(model.rows, simpleModel.rows);
+      for (int i = 0; i < model.columns; ++i) {
+        final input = TableVicinity(row: 1, column: i);
+        final output = model.map(input);
+        final expected = TableVicinity(row: 1, column: i + 1);
+        if (i > 2) {
+          expect(output, expected);
+        } else {
+          expect(input, output);
+        }
+        if (i == 1) {
+          expect(model.columnWidth(i), 50 * (4));
+        } else if (i < 3) {
+          expect(model.columnWidth(i), 50 * (i + 1));
+        } else {
+          expect(model.columnWidth(i), 50 * (i + 2));
+        }
+
+        if (i == 1) {
+          expect(model[input]!.content.length, 2);
+        } else {
+          expect(model[input]!.content.length, 1);
+        }
+      }
     });
   });
 }

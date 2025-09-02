@@ -22,8 +22,31 @@ class NavigationTreeView extends StatefulWidget {
   @override
   State<NavigationTreeView> createState() => NavigationTreeViewState();
 
-  void setHeaderColumn(int docId, int partId, (String, int) heading) {
+  void setHeaderColumn(int docId, int partId, String heading) {
     controller.setHeaderColumn(docId, partId, heading);
+    documentWasModified(docId);
+  }
+
+  void setMergeActive(int docId, int partId, bool v) {
+    controller.setMergeActive(docId, partId, v);
+    documentWasModified(docId);
+  }
+
+  void setMergeColumns(int docId, int partId, String src, String tar) {
+    controller.setMergeColumns(docId, partId, src, tar);
+    documentWasModified(docId);
+  }
+
+  String columnMergeTarget(int docId, int partId) {
+    return controller.columnMergeTarget(docId, partId);
+  }
+
+  String columnMergeSource(int docId, int partId) {
+    return controller.columnMergeSource(docId, partId);
+  }
+
+  bool isMergeActive(int docId, int partId) {
+    return controller.mergeActive(docId, partId);
   }
 
   void documentWasModified(int idx) {
@@ -315,13 +338,21 @@ class NavigationTreeViewState extends State<NavigationTreeView> {
     if (parent == null || !parent.isFile) {
       throw ReqIfError("Internal error: navigation tree is built wrong!");
     }
-    final headerColumn = parent.document.headings;
+    final document = parent.document;
+    final controller = widget.controller;
     final documentPart = part.part;
+    final documentNumber = document.index;
     final partNumber = documentPart.index;
     List<DropdownMenuItem<String>> dropDownWidgets = [];
     for (final name in documentPart.columnNames) {
       dropDownWidgets
           .add(DropdownMenuItem<String>(value: name, child: Text(name)));
+    }
+    final String mergeTarget =
+        widget.columnMergeTarget(documentNumber, partNumber);
+    int mergeIdx = documentPart.columnNames.indexWhere((v) => v == mergeTarget);
+    if (mergeIdx < 0) {
+      mergeIdx = 0;
     }
     return SingleChildScrollView(
         child: Column(
@@ -332,27 +363,65 @@ class NavigationTreeViewState extends State<NavigationTreeView> {
         Row(mainAxisSize: MainAxisSize.min, children: [
           Padding(
               padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
-              child: Text(AppLocalizations.of(context)!.headingsTooltip)),
+              child: Text(AppLocalizations.of(context)!.headings)),
+          Spacer(),
           Tooltip(
               message: AppLocalizations.of(context)!.headingsTooltip,
               child: DropdownButton<String>(
                   items: dropDownWidgets,
                   style: textTheme.bodySmall,
                   onChanged: (v) {
-                    if (v != null && v != headerColumn[partNumber].$1) {
+                    if (v != null &&
+                        v !=
+                            controller.columnMergeSource(
+                                documentNumber, partNumber)) {
                       setState(() {
                         int idx = dropDownWidgets
                             .indexWhere((element) => element.value == v);
                         if (idx >= 0 &&
                             idx < dropDownWidgets.length &&
                             dropDownWidgets[idx].value != null) {
-                          widget.setHeaderColumn(parent.document.index,
-                              partNumber, (dropDownWidgets[idx].value!, idx));
+                          widget.setHeaderColumn(documentNumber, partNumber,
+                              dropDownWidgets[idx].value!);
                         }
                       });
                     }
                   },
-                  value: headerColumn[partNumber].$1))
+                  value:
+                      controller.columnMergeSource(documentNumber, partNumber)))
+        ]),
+        Row(mainAxisSize: MainAxisSize.min, children: [
+          Padding(
+              padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
+              child: Checkbox(
+                  value: widget.isMergeActive(documentNumber, partNumber),
+                  onChanged: (v) {
+                    if (v != null &&
+                        v != widget.isMergeActive(documentNumber, partNumber)) {
+                      widget.setMergeActive(documentNumber, partNumber, v);
+                      // TODO SET ALL PARTS
+                    }
+                  })),
+          Text(AppLocalizations.of(context)!.mergeWith),
+          Spacer(),
+          Tooltip(
+              message: AppLocalizations.of(context)!.mergeTooltip,
+              child: DropdownButton<String>(
+                  items: dropDownWidgets,
+                  style: textTheme.bodySmall,
+                  onChanged: (v) {
+                    if (v != null && v != dropDownWidgets[mergeIdx].value) {
+                      setState(() {
+                        widget.setMergeColumns(
+                            documentNumber,
+                            partNumber,
+                            controller.columnMergeSource(
+                                documentNumber, partNumber),
+                            v);
+                      });
+                    }
+                  },
+                  value: dropDownWidgets[mergeIdx].value))
         ]),
         Row(mainAxisSize: MainAxisSize.max, children: [
           Text(AppLocalizations.of(context)!.columnOrder),
@@ -385,10 +454,16 @@ class NavigationTreeViewState extends State<NavigationTreeView> {
     final documentPart = part.part;
     final partNumber = documentPart.index;
     final document = part.document;
+    final documentNumber = document.index;
     final filter = document.partColumnFilter[partNumber];
     final map = document.partColumnOrder[partNumber];
     final attributes =
         documentPart.attributeDefinitions.toList(growable: false);
+    final mergeActive = widget.isMergeActive(documentNumber, partNumber);
+    final String mergeSource =
+        widget.columnMergeSource(documentNumber, partNumber);
+    final String mergeTarget =
+        widget.columnMergeTarget(documentNumber, partNumber);
     return Container(
         margin: const EdgeInsets.fromLTRB(0, 16, 0, 16),
         height: 300,
@@ -435,7 +510,12 @@ class NavigationTreeViewState extends State<NavigationTreeView> {
                         onChanged: (val) {
                           if (val != null &&
                               val != filter.isVisible(realModelIndex) &&
-                              mounted) {
+                              mounted &&
+                              !(mergeActive &&
+                                  (documentPart.columnNames[column] ==
+                                          mergeTarget ||
+                                      documentPart.columnNames[column] ==
+                                          mergeSource))) {
                             widget.controller.setColumnVisibility(
                                 document: document.index,
                                 part: partNumber,

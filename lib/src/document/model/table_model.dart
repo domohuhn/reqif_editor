@@ -47,6 +47,11 @@ class Cell {
       this.isEditable = false,
       this.isHeading = false,
       this.prefix});
+
+  void extend(Cell other) {
+    isEditable = false;
+    content.addAll(other.content);
+  }
 }
 
 /// Wrapper for an int that encodes the reference system into the type system.

@@ -10,6 +10,7 @@ import 'package:path/path.dart';
 
 import 'package:flutter/material.dart';
 import 'package:reqif_editor/src/document/document_service.dart';
+import 'package:reqif_editor/src/document/model/column_merge_model.dart';
 import 'package:reqif_editor/src/document/model/filter_column_model.dart';
 import 'package:reqif_editor/src/document/model/reqif_model.dart';
 import 'package:reqif_editor/src/document/model/sort_column_model.dart';
@@ -28,22 +29,21 @@ class DocumentData {
   int index;
   DocumentData(
       this.path, this.document, this.flatDocument, this.index, this.service,
-      {required String columnOrder, required String columnVisibility}) {
-    _initializeHeadings();
+      {required String columnOrder,
+      required String columnVisibility,
+      required String mergeData}) {
+    initializePartModels(
+        columnOrder: columnOrder,
+        columnVisibility: columnVisibility,
+        mergeData: mergeData);
     _initializeTexts();
     _initializeIds();
-    initializePartModels(
-        columnOrder: columnOrder, columnVisibility: columnVisibility);
     _initializeSelectionAndSearchData();
     _initializeFilterControllers();
   }
   static const String defaultHeadingName1 = "ReqIF.ChapterName";
   static const String defaultHeadingName2 = "ReqIF.Chapter";
   static const int fallbackHeadingColumn = 1;
-
-  /// columns with the headings for each part.
-  /// $1 ist the name, $2 the column index
-  List<(String, int)> headings = [];
 
   /// columns with the id for each object.
   /// $1 ist the name, $2 the column index
@@ -53,10 +53,13 @@ class DocumentData {
   /// $1 ist the name, $2 the column index
   List<(String, int)> texts = [];
 
+  /// Initializes the headings and merge target if not already selected.
   void _initializeHeadings() {
-    headings.clear();
-    for (final part in flatDocument.parts) {
-      final names = part.columnNames;
+    for (final part in flatDocument.parts.indexed) {
+      if (partColumnMerge[part.$1].mergeSourceColumnName != "") {
+        continue;
+      }
+      final names = part.$2.columnNames;
       int selected = -1;
       int counter = 0;
       for (final name in names) {
@@ -71,7 +74,7 @@ class DocumentData {
         // fallback, select first text or string column
         selected = 0;
         int counter = 0;
-        for (final type in part.attributeDefinitions) {
+        for (final type in part.$2.attributeDefinitions) {
           if (type.isText) {
             counter += 1;
             if (counter == fallbackHeadingColumn) {
@@ -81,9 +84,8 @@ class DocumentData {
           ++selected;
         }
       }
-      headings.add((names[selected], selected));
+      partColumnMerge[part.$1].setMergeOptions(source: names[selected]);
     }
-    assert(headings.length == flatDocument.partCount);
   }
 
   static const String defaultTextName = "ReqIF.Text";
@@ -118,6 +120,14 @@ class DocumentData {
       texts.add((names[selected], selected));
     }
     assert(texts.length == flatDocument.partCount);
+  }
+
+  int headingsColumn(int part) {
+    if (part < 0 || part >= flatDocument.partCount) {
+      return -1;
+    }
+    final name = partColumnMerge[part].mergeSourceColumnName;
+    return flatDocument[part].columnNames.indexWhere((v) => v == name);
   }
 
   static const String defaultIdName1 = "Object Identifier";
@@ -200,6 +210,36 @@ class DocumentData {
     }
   }
 
+  /// Initializes the column merge options from a json string given in [strData]
+  void _columnMergeFromJson(String strData) {
+    try {
+      final data = jsonDecode(strData);
+      for (int i = 0; i < partColumnMerge.length; ++i) {
+        partColumnMerge[i].fromJson(data, "$i");
+      }
+    } catch (e) {
+      for (int i = 0; i < partColumnFilter.length; ++i) {
+        partColumnMerge[i].resetMerging();
+      }
+    }
+    _initializeHeadings();
+  }
+
+  /// Serializes the column merge options to a json string
+  String columnMergeToJson() {
+    StringBuffer rv = StringBuffer('{');
+    for (int i = 0; i < partColumnMerge.length; ++i) {
+      bool isLast = (i + 1) == partColumnMerge.length;
+      rv.write('"$i":');
+      rv.write(partColumnMerge[i].toJson());
+      if (!isLast) {
+        rv.write(',');
+      }
+    }
+    rv.write('}');
+    return rv.toString();
+  }
+
   /// Serializes the column ordering to a json string
   String columnOrderToJson() {
     StringBuffer rv = StringBuffer('{');
@@ -267,12 +307,16 @@ class DocumentData {
     }
   }
 
+  List<ColumnMergeModel> partColumnMerge = [];
   List<SortColumnModel> partColumnOrder = [];
   List<FilterColumnModel> partColumnFilter = [];
   List<TableModel> partModels = [];
 
   void initializePartModels(
-      {required String columnOrder, required String columnVisibility}) {
+      {required String columnOrder,
+      required String columnVisibility,
+      required String mergeData}) {
+    partColumnMerge.clear();
     partColumnOrder.clear();
     partColumnFilter.clear();
     partModels.clear();
@@ -280,12 +324,15 @@ class DocumentData {
       final dataModel = ReqIfModel(flatDocument[i]);
       final order = SortColumnModel(dataModel);
       final visibility = FilterColumnModel(order);
+      final columnMerge = ColumnMergeModel(visibility);
+      partColumnMerge.add(columnMerge);
       partColumnOrder.add(order);
       partColumnFilter.add(visibility);
-      partModels.add(visibility);
+      partModels.add(columnMerge);
     }
     _columnOrderFromJson(columnOrder);
     _columnVisibilityFromJson(columnVisibility);
+    _columnMergeFromJson(mergeData);
   }
 
   /// Text editing controllers per part.
