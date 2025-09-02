@@ -31,3 +31,9 @@ jobs:
           pushd release
           powershell Compress-Archive ../build/windows/x64/runner/Release/* reqif-editor-windows-x64.zip
           popd
+     - name: Archive production artifacts
+       uses: actions/upload-artifact@v4
+       with:
+          name: reqif-editor-windows-x64.zip
+          path: release/reqif-editor-*
+          retention-days: 30
