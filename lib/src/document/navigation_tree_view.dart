@@ -354,6 +354,13 @@ class NavigationTreeViewState extends State<NavigationTreeView> {
     if (mergeIdx < 0) {
       mergeIdx = 0;
     }
+    final String mergeSource =
+        controller.columnMergeSource(documentNumber, partNumber);
+    int mergeSourceIdx =
+        documentPart.columnNames.indexWhere((v) => v == mergeSource);
+    if (mergeSourceIdx < 0) {
+      mergeSourceIdx = 0;
+    }
     return SingleChildScrollView(
         child: Column(
       mainAxisSize: MainAxisSize.min,
@@ -372,9 +379,7 @@ class NavigationTreeViewState extends State<NavigationTreeView> {
                   style: textTheme.bodySmall,
                   onChanged: (v) {
                     if (v != null &&
-                        v !=
-                            controller.columnMergeSource(
-                                documentNumber, partNumber)) {
+                        v != dropDownWidgets[mergeSourceIdx].value) {
                       setState(() {
                         int idx = dropDownWidgets
                             .indexWhere((element) => element.value == v);
@@ -387,8 +392,7 @@ class NavigationTreeViewState extends State<NavigationTreeView> {
                       });
                     }
                   },
-                  value:
-                      controller.columnMergeSource(documentNumber, partNumber)))
+                  value: dropDownWidgets[mergeSourceIdx].value))
         ]),
         Row(mainAxisSize: MainAxisSize.min, children: [
           Padding(
