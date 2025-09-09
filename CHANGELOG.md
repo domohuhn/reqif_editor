@@ -2,6 +2,7 @@
 
 - bugfix: The navigation tree should no longer become invisible when a filter is applied
 - bugfix: The part edit window should no longer crash
+- bugfix: filtering works when two columns are merged
 
 ## 0.6.0
 

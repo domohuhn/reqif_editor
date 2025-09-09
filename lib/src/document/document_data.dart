@@ -389,8 +389,24 @@ class DocumentData {
 
   void applyFilter(bool active) {
     for (final part in flatDocument.parts.indexed) {
-      part.$2.applyFilter(
-          active, partFilterControllers[part.$1].map((e) => e.text).toList());
+      final filterList =
+          partFilterControllers[part.$1].map((e) => e.text).toList();
+      List<int> orColumns = [];
+      if (part.$1 < partColumnMerge.length) {
+        final merge = partColumnMerge[part.$1];
+        if (merge.mergeActiveAndValid) {
+          int source = part.$2.columnNames
+              .indexWhere((v) => v == merge.mergeSourceColumnName);
+          int target = part.$2.columnNames
+              .indexWhere((v) => v == merge.mergeTargetColumnName);
+          orColumns.add(source);
+          orColumns.add(target);
+          if (source < filterList.length && target < filterList.length) {
+            filterList[target] = filterList[source];
+          }
+        }
+      }
+      part.$2.applyFilter(active, filterList, columnsToOr: orColumns);
     }
 
     for (int i = 0; i < flatDocument.parts.length; ++i) {

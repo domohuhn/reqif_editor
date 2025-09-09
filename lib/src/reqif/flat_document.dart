@@ -174,7 +174,7 @@ class ReqIfDocumentPart {
   /// The filter is a list of regular expressions that are matched to the raw text
   /// contents of each column. Elements are filtered if nothing matches. An empty
   /// String will always match. The filter list is applied in column order.
-  void applyFilter(bool active, List<String> filter) {
+  void applyFilter(bool active, List<String> filter, {List<int>? columnsToOr}) {
     if (filter.every((element) => element == "")) {
       _filterActive = false;
       return;
@@ -187,7 +187,7 @@ class ReqIfDocumentPart {
         filter.map((e) => RegExp(e, caseSensitive: false)).toList();
     int position = 0;
     for (final val in _elements) {
-      if (_matches(val, regexFilter)) {
+      if (_matches(val, regexFilter, columnsToOr)) {
         _filteredElements
             .add(ReqIfDocumentElement.copyWith(val, position: position));
         _mapFilteredToOriginal.add(_mapOriginalToFilter.length);
@@ -201,9 +201,9 @@ class ReqIfDocumentPart {
     _filteredOutline.clear();
 
     for (int i = 0; i < _outline.length; ++i) {
-      final childMatches =
-          _outlineChildMatches(_outline[i], _outline[i].position, regexFilter);
-      if (_matches(_outline[i], regexFilter) || childMatches.$1) {
+      final childMatches = _outlineChildMatches(
+          _outline[i], _outline[i].position, regexFilter, columnsToOr);
+      if (_matches(_outline[i], regexFilter, columnsToOr) || childMatches.$1) {
         _filteredOutline.add(ReqIfDocumentElement.copyWith(_outline[i],
             position: _findNextPositionInFilteredList(_outline[i].position)));
       }
@@ -229,7 +229,8 @@ class ReqIfDocumentPart {
     return -1;
   }
 
-  bool _matches(ReqIfDocumentElement element, List<RegExp> filter) {
+  bool _matches(ReqIfDocumentElement element, List<RegExp> filter,
+      List<int>? columnsToOr) {
     List<bool> matches = filter.map((e) => e.pattern == "").toList();
     for (final attribute in element) {
       if (attribute == null) {
@@ -241,18 +242,31 @@ class ReqIfDocumentPart {
         matches[index] = filter[index].hasMatch(value.toStringWithNewlines());
       }
     }
-    return matches.every((element) => element);
+    if (columnsToOr == null) {
+      return matches.every((element) => element);
+    } else {
+      bool columnsOr = false;
+      bool columnsAnd = true;
+      for (int i = 0; i < matches.length; ++i) {
+        if (columnsToOr.contains(i)) {
+          columnsOr = columnsOr || matches[i];
+        } else {
+          columnsAnd = columnsAnd && matches[i];
+        }
+      }
+      return columnsOr && columnsAnd;
+    }
   }
 
-  (bool, int) _outlineChildMatches(
-      ReqIfDocumentElement element, int start, List<RegExp> filter) {
+  (bool, int) _outlineChildMatches(ReqIfDocumentElement element, int start,
+      List<RegExp> filter, List<int>? columnsToOr) {
     int levelToStop = element.level;
     for (int i = start + 1; i < _elements.length; ++i) {
       final compare = _elements[i];
       if (compare.level <= levelToStop) {
         break;
       }
-      if (_matches(compare, filter)) {
+      if (_matches(compare, filter, columnsToOr)) {
         return (true, compare.position);
       }
     }
