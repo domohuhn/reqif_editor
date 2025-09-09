@@ -135,7 +135,7 @@ class NavigationTreeNode {
       }
       if (current == null && level != lastLevel) {
         throw ReqIfError(
-            "Flat document is build wrong! First level must be 0! Last $lastLevel and ${element.level}");
+            "Flat document is build wrong! First level must be 0! Got ${element.level} in '$element'");
       }
       if (level > lastLevel) {
         if (lastLevel + 1 == level) {

@@ -1,3 +1,7 @@
+## 0.6.1
+
+- bugfix: The navigation tree should no longer become invisible when a filter is applied
+
 ## 0.6.0
 
 - For a better experience when working with files exported by DOORs, it is now possible to merge two columns in the display.

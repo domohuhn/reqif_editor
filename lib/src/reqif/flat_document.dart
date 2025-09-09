@@ -249,7 +249,7 @@ class ReqIfDocumentPart {
     int levelToStop = element.level;
     for (int i = start + 1; i < _elements.length; ++i) {
       final compare = _elements[i];
-      if (compare.level == levelToStop) {
+      if (compare.level <= levelToStop) {
         break;
       }
       if (_matches(compare, filter)) {
