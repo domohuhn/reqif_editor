@@ -55,8 +55,14 @@ class FilterColumnModel extends BaseSortModel {
   /// Called by child models in case rows or columns are sorted
   @override
   void onColumnMoved(int column, int move) {
+    assert(move == 1 || move == -1);
+    final sourceVisible = isVisible(column);
+    final targetVisible = isVisible(column + move);
     moveColumn(column, move);
-    parent?.onColumnMoved(column, move);
+    // only push up if visible
+    if (sourceVisible && targetVisible) {
+      parent?.onColumnMoved(column, move);
+    }
   }
 
   /// Creates a json fragment as string to serialize the document order.

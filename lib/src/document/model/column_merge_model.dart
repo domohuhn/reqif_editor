@@ -72,6 +72,7 @@ class ColumnMergeModel extends BaseSortModel {
   /// Called by child models in case rows or columns are sorted
   @override
   void onColumnMoved(int column, int move) {
+    // TODO FIX BUG - filter active and swap with invisible row == merging becomes inactive
     _mergeSource = _computeNewColumn(_mergeSource, column, move);
     _mergeTarget = _computeNewColumn(_mergeTarget, column, move);
     parent?.onColumnMoved(column, move);
