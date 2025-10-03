@@ -61,7 +61,7 @@ class FilterColumnModel extends BaseSortModel {
     moveColumn(column, move);
     // only push up if visible
     if (sourceVisible && targetVisible) {
-      parent?.onColumnMoved(column, move);
+      parent?.onColumnMoved(inverseMapColumn(column), move);
     }
   }
 

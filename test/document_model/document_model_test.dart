@@ -319,5 +319,22 @@ void main() {
         }
       }
     });
+
+    test("filter and merge columns", () {
+      final filter = FilterColumnModel(simpleModel);
+      final model = ColumnMergeModel(filter);
+      filter.setVisibility(1, false);
+
+      model.setMergeOptions(
+          active: true,
+          source: "(row: 0, column: 3)",
+          target: "(row: 0, column: 4)");
+      expect(model.mergeSource, 2);
+      expect(model.mergeTarget, 3);
+
+      filter.onColumnMoved(3, -1);
+      expect(model.mergeSource, 1);
+      expect(model.mergeTarget, 3);
+    });
   });
 }

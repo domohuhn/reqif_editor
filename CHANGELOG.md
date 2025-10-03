@@ -1,6 +1,7 @@
 ## 0.6.2
 
 - bugfix: Row filter works again if no columns are merged.
+- bugfix: Swapping rows with invisible rows should work while column merging is active.
 
 ## 0.6.1
 
