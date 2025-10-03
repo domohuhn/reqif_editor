@@ -124,7 +124,8 @@ class XHtmlToWidgetsConverter extends StatelessWidget {
       node as xml.XmlElement;
       final child = node.getElement('object', namespace: '*');
       Image? image;
-      if (node.getAttribute('type') == "image/png") {
+      final objectType = node.getAttribute('type');
+      if (objectType == "image/png") {
         final provider = cache.getCachedImageOrLoad(node.getAttribute('data'));
         if (provider != null) image = Image(image: provider);
       }
@@ -134,16 +135,20 @@ class XHtmlToWidgetsConverter extends StatelessWidget {
         final provider = cache.getCachedImageOrLoad(child.getAttribute('data'));
         if (provider != null) image = Image(image: provider);
       }
-      if (image == null && child != null) {
-        // read alternative text and provide error message
-        currentTextSpan.add(const TextSpan(
-            text: 'FAILED TO LOAD OBJECT. Alternative Text:\n',
+      if (image == null) {
+        var errorString =
+            'FAILED TO LOAD OBJECT\n"${node.getAttribute('data')}"\nOF TYPE "$objectType".';
+        if (child != null) errorString += ' Alternative Text:\n';
+        currentTextSpan.add(TextSpan(
+            text: errorString,
             style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)));
-        for (final node in child.nodes) {
-          _recurseThroughDOM(
-              widgets, node, nextAttributes, ctx, currentTextSpan);
+        if (child != null) {
+          for (final node in child.nodes) {
+            _recurseThroughDOM(
+                widgets, node, nextAttributes, ctx, currentTextSpan);
+          }
         }
-      } else if (image != null) {
+      } else {
         _pushCollectedTextsToList(widgets, currentTextSpan);
         widgets.add(image);
       }

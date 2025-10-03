@@ -217,55 +217,53 @@ class NavigationTreeViewState extends State<NavigationTreeView> {
   }
 
   Span _treeRowBuilder(TreeViewNode<NavigationTreeNode> node) {
+    final extend = FixedTreeRowExtent(40.0);
+    SpanDecoration? background;
+    SpanDecoration? foreground;
     if (_selectedNode == node) {
-      return TreeRow(
-        extent: FixedTreeRowExtent(
-          node.children.isNotEmpty ? 60.0 : 50.0,
-        ),
-        recognizerFactories: _getTapRecognizer(node),
-        backgroundDecoration: TreeRowDecoration(
-          color: Theme.of(context).colorScheme.inversePrimary,
-        ),
-        foregroundDecoration: const TreeRowDecoration(
-          border: TreeRowBorder.all(BorderSide()),
-        ),
+      background = TreeRowDecoration(
+        color: Theme.of(context).colorScheme.inversePrimary,
+      );
+      foreground = const TreeRowDecoration(
+        border: TreeRowBorder.all(BorderSide()),
       );
     }
     return TreeRow(
-      extent: FixedTreeRowExtent(
-        node.children.isNotEmpty ? 60.0 : 50.0,
-      ),
-      recognizerFactories: _getTapRecognizer(node),
-    );
+        extent: extend,
+        recognizerFactories: _getTapRecognizer(node),
+        backgroundDecoration: background,
+        foregroundDecoration: foreground);
   }
 
   Widget _getTreeView() {
-    return Scrollbar(
-      controller: horizontalController,
-      thumbVisibility: true,
-      child: Scrollbar(
-        controller: _verticalController,
-        thumbVisibility: true,
-        child: TreeView<NavigationTreeNode>(
-          controller: treeController,
-          verticalDetails: ScrollableDetails.vertical(
-            controller: _verticalController,
-          ),
-          horizontalDetails: ScrollableDetails.horizontal(
-            controller: horizontalController,
-          ),
-          tree: _tree,
-          onNodeToggle: (TreeViewNode<NavigationTreeNode> node) {
-            setState(() {
-              _selectedNode = node;
-            });
-          },
-          treeNodeBuilder: _treeNodeBuilder,
-          treeRowBuilder: _treeRowBuilder,
-          indentation: TreeViewIndentationType.none,
+    return _wrapInScrollbars(
+      TreeView<NavigationTreeNode>(
+        controller: treeController,
+        verticalDetails: ScrollableDetails.vertical(
+          controller: _verticalController,
         ),
+        horizontalDetails: ScrollableDetails.horizontal(
+          controller: horizontalController,
+        ),
+        tree: _tree,
+        onNodeToggle: (TreeViewNode<NavigationTreeNode> node) {
+          setState(() {
+            _selectedNode = node;
+          });
+        },
+        treeNodeBuilder: _treeNodeBuilder,
+        treeRowBuilder: _treeRowBuilder,
+        indentation: TreeViewIndentationType.none,
       ),
     );
+  }
+
+  Widget _wrapInScrollbars(Widget w) {
+    return Scrollbar(
+        controller: horizontalController,
+        thumbVisibility: true,
+        child: Scrollbar(
+            controller: _verticalController, thumbVisibility: true, child: w));
   }
 
   Widget _wrapInBox(Widget w) {

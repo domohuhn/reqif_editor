@@ -1,5 +1,6 @@
 ## 0.6.2
 
+- embedded objects that fail to load should now be visible as error message, even if they provide no alternatives
 - bugfix: Row filter works again if no columns are merged.
 - bugfix: Swapping rows with invisible rows should work while column merging is active.
 
