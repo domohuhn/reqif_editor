@@ -17,9 +17,38 @@ void main() {
     test('Filter', () {
       final linear = ReqIfFlatDocument.buildFlatDocument(parsed);
       expect(linear.partCount, 1);
-      linear.parts.first.applyFilter(true, ["", "", "chap", "", "", "", ""]);
-      expect(linear.parts.first.filteredOutline.length, 1);
-      expect(linear.parts.first.filteredOutline.first.prefix, "3");
+      final part = linear.parts.first;
+      part.applyFilter(true, ["", "", "chap", "", "", "", ""]);
+      expect(part.filteredOutline.length, 1);
+      expect(part.filteredOutline.first.prefix, "3");
+      expect(part.elements.length, 2);
+      expect(part.elements.first.toString(),
+          "[0] | 3 | REQ_13 | [Heading] | Additional Chapter |  | [Windows, Linux, MacOS] |  | [Draft] | Initial revision |  |  | ");
+    });
+
+    test('Filter', () {
+      final linear = ReqIfFlatDocument.buildFlatDocument(parsed);
+      expect(linear.partCount, 1);
+      final part = linear.parts.first;
+      part.applyFilter(true, ["", "", "chap", "", "", "", ""], columnsToOr: []);
+      expect(part.filteredOutline.length, 1);
+      expect(part.filteredOutline.first.prefix, "3");
+      expect(part.elements.length, 2);
+      expect(part.elements.first.toString(),
+          "[0] | 3 | REQ_13 | [Heading] | Additional Chapter |  | [Windows, Linux, MacOS] |  | [Draft] | Initial revision |  |  | ");
+    });
+
+    test('Filter - merged', () {
+      final linear = ReqIfFlatDocument.buildFlatDocument(parsed);
+      expect(linear.partCount, 1);
+      final part = linear.parts.first;
+      part.applyFilter(true, ["", "", "app", "app", "", "", ""],
+          columnsToOr: [2, 3]);
+      expect(part.filteredOutline.length, 1);
+      expect(part.filteredOutline.first.prefix, "1");
+      expect(part.elements.length, 3);
+      expect(part.elements.first.toString(),
+          "[0] |  | REQ_3 | [Requirement] |  | The application must work on the windows operating system. | [Windows] |  | [Draft] | Initial revision |  |  | ");
     });
   });
 }

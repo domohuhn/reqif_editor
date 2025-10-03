@@ -1,3 +1,7 @@
+## 0.6.2
+
+- bugfix: Row filter works again if no columns are merged.
+
 ## 0.6.1
 
 - bugfix: The navigation tree should no longer become invisible when a filter is applied

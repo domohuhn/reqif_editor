@@ -242,7 +242,7 @@ class ReqIfDocumentPart {
         matches[index] = filter[index].hasMatch(value.toStringWithNewlines());
       }
     }
-    if (columnsToOr == null) {
+    if (columnsToOr == null || columnsToOr.isEmpty) {
       return matches.every((element) => element);
     } else {
       bool columnsOr = false;
