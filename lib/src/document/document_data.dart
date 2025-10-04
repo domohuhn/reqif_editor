@@ -258,7 +258,7 @@ class DocumentData {
   /// Reset the column ordering
   void resetAllColumnOrders() {
     for (int i = 0; i < partColumnOrder.length; ++i) {
-      partColumnOrder[i].resetOrder();
+      resetColumnOrder(i);
     }
   }
 
@@ -267,7 +267,20 @@ class DocumentData {
   /// Returns true if values were changed.
   bool resetColumnOrder(int part) {
     if (part < partColumnOrder.length) {
-      return partColumnOrder[part].resetOrder();
+      // get visible real cols
+      var model = partColumnFilter[part];
+      var visibilityCols = [];
+      for (int i = 0; i < model.columns; ++i) {
+        visibilityCols.add(model.map(TableVicinity(row: 0, column: i)).column);
+      }
+      final rv = partColumnOrder[part].resetOrder();
+      if (rv) {
+        model.resetVisibility(false);
+        for (int i = 0; i < visibilityCols.length; ++i) {
+          model.setVisibility(visibilityCols[i], true);
+        }
+      }
+      return rv;
     }
     return false;
   }

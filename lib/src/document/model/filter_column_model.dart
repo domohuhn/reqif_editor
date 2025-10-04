@@ -72,9 +72,9 @@ class FilterColumnModel extends BaseSortModel {
 
   bool get visibilityFilterActive => _visible.any((v) => !v);
 
-  bool resetVisibility() {
-    final rv = visibilityFilterActive;
-    _visible.fillRange(0, _visible.length, true);
+  bool resetVisibility([bool visibility = true]) {
+    final rv = _visible.any((v) => v != visibility);
+    _visible.fillRange(0, _visible.length, visibility);
     return rv;
   }
 

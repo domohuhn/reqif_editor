@@ -49,5 +49,26 @@ void main() async {
       controller.documents[0].initializePartModels(
           columnOrder: input4, columnVisibility: "", mergeData: "");
     });
+
+    test('reset column orders', () async {
+      DocumentController controller =
+          DocumentController(system, settingsController);
+      await controller.loadDocument(inputFile);
+
+      const inputOrder = '{"0":[10,9,8,7,6,5,4,3,2,1,0]}';
+      const inputVisibility =
+          '{"0":[false,false,false,true,true,true,false,false,false,true,true]}';
+      final doc = controller.documents[0];
+      doc.initializePartModels(
+          columnOrder: inputOrder,
+          columnVisibility: inputVisibility,
+          mergeData: "");
+      final result1 = doc.columnVisibilityToJson();
+      expect(result1, inputVisibility);
+      doc.resetColumnOrder(0);
+      final result2 = doc.columnVisibilityToJson();
+      expect(result2,
+          '{"0":[true,true,false,false,false,true,true,true,false,false,false]}');
+    });
   });
 }
