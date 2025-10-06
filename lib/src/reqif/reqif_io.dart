@@ -78,12 +78,18 @@ String escapeSpecialCharacters(String input) {
     // escape tabs, ', " in the-value blocks:
     final bool relevantCharacter =
         (pt == 34 || pt == 39 || pt == 9 || pt == 37 || pt == 94);
+    final bool escapeInAttribute =
+        inAttribute && pt != attributeStart && (pt == 37 || pt == 39);
     final bool escapeInValue = relevantCharacter &&
         !inAttribute &&
         !wasAttribute &&
         _isInValueRange(counter, currentValueBlock, starts, ends);
     bracketCount = max(bracketCount, 0);
-    if (pt < 127 && pt != 124 && !escapeBracket && !escapeInValue) {
+    if (pt < 127 &&
+        pt != 124 &&
+        !escapeBracket &&
+        !escapeInValue &&
+        !escapeInAttribute) {
       buffer.write(ascii.decode([pt]));
     } else {
       if (escapeBracket) {
