@@ -111,7 +111,8 @@ class NavigationTreeViewState extends State<NavigationTreeView> {
                   document: node.content.document.index,
                   part: node.content.part.index,
                   row: node.content.isNode
-                      ? node.content.element.position
+                      ? (node.content.element.position +
+                          1) // add one for the static header
                       : null);
             }
             if (node.content.isFile) {

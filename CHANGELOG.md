@@ -1,6 +1,7 @@
 ## 0.6.3
 
 - character escapes when saving files are more consistent
+- bugfix: clicking a node in the navigation tree will move the focus to the correct element 
 
 ## 0.6.2
 
