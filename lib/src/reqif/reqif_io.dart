@@ -76,7 +76,8 @@ String escapeSpecialCharacters(String input) {
     // escape closing tags in text sections:
     final bool escapeBracket = (bracketCount < 0 || inAttribute) && pt == 62;
     // escape tabs, ', " in the-value blocks:
-    final bool relevantCharacter = (pt == 34 || pt == 39 || pt == 9);
+    final bool relevantCharacter =
+        (pt == 34 || pt == 39 || pt == 9 || pt == 37);
     final bool escapeInValue = relevantCharacter &&
         !inAttribute &&
         !wasAttribute &&
