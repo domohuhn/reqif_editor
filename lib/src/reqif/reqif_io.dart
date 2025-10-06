@@ -42,13 +42,10 @@ List<int> _findAllSubstrings(String text, String search) {
   return indices;
 }
 
-bool _isInValueRange(int idx, List<int> starts, List<int> ends) {
-  if (starts.length == ends.length) {
-    for (int i = 0; i < starts.length; ++i) {
-      if (starts[i] < idx && idx < ends[i]) {
-        return true;
-      }
-    }
+bool _isInValueRange(int idx, int block, List<int> starts, List<int> ends) {
+  if (starts.length == ends.length && block < starts.length) {
+    final startIdx = max(0, block);
+    return starts[startIdx] < idx && idx < ends[startIdx];
   }
   return false;
 }
@@ -57,9 +54,9 @@ bool _isInValueRange(int idx, List<int> starts, List<int> ends) {
 String escapeSpecialCharacters(String input) {
   final starts = _findAllSubstrings(input, "<THE-VALUE");
   final ends = _findAllSubstrings(input, "</THE-VALUE");
-
   StringBuffer buffer = StringBuffer();
   int counter = 0;
+  int currentValueBlock = 0;
   int bracketCount = 0;
   bool inAttribute = false;
   int attributeStart = 0;
@@ -78,10 +75,12 @@ String escapeSpecialCharacters(String input) {
     if (pt == 62 && !inAttribute) bracketCount -= 1;
     // escape closing tags in text sections:
     final bool escapeBracket = (bracketCount < 0 || inAttribute) && pt == 62;
-    final bool isAValue =
-        !inAttribute && !wasAttribute && _isInValueRange(counter, starts, ends);
     // escape tabs, ', " in the-value blocks:
-    final bool escapeInValue = isAValue && (pt == 34 || pt == 39 || pt == 9);
+    final bool relevantCharacter = (pt == 34 || pt == 39 || pt == 9);
+    final bool escapeInValue = relevantCharacter &&
+        !inAttribute &&
+        !wasAttribute &&
+        _isInValueRange(counter, currentValueBlock, starts, ends);
     bracketCount = max(bracketCount, 0);
     if (pt < 127 && pt != 124 && !escapeBracket && !escapeInValue) {
       buffer.write(ascii.decode([pt]));
@@ -95,6 +94,10 @@ String escapeSpecialCharacters(String input) {
       } else {
         buffer.write('&#x${pt.toRadixString(16).toUpperCase()};');
       }
+    }
+    final checkIdx = max(0, currentValueBlock);
+    if (checkIdx < ends.length && counter >= ends[checkIdx]) {
+      currentValueBlock += 1;
     }
     ++counter;
   }
