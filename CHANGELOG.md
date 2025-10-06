@@ -1,3 +1,7 @@
+## 0.6.3
+
+- character escapes when saving files are more consistent
+
 ## 0.6.2
 
 - embedded objects that fail to load should now be visible as error message, even if they provide no alternatives

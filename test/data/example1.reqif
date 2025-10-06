@@ -62,7 +62,7 @@
 <EMBEDDED-VALUE OTHER-CONTENT="-1" KEY="0"/>
 </PROPERTIES>
 </ENUM-VALUE>
-<ENUM-VALUE LAST-CHANGE="2023-11-22T11:42:13+01:00" IDENTIFIER="_ebb35b8b-536d-438c-84d3-411561deaa30" LONG-NAME="Review &#220;&#228;">
+<ENUM-VALUE LAST-CHANGE="2023-11-22T11:42:13+01:00" IDENTIFIER="_ebb35b8b-536d-438c-84d3-411561deaa30" LONG-NAME="Review &#xDC;&#xE4;">
 <PROPERTIES>
 <EMBEDDED-VALUE OTHER-CONTENT="-1" KEY="3"/>
 </PROPERTIES>
@@ -563,7 +563,7 @@
 <DEFINITION>
 <ATTRIBUTE-DEFINITION-XHTML-REF>_0db30098-9450-4a8a-bdcb-9be6bd8ddf40</ATTRIBUTE-DEFINITION-XHTML-REF>
 </DEFINITION>
-<THE-VALUE><reqif-xhtml:div>The program must be able to save files conforming to ReqIf version 1.0.<reqif-xhtml:br/>Some characters may need to be escaped: &#91;brackets&#93;&#009;Some non ascii characters: &#xE4;&#xF6;<reqif-xhtml:br/></reqif-xhtml:div></THE-VALUE>
+<THE-VALUE><reqif-xhtml:div>The program must be able to save files conforming to ReqIf version 1.0.<reqif-xhtml:br/>Some characters may need to be escaped: [brackets]&#x9;Some non ascii characters: &#xE4;&#xF6;<reqif-xhtml:br/></reqif-xhtml:div></THE-VALUE>
 </ATTRIBUTE-VALUE-XHTML>
 <ATTRIBUTE-VALUE-ENUMERATION>
 <DEFINITION>

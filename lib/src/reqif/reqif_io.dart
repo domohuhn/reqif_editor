@@ -32,17 +32,42 @@ void writeXMLToFile(
   system.writeFileSync(outputPath, convertXMLToString(doc));
 }
 
-/// escapes the same characters DOORS seems to escape.
+List<int> _findAllSubstrings(String text, String search) {
+  RegExp regex = RegExp(search);
+  Iterable<RegExpMatch> matches = regex.allMatches(text);
+  List<int> indices = [];
+  for (RegExpMatch match in matches) {
+    indices.add(match.start);
+  }
+  return indices;
+}
+
+bool _isInValueRange(int idx, List<int> starts, List<int> ends) {
+  if (starts.length == ends.length) {
+    for (int i = 0; i < starts.length; ++i) {
+      if (starts[i] < idx && idx < ends[i]) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+/// escapes the same characters as the PTC requirements connector seems to escape.
 String escapeSpecialCharacters(String input) {
+  final starts = _findAllSubstrings(input, "<THE-VALUE");
+  final ends = _findAllSubstrings(input, "</THE-VALUE");
+
   StringBuffer buffer = StringBuffer();
-  int startOtherEscapes = input.indexOf("DATATYPES");
-  int endOtherEscapes = input.indexOf("/DATATYPES");
   int counter = 0;
   int bracketCount = 0;
   bool inAttribute = false;
   int attributeStart = 0;
   for (int pt in input.codeUnits) {
+    // count open and close tags < (60) and > (62)
     if (pt == 60 && !inAttribute) bracketCount += 1;
+    // start/end an attribute whenever we see a matching pair of ' or " (34 and 39)
+    final wasAttribute = inAttribute;
     if (inAttribute && attributeStart == pt) {
       attributeStart = 0;
       inAttribute = false;
@@ -51,26 +76,24 @@ String escapeSpecialCharacters(String input) {
       inAttribute = true;
     }
     if (pt == 62 && !inAttribute) bracketCount -= 1;
+    // escape closing tags in text sections:
     final bool escapeBracket = (bracketCount < 0 || inAttribute) && pt == 62;
+    final bool isAValue =
+        !inAttribute && !wasAttribute && _isInValueRange(counter, starts, ends);
+    // escape tabs, ', " in the-value blocks:
+    final bool escapeInValue = isAValue && (pt == 34 || pt == 39 || pt == 9);
     bracketCount = max(bracketCount, 0);
-    if (pt < 127 &&
-        pt != 91 &&
-        pt != 93 &&
-        pt != 124 &&
-        pt != 9 &&
-        !escapeBracket) {
+    if (pt < 127 && pt != 124 && !escapeBracket && !escapeInValue) {
       buffer.write(ascii.decode([pt]));
     } else {
-      final bool inRange =
-          startOtherEscapes < counter && counter < endOtherEscapes;
       if (escapeBracket) {
         buffer.write('&gt;');
-      } else if (pt > 100 && pt != 124 && !inRange) {
-        buffer.write('&#x${pt.toRadixString(16).toUpperCase()};');
-      } else if (pt == 9) {
-        buffer.write('&#${pt.toString().padLeft(3, '0')};');
+      } else if (pt == 34) {
+        buffer.write('&quot;');
+      } else if (pt == 39) {
+        buffer.write('&#039;');
       } else {
-        buffer.write('&#$pt;');
+        buffer.write('&#x${pt.toRadixString(16).toUpperCase()};');
       }
     }
     ++counter;
