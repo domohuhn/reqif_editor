@@ -205,7 +205,6 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
       columnWidths.add(defaultColumnWidth);
     }
     for (final element in widget.part.elements) {
-      bool rowHasEmbeddedObjects = false;
       double rowHeight = defaultRowHeight;
       final bool rowEditable = element.isEditable && widget.isEditable;
       for (int i = 0; i < widget.part.columnCount; ++i) {
@@ -242,12 +241,15 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
             if (attr.embeddedObjectCount > 0) {
               columnWidth = maxTextLineWidth;
             }
-            columnWidth = max(columnWidth, size.width + defaultTextPadding);
-            rowHeight = max(rowHeight, size.height + defaultTextPadding);
+            var currentHeight = size.height + defaultTextPadding;
             if (attr.embeddedObjectCount > 0) {
-              rowHasEmbeddedObjects = true;
-              rowHeight += columnWidth * attr.embeddedObjectCount;
+              currentHeight += columnWidth * attr.embeddedObjectCount;
             }
+            if (attr.hasList) {
+              currentHeight *= 1.2;
+            }
+            columnWidth = max(columnWidth, size.width + defaultTextPadding);
+            rowHeight = max(rowHeight, currentHeight);
           default:
             final text = attr.toString();
             final Size size = (TextPainter(
@@ -261,10 +263,7 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
         }
         columnWidths[i] = columnWidth;
       }
-      if (!rowHasEmbeddedObjects) {
-        rowHeight += 10;
-      }
-      rowHeights.add(rowHeight);
+      rowHeights.add(rowHeight * 1.1);
     }
     columnWidths.insert(0, _rowNumberIndicatorWidth);
     final int columnWithPrefix = widget.controller.headingsColumn + 1;

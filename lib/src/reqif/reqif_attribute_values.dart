@@ -359,6 +359,7 @@ class ReqIfAttributeValueXhtml extends ReqIfAttributeValue {
       for (final xhtml in child.descendants) {
         if (xhtml is xml.XmlElement &&
             (xhtml.name.local == "br" || xhtml.name.local == "li")) {
+          hasList = xhtml.name.local == "li";
           buffer.write('\n');
         }
         if (xhtml.value != null) {
@@ -368,4 +369,6 @@ class ReqIfAttributeValueXhtml extends ReqIfAttributeValue {
     }
     return buffer.toString();
   }
+
+  bool hasList = false;
 }
