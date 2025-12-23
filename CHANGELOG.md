@@ -1,3 +1,8 @@
+## 0.6.4
+
+- bugfix: vertical size computation for cells provides more room 
+- bugfix: long column names are truncated in the specification options
+
 ## 0.6.3
 
 - character escapes when saving files are more consistent
