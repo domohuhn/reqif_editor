@@ -504,7 +504,10 @@ class NavigationTreeViewState extends State<NavigationTreeView> {
                     icon: const Icon(Icons.keyboard_arrow_down)),
                 Padding(
                     padding: const EdgeInsets.fromLTRB(16, 0, 8, 0),
-                    child: Text(documentPart.columnNames[column])),
+                    child: ConstrainedBox(
+                        constraints: BoxConstraints(maxWidth: 260),
+                        child: Text(documentPart.columnNames[column],
+                            overflow: TextOverflow.ellipsis))),
                 const Spacer(),
                 SizedBox(
                     width: widthVisibleColumn + indentAmount,
