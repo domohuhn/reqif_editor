@@ -2,6 +2,7 @@
 
 - bugfix: vertical size computation for cells provides more room 
 - bugfix: long column names are truncated in the specification options
+- bugfix: arrows for column reordering are no longer visible at the end of the list
 
 ## 0.6.3
 

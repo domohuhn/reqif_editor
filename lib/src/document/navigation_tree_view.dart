@@ -478,30 +478,38 @@ class NavigationTreeViewState extends State<NavigationTreeView> {
           itemCount: documentPart.columnCount,
           itemBuilder: (BuildContext ctx, int index) {
             final int realModelIndex = index + 1;
-            final column =
-                map.map(TableVicinity(row: 0, column: realModelIndex)).column -
-                    1;
+            final vicinity = TableVicinity(row: 0, column: realModelIndex);
+            final column = map.map(vicinity).column - 1;
+            final moveUpButton = IconButton(
+                onPressed: () {
+                  widget.controller.moveColumn(
+                      document: document.index,
+                      part: partNumber,
+                      column: realModelIndex,
+                      move: -1);
+                },
+                icon: const Icon(Icons.keyboard_arrow_up));
+            final moveDownButton = IconButton(
+                onPressed: () {
+                  widget.controller.moveColumn(
+                      document: document.index,
+                      part: partNumber,
+                      column: realModelIndex,
+                      move: 1);
+                },
+                icon: const Icon(Icons.keyboard_arrow_down));
+            final replacement = SizedBox.fromSize(size: Size(40, 40));
             return Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                IconButton(
-                    onPressed: () {
-                      widget.controller.moveColumn(
-                          document: document.index,
-                          part: partNumber,
-                          column: realModelIndex,
-                          move: -1);
-                    },
-                    icon: const Icon(Icons.keyboard_arrow_up)),
-                IconButton(
-                    onPressed: () {
-                      widget.controller.moveColumn(
-                          document: document.index,
-                          part: partNumber,
-                          column: realModelIndex,
-                          move: 1);
-                    },
-                    icon: const Icon(Icons.keyboard_arrow_down)),
+                Visibility(
+                    visible: realModelIndex > 1,
+                    replacement: replacement,
+                    child: moveUpButton),
+                Visibility(
+                    visible: realModelIndex < documentPart.columnCount,
+                    replacement: replacement,
+                    child: moveDownButton),
                 Padding(
                     padding: const EdgeInsets.fromLTRB(16, 0, 8, 0),
                     child: ConstrainedBox(
