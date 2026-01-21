@@ -359,7 +359,10 @@ class _ResizableTableViewState extends State<ResizableTableView> {
   }
 
   Widget _buildFixedCell(BuildContext context, TableVicinity vicinity) {
-    final fixedColumColor = Theme.of(context).colorScheme.secondaryContainer;
+    final selectedRow = vicinity.row == selection.row;
+    final fixedColumColor = selectedRow
+        ? Theme.of(context).colorScheme.inversePrimary
+        : Theme.of(context).colorScheme.secondaryContainer;
     final borderColor = Theme.of(context).colorScheme.onSecondaryContainer;
     // Top left corner: always empty
     if ((vicinity.row == 0 && vicinity.column == 0) ||
