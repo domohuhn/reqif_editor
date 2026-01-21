@@ -336,7 +336,10 @@ class ReqIfAttributeValueXhtml extends ReqIfAttributeValue {
     for (final child in node.findAllElements(_xmlValueName, namespace: "*")) {
       for (final object
           in child.findAllElements(_xmlObjectName, namespace: "*")) {
-        if (object.getAttribute('type') == "image/png") {
+        final parent = object.parentElement;
+        final isFirstObject =
+            parent != null && parent.name.local != _xmlObjectName;
+        if (isFirstObject) {
           countPng += 1;
         }
       }
@@ -344,10 +347,34 @@ class ReqIfAttributeValueXhtml extends ReqIfAttributeValue {
     return countPng;
   }
 
+  int get listItemCount {
+    int count = 0;
+    for (final child in node.findAllElements(_xmlValueName, namespace: "*")) {
+      for (final xhtml in child.descendants) {
+        if (xhtml is xml.XmlElement && xhtml.name.local == "li") {
+          count += 1;
+        }
+      }
+    }
+    return count;
+  }
+
+  int get newLineCount {
+    int count = 0;
+    for (final child in node.findAllElements(_xmlValueName, namespace: "*")) {
+      for (final xhtml in child.descendants) {
+        if (xhtml is xml.XmlElement && xhtml.name.local == "br") {
+          count += 1;
+        }
+      }
+    }
+    return count;
+  }
+
   /// Returns the unformatted text of the node.
   String _toString() {
     final buffer = StringBuffer();
-    for (final child in node.findAllElements(_xmlValueName)) {
+    for (final child in node.findAllElements(_xmlValueName, namespace: "*")) {
       buffer.write(child.innerText);
     }
     return buffer.toString();
@@ -355,7 +382,7 @@ class ReqIfAttributeValueXhtml extends ReqIfAttributeValue {
 
   String _toStringWithNewlines() {
     final buffer = StringBuffer();
-    for (final child in node.findAllElements(_xmlValueName)) {
+    for (final child in node.findAllElements(_xmlValueName, namespace: "*")) {
       for (final xhtml in child.descendants) {
         if (xhtml is xml.XmlElement &&
             (xhtml.name.local == "br" || xhtml.name.local == "li")) {

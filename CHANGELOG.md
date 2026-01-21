@@ -1,3 +1,7 @@
+## 0.6.5
+
+- bugfix: Updated height calculation for lists 
+
 ## 0.6.4
 
 - bugfix: vertical size computation for cells provides more room 

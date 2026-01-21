@@ -234,16 +234,19 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
             final text = attr.toStringWithNewlines();
             final Size size = (TextPainter(
                     text: TextSpan(text: text),
-                    textScaler: MediaQuery.of(context).textScaler,
                     textDirection: TextDirection.ltr)
                   ..layout(maxWidth: maxTextLineWidth))
                 .size;
-            if (attr.embeddedObjectCount > 0) {
+            final embeddedObjectCount = attr.embeddedObjectCount;
+            if (embeddedObjectCount > 0) {
               columnWidth = maxTextLineWidth;
             }
-            var currentHeight = size.height + defaultTextPadding;
-            if (attr.embeddedObjectCount > 0) {
-              currentHeight += columnWidth * attr.embeddedObjectCount;
+            var currentHeight = size.height +
+                defaultTextPadding +
+                attr.listItemCount * 4 +
+                attr.newLineCount;
+            if (embeddedObjectCount > 0) {
+              currentHeight += columnWidth * embeddedObjectCount;
             }
             if (attr.hasList) {
               currentHeight *= 1.2;
@@ -251,10 +254,9 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
             columnWidth = max(columnWidth, size.width + defaultTextPadding);
             rowHeight = max(rowHeight, currentHeight);
           default:
-            final text = attr.toString();
+            final text = attr.toStringWithNewlines();
             final Size size = (TextPainter(
                     text: TextSpan(text: text),
-                    textScaler: MediaQuery.of(context).textScaler,
                     textDirection: TextDirection.ltr)
                   ..layout(maxWidth: maxTextLineWidth))
                 .size;
