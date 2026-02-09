@@ -174,5 +174,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get lastUsed => 'Last used';
 
   @override
+  String get copyCell => 'Copy cell';
+
+  @override
   String get openRecent => 'Open recent';
 }

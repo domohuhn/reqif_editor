@@ -177,5 +177,8 @@ class AppLocalizationsDe extends AppLocalizations {
   String get lastUsed => 'Zuletzt geöffnet';
 
   @override
+  String get copyCell => 'Zelle kopieren';
+
+  @override
   String get openRecent => 'Zuletzt geöffnet';
 }

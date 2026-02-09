@@ -422,6 +422,12 @@ abstract class AppLocalizations {
   /// **'Last used'**
   String get lastUsed;
 
+  /// text for the context menu item that copies the content of a cell to the clipboard
+  ///
+  /// In en, this message translates to:
+  /// **'Copy cell'**
+  String get copyCell;
+
   /// text for the open recent menu item
   ///
   /// In en, this message translates to:

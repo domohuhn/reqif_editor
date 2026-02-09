@@ -6,13 +6,18 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'
-    show TextInputFormatter, FilteringTextInputFormatter;
+    show
+        TextInputFormatter,
+        FilteringTextInputFormatter,
+        Clipboard,
+        ClipboardData;
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:reqif_editor/src/document/column_header.dart';
 import 'package:reqif_editor/src/document/document_controller.dart';
 import 'package:reqif_editor/src/document/document_data.dart';
 import 'package:reqif_editor/src/document/model/table_model.dart';
 import 'package:reqif_editor/src/document/resizable_table_view.dart';
+import 'package:reqif_editor/src/localization/app_localizations.dart';
 import 'package:reqif_editor/src/reqif/convert_reqif_xhtml_to_widgets.dart';
 import 'package:reqif_editor/src/reqif/flat_document.dart';
 import 'package:reqif_editor/src/reqif/reqif_attribute_definitions.dart';
@@ -89,10 +94,7 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
   Widget _buildQuillEditor() {
     return QuillEditor.basic(
       controller: widget.editorController,
-      config: QuillEditorConfig(
-        autoFocus: true,
-        expands: true,
-      ),
+      config: QuillEditorConfig(autoFocus: true, expands: true),
       focusNode: editorFocusNode,
     );
   }
@@ -149,6 +151,7 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
     return ResizableTableView(
         cellBuilder: _buildCell,
         columnHeaderBuilder: _buildColumnHeader,
+        contextMenuListBuilder: _buildContextMenuWidgetList,
         initialRowHeights: _estimateInitialRowHeights,
         initialColumnWidths: _estimateInitialColumnWidths,
         onSelectionChanged: _onSelectionChanged,
@@ -419,6 +422,50 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
       );
     }
     return null;
+  }
+
+  void _copyCellToClipBoard(TableVicinity vicinity) {
+    if (!mounted || !widget.hasPart) {
+      return;
+    }
+    final model = widget.data.partModels[widget.partNumber];
+    final cell = model[vicinity];
+    if (cell == null) {
+      return;
+    }
+    String copy = '';
+    for (final data in cell.content) {
+      if (copy.isNotEmpty) {
+        copy += '\n';
+      }
+      if (data is ReqIfAttributeValueXhtml) {
+        copy += data.toStringWithNewlines();
+      } else {
+        copy += data.toString();
+      }
+    }
+    if (copy.isNotEmpty) {
+      Clipboard.setData(ClipboardData(text: copy));
+    }
+  }
+
+  List<ContextMenuButtonItem> _buildContextMenuWidgetList(BuildContext ctx) {
+    final selection = _selected();
+    final selected = selection.row > 0 && selection.column > 0;
+    final buttonItems = <ContextMenuButtonItem>[];
+    if (selected) {
+      buttonItems.insert(
+        0,
+        ContextMenuButtonItem(
+          label: AppLocalizations.of(context)!.copyCell,
+          onPressed: () {
+            ContextMenuController.removeAny();
+            _copyCellToClipBoard(selection);
+          },
+        ),
+      );
+    }
+    return buttonItems;
   }
 
   CellContents _wrapWithPrefix(

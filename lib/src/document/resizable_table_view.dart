@@ -43,6 +43,7 @@ class ResizableTableView extends StatefulWidget {
       this.selection,
       this.initialRowHeights,
       this.cellBuilder,
+      this.contextMenuListBuilder,
       required this.selectAble,
       this.defaultColumnWidth = 160,
       this.minColumnWidth = 100,
@@ -112,6 +113,12 @@ class ResizableTableView extends StatefulWidget {
   /// The callback should return a list with length rowCount+1 if [columnHeaderBuilder] is provided, otherwise rowCount.
   /// If not enough entries are returned, then the rest of the list is filled with the default value.
   final List<double> Function()? initialRowHeights;
+
+  /// If this function is provided, it is called whenever a context menu is requested.
+  ///
+  /// The callback should return a list with buttons that are added to the context menu.
+  final List<ContextMenuButtonItem> Function(BuildContext)?
+      contextMenuListBuilder;
 
   /// The initial column width if [columnWidths] is not provided.
   final double defaultColumnWidth;
@@ -228,7 +235,22 @@ class _ResizableTableViewState extends State<ResizableTableView> {
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(0, 0, 10, 10),
                 child: widget.selectAble
-                    ? SelectionArea(child: tableView)
+                    ? SelectionArea(
+                        child: tableView,
+                        contextMenuBuilder:
+                            (BuildContext ctx, SelectableRegionState state) {
+                          final buttonItems = state.contextMenuButtonItems;
+                          if (mounted) {
+                            final builder = widget.contextMenuListBuilder;
+                            if (builder != null) {
+                              buttonItems.insertAll(0, builder(ctx));
+                            }
+                          }
+                          return AdaptiveTextSelectionToolbar.buttonItems(
+                            anchors: state.contextMenuAnchors,
+                            buttonItems: buttonItems,
+                          );
+                        })
                     : tableView,
               )),
         ));
@@ -360,9 +382,12 @@ class _ResizableTableViewState extends State<ResizableTableView> {
 
   Widget _buildFixedCell(BuildContext context, TableVicinity vicinity) {
     final selectedRow = vicinity.row == selection.row;
+    final searchRow = vicinity.row == searchPosition.row;
     final fixedColumColor = selectedRow
         ? Theme.of(context).colorScheme.inversePrimary
-        : Theme.of(context).colorScheme.secondaryContainer;
+        : searchRow
+            ? Theme.of(context).colorScheme.tertiaryContainer
+            : Theme.of(context).colorScheme.secondaryContainer;
     final borderColor = Theme.of(context).colorScheme.onSecondaryContainer;
     // Top left corner: always empty
     if ((vicinity.row == 0 && vicinity.column == 0) ||
@@ -426,9 +451,11 @@ class _ResizableTableViewState extends State<ResizableTableView> {
     final borderColor = Theme.of(context).colorScheme.outlineVariant;
 
     final selected = vicinity == selection;
-    var color = selected ? Theme.of(context).colorScheme.inversePrimary : null;
-    if (vicinity == searchPosition) {
-      color = Theme.of(context).colorScheme.tertiaryContainer;
+    final searched = vicinity == searchPosition;
+    var color =
+        searched ? Theme.of(context).colorScheme.tertiaryContainer : null;
+    if (selected) {
+      color = Theme.of(context).colorScheme.inversePrimary;
     }
     Widget? contents;
     if (widget.cellBuilder != null) {

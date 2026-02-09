@@ -1,6 +1,7 @@
 ## 0.6.5
 
 - The row number of a selected cell now has the same color as the selected cell.
+- A selected cell (highlighted with a different color) can be copied via CTRL-C or via a right click->"copy cell"
 - bugfix: Updated height calculation for lists 
 
 ## 0.6.4

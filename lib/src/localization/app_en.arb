@@ -216,6 +216,10 @@
   "@lastUsed": {
     "description": "text for last used field"
   },
+  "copyCell": "Copy cell",
+  "@copyCell": {
+    "description": "text for the context menu item that copies the content of a cell to the clipboard"
+  },
   "openRecent": "Open recent",
   "@openRecent": {
     "description": "text for the open recent menu item"

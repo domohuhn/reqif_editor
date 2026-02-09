@@ -55,5 +55,6 @@
   "visible": "Sichtbar",
   "resetVisibility": "Sichtbarkeit zurücksetzen",
   "openRecent": "Zuletzt geöffnet",
+  "copyCell": "Zelle kopieren",
   "noMatches": "Ausdruck nicht gefunden"
 }
