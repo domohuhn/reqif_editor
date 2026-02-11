@@ -39,12 +39,13 @@ class ResizableTableView extends StatefulWidget {
       {super.key,
       this.columnHeaderBuilder,
       this.initialColumnWidths,
-      this.onSelectionChanged,
+      this.onCellSelectionChanged,
+      this.onTextSelectionChanged,
       this.selection,
       this.initialRowHeights,
       this.cellBuilder,
       this.contextMenuListBuilder,
-      required this.selectAble,
+      required this.selectable,
       this.defaultColumnWidth = 160,
       this.minColumnWidth = 100,
       this.defaultRowHeight = 40,
@@ -80,11 +81,16 @@ class ResizableTableView extends StatefulWidget {
   final CellContents? Function(
       BuildContext context, TableVicinity vicinity, bool selected)? cellBuilder;
 
-  /// This callback is invoked whenever the selection changes.
+  /// This callback is invoked whenever the selected cell changes.
   ///
   /// [vicinity] ranges from [1, rowCount] and [1, colCount]
   final void Function(TableVicinity vicinity, CellState state)?
-      onSelectionChanged;
+      onCellSelectionChanged;
+
+  /// This callback is invoked whenever the selected text in the sheet changes.
+  ///
+  /// [text] contains the selected text.
+  final void Function(String text)? onTextSelectionChanged;
 
   /// This callback is invoked whenever the selected position is needed.
   ///
@@ -137,7 +143,7 @@ class ResizableTableView extends StatefulWidget {
   /// The width of the drag able borders in the table view.
   final double borderWidth;
 
-  final bool selectAble;
+  final bool selectable;
 
   final TableViewScrollControllers Function()? scrollControllerBuilder;
 
@@ -161,6 +167,8 @@ class _ResizableTableViewState extends State<ResizableTableView> {
     }
   }
 
+  late FocusNode _selectionAreaFocusNode;
+
   @override
   void initState() {
     super.initState();
@@ -172,6 +180,7 @@ class _ResizableTableViewState extends State<ResizableTableView> {
       _verticalController = ScrollController();
       _horizontalController = ScrollController();
     }
+    _selectionAreaFocusNode = FocusNode();
     ensureSizesInitialized();
   }
 
@@ -179,6 +188,7 @@ class _ResizableTableViewState extends State<ResizableTableView> {
   void dispose() {
     _verticalController.dispose();
     _horizontalController.dispose();
+    _selectionAreaFocusNode.dispose();
     super.dispose();
   }
 
@@ -227,33 +237,40 @@ class _ResizableTableViewState extends State<ResizableTableView> {
           return false;
         },
         child: Scrollbar(
-          thumbVisibility: true,
-          controller: _horizontalController,
-          child: Scrollbar(
-              thumbVisibility: true,
-              controller: _verticalController,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(0, 0, 10, 10),
-                child: widget.selectAble
-                    ? SelectionArea(
-                        child: tableView,
-                        contextMenuBuilder:
-                            (BuildContext ctx, SelectableRegionState state) {
-                          final buttonItems = state.contextMenuButtonItems;
-                          if (mounted) {
-                            final builder = widget.contextMenuListBuilder;
-                            if (builder != null) {
-                              buttonItems.insertAll(0, builder(ctx));
+            thumbVisibility: true,
+            controller: _horizontalController,
+            child: Scrollbar(
+                thumbVisibility: true,
+                controller: _verticalController,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 0, 10, 10),
+                  child: widget.selectable
+                      ? SelectionArea(
+                          focusNode: _selectionAreaFocusNode,
+                          child: tableView,
+                          contextMenuBuilder:
+                              (BuildContext ctx, SelectableRegionState state) {
+                            final buttonItems = state.contextMenuButtonItems;
+                            if (mounted) {
+                              final builder = widget.contextMenuListBuilder;
+                              if (builder != null) {
+                                buttonItems.insertAll(0, builder(ctx));
+                              }
                             }
-                          }
-                          return AdaptiveTextSelectionToolbar.buttonItems(
-                            anchors: state.contextMenuAnchors,
-                            buttonItems: buttonItems,
-                          );
-                        })
-                    : tableView,
-              )),
-        ));
+                            return AdaptiveTextSelectionToolbar.buttonItems(
+                              anchors: state.contextMenuAnchors,
+                              buttonItems: buttonItems,
+                            );
+                          },
+                          onSelectionChanged: (value) {
+                            final cb = widget.onTextSelectionChanged;
+                            if (cb != null) {
+                              cb(value != null ? value.plainText : "");
+                            }
+                          },
+                        )
+                      : tableView,
+                ))));
   }
 
   TableVicinity get selection => widget.selection != null
@@ -279,11 +296,12 @@ class _ResizableTableViewState extends State<ResizableTableView> {
           onTap: () {
             setState(() {
               FocusScope.of(context).unfocus();
-              if (widget.onSelectionChanged != null) {
-                widget.onSelectionChanged!(
+              if (widget.onCellSelectionChanged != null) {
+                widget.onCellSelectionChanged!(
                     TableVicinity(row: row, column: column),
                     CellState.selected);
               }
+              _selectionAreaFocusNode.requestFocus();
             });
           },
           child: contents);
@@ -356,8 +374,8 @@ class _ResizableTableViewState extends State<ResizableTableView> {
       return;
     }
     setState(() {
-      if (widget.onSelectionChanged != null) {
-        widget.onSelectionChanged!(
+      if (widget.onCellSelectionChanged != null) {
+        widget.onCellSelectionChanged!(
             const TableVicinity(row: -1, column: -1), CellState.deselected);
       }
       focus.unfocus();

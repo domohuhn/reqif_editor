@@ -10,7 +10,8 @@ import 'package:flutter/services.dart'
         TextInputFormatter,
         FilteringTextInputFormatter,
         Clipboard,
-        ClipboardData;
+        ClipboardData,
+        LogicalKeyboardKey;
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:reqif_editor/src/document/column_header.dart';
 import 'package:reqif_editor/src/document/document_controller.dart';
@@ -76,6 +77,24 @@ class ReqIfSpreadSheet extends StatefulWidget {
   State<ReqIfSpreadSheet> createState() => _ReqIfSpreadSheetState();
 }
 
+class CopyCellIntent extends Intent {
+  const CopyCellIntent();
+}
+
+class _CopyCellAction extends Action<CopyCellIntent> {
+  _CopyCellAction(this.sheet);
+
+  final _ReqIfSpreadSheetState sheet;
+
+  @override
+  bool get isActionEnabled => !sheet.quillSelected && !sheet.textSelected;
+
+  @override
+  void invoke(covariant CopyCellIntent intent) {
+    sheet.copySelectedCellToClipBoard();
+  }
+}
+
 class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
   @override
   void initState() {
@@ -90,6 +109,7 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
 
   final FocusNode editorFocusNode = FocusNode();
   bool quillSelected = false;
+  bool textSelected = false;
 
   Widget _buildQuillEditor() {
     return QuillEditor.basic(
@@ -148,30 +168,33 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
           "in document ${flatDocument.title}");
     }
     _fillCache();
-    return ResizableTableView(
-        cellBuilder: _buildCell,
-        columnHeaderBuilder: _buildColumnHeader,
-        contextMenuListBuilder: _buildContextMenuWidgetList,
-        initialRowHeights: _estimateInitialRowHeights,
-        initialColumnWidths: _estimateInitialColumnWidths,
-        onSelectionChanged: _onSelectionChanged,
-        model: widget.controller.documents[widget.document]
-            .partModels[widget.partNumber],
-        selection: _selected,
-        rowPositionBuilder: _buildRowPosition,
-        selectAble: !quillSelected,
-        searchPosition: () {
-          if (widget.hasPart && widget.searchIsEnabled) {
-            return widget.data.searchData[widget.partNumber].matchPosition;
-          }
-          return const TableVicinity(row: -1, column: -1);
-        },
-        scrollControllerBuilder: () {
-          widget.controller.refreshScrollControllers();
-          return TableViewScrollControllers(
-              horizontal: widget.controller.horizontalScrollController,
-              vertical: widget.controller.verticalScrollController);
-        });
+    return _wrapInShortcuts(
+        context,
+        ResizableTableView(
+            cellBuilder: _buildCell,
+            columnHeaderBuilder: _buildColumnHeader,
+            contextMenuListBuilder: _buildContextMenuWidgetList,
+            initialRowHeights: _estimateInitialRowHeights,
+            initialColumnWidths: _estimateInitialColumnWidths,
+            onCellSelectionChanged: _onSelectionChanged,
+            onTextSelectionChanged: (text) => textSelected = text != "",
+            model: widget.controller.documents[widget.document]
+                .partModels[widget.partNumber],
+            selection: _selected,
+            rowPositionBuilder: _buildRowPosition,
+            selectable: !quillSelected,
+            searchPosition: () {
+              if (widget.hasPart && widget.searchIsEnabled) {
+                return widget.data.searchData[widget.partNumber].matchPosition;
+              }
+              return const TableVicinity(row: -1, column: -1);
+            },
+            scrollControllerBuilder: () {
+              widget.controller.refreshScrollControllers();
+              return TableViewScrollControllers(
+                  horizontal: widget.controller.horizontalScrollController,
+                  vertical: widget.controller.verticalScrollController);
+            }));
   }
 
   double defaultRowHeight = 40;
@@ -252,7 +275,7 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
               currentHeight += columnWidth * embeddedObjectCount;
             }
             if (attr.hasList) {
-              currentHeight *= 1.2;
+              currentHeight *= 1.02;
             }
             columnWidth = max(columnWidth, size.width + defaultTextPadding);
             rowHeight = max(rowHeight, currentHeight);
@@ -449,6 +472,19 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
     }
   }
 
+  Widget _wrapInShortcuts(BuildContext context, Widget widget) {
+    return Shortcuts(
+        shortcuts: const <ShortcutActivator, Intent>{
+          SingleActivator(LogicalKeyboardKey.keyC, control: true):
+              CopyCellIntent(),
+          SingleActivator(LogicalKeyboardKey.keyX, control: true):
+              CopyCellIntent(),
+        },
+        child: Actions(actions: <Type, Action<Intent>>{
+          CopyCellIntent: _CopyCellAction(this)
+        }, child: widget));
+  }
+
   List<ContextMenuButtonItem> _buildContextMenuWidgetList(BuildContext ctx) {
     final selection = _selected();
     final selected = selection.row > 0 && selection.column > 0;
@@ -466,6 +502,14 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
       );
     }
     return buttonItems;
+  }
+
+  void copySelectedCellToClipBoard() {
+    final selection = _selected();
+    final selected = selection.row > 0 && selection.column > 0;
+    if (selected) {
+      _copyCellToClipBoard(selection);
+    }
   }
 
   CellContents _wrapWithPrefix(
@@ -613,13 +657,15 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
         if (selected) {
           return CellContents(child: _buildQuillEditor());
         }
-        return CellContents(
-            child: Center(
+        return _wrapWithPrefix(
+            cellContent.prefix,
+            Center(
                 child: XHtmlToWidgetsConverter(
               node: value.node,
               cache: widget.data,
             )),
-            attribute: cellAttribute);
+            cellAttribute,
+            wrapWithPrefix);
       case ReqIfElementTypes.attributeValueBoolean:
         value as ReqIfAttributeValueBool;
         if (selected) {
