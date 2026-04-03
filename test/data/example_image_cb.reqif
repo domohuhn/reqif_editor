@@ -560,7 +560,7 @@
 <ATTRIBUTE-DEFINITION-XHTML-REF>_0db30098-9450-4a8a-bdcb-9be6bd8ddf40</ATTRIBUTE-DEFINITION-XHTML-REF>
 </DEFINITION>
     <THE-VALUE>
-        <reqif-xhtml:div>The program must be able to save files conforming to ReqIf version 1.0.<reqif-xhtml:br/>Some characters may need to be escaped: [brackets]&#x9;Some non ascii characters: &#xE4;&#xF6;</reqif-xhtml:div>
+        <reqif-xhtml:div>The program must be able to save files conforming to ReqIf version 1.0.<reqif-xhtml:br/>Some characters may need to be escaped: [brackets]&#x9;Some non ascii characters: &#xE4;&#xF6;<reqif-xhtml:br/><reqif-xhtml:div style="margin-left:24px">This text should be indented.</reqif-xhtml:div></reqif-xhtml:div>
 	</THE-VALUE>
 </ATTRIBUTE-VALUE-XHTML>
 <ATTRIBUTE-VALUE-ENUMERATION>
@@ -685,11 +685,11 @@
 </reqif-xhtml:p>
 <reqif-xhtml:p>dummy line   
 </reqif-xhtml:p>
-<reqif-xhtml:p>dummy line   
+<reqif-xhtml:p>dummy line
 </reqif-xhtml:p>
-<reqif-xhtml:p>dummy line   
+<reqif-xhtml:p>dummy line
 </reqif-xhtml:p>
-<reqif-xhtml:p>dummy line   
+<reqif-xhtml:p>dummy line
 </reqif-xhtml:p>
 <reqif-xhtml:p>dummy line   
 </reqif-xhtml:p>

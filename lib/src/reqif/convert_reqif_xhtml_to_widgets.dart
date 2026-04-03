@@ -19,12 +19,14 @@ class _XhtmlTextStyles {
       : italic = other.italic,
         bold = other.bold,
         strike = other.strike,
-        underline = other.underline;
+        underline = other.underline,
+        leftMargin = other.leftMargin;
 
   bool italic = false;
   bool bold = false;
   bool strike = false;
   bool underline = false;
+  int leftMargin = 0;
 
   TextStyle apply(TextStyle input) {
     return input.copyWith(
@@ -81,8 +83,23 @@ class XHtmlToWidgetsConverter extends StatelessWidget {
   /// or at the end of the widget creation.
   void _pushCollectedTextsToList(
       List<Widget> widgets, List<InlineSpan> currentTextSpan) {
-    if (currentTextSpan.isNotEmpty &&
-        currentTextSpan.last.toPlainText() == "\n") {
+    if (widgets.isEmpty) {
+      // drop all text segments that are only whitespace before any text was added.
+      int countToDrop = 0;
+      for (final t in currentTextSpan) {
+        if (t
+            .toPlainText(
+                includePlaceholders: false, includeSemanticsLabels: false)
+            .trim()
+            .isEmpty) {
+          countToDrop += 1;
+        } else {
+          break;
+        }
+      }
+      currentTextSpan.removeRange(0, countToDrop);
+    }
+    if (lastLineEndsWithNewline(currentTextSpan)) {
       currentTextSpan.removeLast();
     }
     if (currentTextSpan.isNotEmpty) {
@@ -138,7 +155,9 @@ class XHtmlToWidgetsConverter extends StatelessWidget {
       if (image == null) {
         var errorString =
             'FAILED TO LOAD OBJECT\n"${node.getAttribute('data')}"\nOF TYPE "$objectType".';
-        if (child != null) errorString += ' Alternative Text:\n';
+        if (child != null) {
+          errorString += ' Alternative Text:\n';
+        }
         currentTextSpan.add(TextSpan(
             text: errorString,
             style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)));
@@ -154,10 +173,27 @@ class XHtmlToWidgetsConverter extends StatelessWidget {
       }
       return;
     }
+    if (isHtmlDomElement(node, 'p') &&
+        !lastLineEndsWithNewline(currentTextSpan)) {
+      currentTextSpan.add(TextSpan(text: '\n', style: attributes.apply(ctx)));
+    }
     _addToRichText(node, nextAttributes, ctx, currentTextSpan);
     for (final node in node.nodes) {
       _recurseThroughDOM(widgets, node, nextAttributes, ctx, currentTextSpan);
     }
+    if (isHtmlDomElement(node, 'p')) {
+      currentTextSpan.add(TextSpan(text: '\n', style: attributes.apply(ctx)));
+    }
+  }
+
+  bool lastLineEndsWithNewline(List<InlineSpan> spans) {
+    if (spans.isEmpty) {
+      return false;
+    }
+    final text = spans.last.toPlainText();
+    final cus = text.codeUnits;
+    bool val = cus.isNotEmpty && (cus.last == 10 || cus.last == 13);
+    return val;
   }
 
   _XhtmlTextStyles _pushStyles(xml.XmlNode node, _XhtmlTextStyles attributes) {
@@ -194,17 +230,30 @@ class XHtmlToWidgetsConverter extends StatelessWidget {
         if (parseUnderLineFromStyle(style)) {
           copy.underline = true;
         }
+        copy.leftMargin += parseLeftMarginFromStyle(style);
       }
       return copy;
     }
     return attributes;
   }
 
+  String _indentText(String text, _XhtmlTextStyles attributes) {
+    final int spaces = (attributes.leftMargin / 4).round();
+    if (spaces > 0) {
+      return ' ' * spaces + text;
+    }
+    return text;
+  }
+
   void _addToRichText(xml.XmlNode element, _XhtmlTextStyles attributes,
       TextStyle ctx, List<InlineSpan> currentTextSpan) {
     if (element is xml.XmlText) {
-      currentTextSpan
-          .add(TextSpan(text: element.value, style: attributes.apply(ctx)));
+      // drop all new lines except explicit br and p
+      final text = element.value.replaceAll('\n', '').replaceAll('\r', '');
+      if (text.isNotEmpty) {
+        currentTextSpan.add(TextSpan(
+            text: _indentText(text, attributes), style: attributes.apply(ctx)));
+      }
     }
     if (element is xml.XmlElement) {
       if (element.localName == "br") {

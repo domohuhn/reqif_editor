@@ -32,6 +32,7 @@ String stripSurroundingTags(
 
 final RegExp _underline = RegExp(r'text-decoration:[^;]*underline');
 final RegExp _strikeThrough = RegExp(r'text-decoration:[^;]*line-through');
+final RegExp _leftMargin = RegExp(r'margin-left:([0-9]+)px');
 
 bool parseUnderLineFromStyle(String style) {
   return _underline.hasMatch(style);
@@ -39,6 +40,14 @@ bool parseUnderLineFromStyle(String style) {
 
 bool parseStrikeThroughFromStyle(String style) {
   return _strikeThrough.hasMatch(style);
+}
+
+int parseLeftMarginFromStyle(String style) {
+  for (final m in _leftMargin.allMatches(style)) {
+    final g = m.group(1);
+    return int.tryParse(g ?? "0") ?? 0;
+  }
+  return 0;
 }
 
 bool isHtmlDomElement(xml.XmlNode element, String localName) {
