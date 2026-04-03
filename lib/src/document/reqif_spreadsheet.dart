@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // See LICENSE for the full text of the license
 
+import 'dart:io' show Platform;
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -276,6 +277,9 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
             }
             if (attr.hasList) {
               currentHeight *= 1.02;
+            }
+            if (Platform.isLinux) {
+              currentHeight *= 1.15;
             }
             columnWidth = max(columnWidth, size.width + defaultTextPadding);
             rowHeight = max(rowHeight, currentHeight);
