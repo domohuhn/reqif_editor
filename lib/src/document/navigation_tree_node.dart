@@ -72,10 +72,11 @@ class NavigationTreeNode {
       if (value == null) {
         return null;
       }
+      final text = value.toString().trim();
       if (element.prefix != null) {
-        return "${element.prefix}  $value";
+        return "${element.prefix}  $text";
       } else {
-        return value.toString();
+        return text;
       }
     }
   }
