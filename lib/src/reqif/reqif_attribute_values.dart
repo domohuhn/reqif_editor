@@ -382,19 +382,34 @@ class ReqIfAttributeValueXhtml extends ReqIfAttributeValue {
 
   String _toStringWithNewlines() {
     final buffer = StringBuffer();
+    bool lastHadNewline = true;
     for (final child in node.findAllElements(_xmlValueName, namespace: "*")) {
       for (final xhtml in child.descendants) {
         if (xhtml is xml.XmlElement &&
-            (xhtml.name.local == "br" || xhtml.name.local == "li")) {
+            (xhtml.name.local == "br" ||
+                xhtml.name.local == "li" ||
+                xhtml.name.local == "p")) {
           if (xhtml.name.local == "li") {
             hasList = true;
             buffer.write('\n - ');
+          } else if (xhtml.name.local == "p" && !lastHadNewline) {
+            buffer.write('\n');
+            lastHadNewline = true;
           } else {
             buffer.write('\n');
+            lastHadNewline = true;
           }
         }
-        if (xhtml.value != null) {
-          buffer.write(xhtml.value);
+        if (xhtml is! xml.XmlAttribute) {
+          final text = xhtml.value;
+          if (text != null) {
+            final cleaned =
+                text.replaceAll('\n', '').replaceAll('\r', '').trim();
+            if (cleaned.isNotEmpty) {
+              buffer.write(cleaned);
+              lastHadNewline = false;
+            }
+          }
         }
       }
     }
