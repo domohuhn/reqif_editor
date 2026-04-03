@@ -11,7 +11,10 @@ import 'package:reqif_editor/src/document/document_view.dart';
 mixin OpenDocument<T extends StatefulWidget> on State<T> {
   void openPath(DocumentController documentController, String path) {
     Navigator.pushNamed(context, LoadingScreen.routeName);
-    documentController.loadDocument(path, _showLoadError).then((value) {
+    documentController
+        .loadDocument(path, _showLoadError,
+            AppLocalizations.of(context)!.fileDoesNotExist)
+        .then((value) {
       if (value && mounted) {
         Navigator.pop(context);
         Navigator.popAndPushNamed(context, ReqIfDocumentView.routeName);

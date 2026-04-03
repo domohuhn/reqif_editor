@@ -220,6 +220,10 @@
   "@copyCell": {
     "description": "text for the context menu item that copies the content of a cell to the clipboard"
   },
+  "fileDoesNotExist": "The system can not find the given path!",
+  "@fileDoesNotExist": {
+    "description": "text for the error that is displayed when a file that should be opened does not exist"
+  },
   "openRecent": "Open recent",
   "@openRecent": {
     "description": "text for the open recent menu item"

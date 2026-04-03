@@ -428,6 +428,12 @@ abstract class AppLocalizations {
   /// **'Copy cell'**
   String get copyCell;
 
+  /// text for the error that is displayed when a file that should be opened does not exist
+  ///
+  /// In en, this message translates to:
+  /// **'The system can not find the given path!'**
+  String get fileDoesNotExist;
+
   /// text for the open recent menu item
   ///
   /// In en, this message translates to:

@@ -180,5 +180,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get copyCell => 'Zelle kopieren';
 
   @override
+  String get fileDoesNotExist =>
+      'Das System kann den angegebenen Pfad nicht finden!';
+
+  @override
   String get openRecent => 'Zuletzt geöffnet';
 }

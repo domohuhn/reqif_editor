@@ -29,8 +29,26 @@ class DocumentController with ChangeNotifier {
   final DocumentService _service;
 
   Future<bool> loadDocument(String path,
-      [void Function(dynamic, dynamic)? onError]) async {
-    final contents = await _service.read(path);
+      [void Function(dynamic, dynamic)? onError, String? doesNotExist]) async {
+    final exists = await _service.fileExists(path);
+    if (!exists) {
+      if (onError != null) {
+        onError(doesNotExist, path);
+      }
+      return false;
+    }
+    final contents = await _service
+        .read(path)
+        .timeout(const Duration(seconds: 30))
+        .onError((error, stackTrace) {
+      if (onError != null) {
+        onError(error, stackTrace);
+      }
+      return "";
+    });
+    if (contents == "") {
+      return false;
+    }
     final doc =
         await compute(_parseAsync, contents).onError((error, stackTrace) {
       if (onError != null) {

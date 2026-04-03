@@ -56,5 +56,6 @@
   "resetVisibility": "Sichtbarkeit zurücksetzen",
   "openRecent": "Zuletzt geöffnet",
   "copyCell": "Zelle kopieren",
+  "fileDoesNotExist": "Das System kann den angegebenen Pfad nicht finden!",
   "noMatches": "Ausdruck nicht gefunden"
 }

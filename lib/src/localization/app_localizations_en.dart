@@ -177,5 +177,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get copyCell => 'Copy cell';
 
   @override
+  String get fileDoesNotExist => 'The system can not find the given path!';
+
+  @override
   String get openRecent => 'Open recent';
 }
