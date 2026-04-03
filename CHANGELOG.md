@@ -1,5 +1,6 @@
 ## 0.7.0
 
+- escaped characters are now in lower case to better match other tools
 - bugfix: Trying to load a document that does not exist will show an error instead of getting stuck
 - bugfix: Cells can now start with a list and will still be editable
 

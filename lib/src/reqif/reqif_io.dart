@@ -76,8 +76,7 @@ String escapeSpecialCharacters(String input) {
     // escape closing tags in text sections:
     final bool escapeBracket = (bracketCount < 0 || inAttribute) && pt == 62;
     // escape tabs, ', " in the-value blocks:
-    final bool relevantCharacter =
-        (pt == 34 || pt == 39 || pt == 9 || pt == 37 || pt == 94);
+    final bool relevantCharacter = (pt == 9 || pt == 37 || pt == 94);
     final bool escapeInAttribute =
         inAttribute && pt != attributeStart && (pt == 37 || pt == 39);
     final bool escapeInValue = relevantCharacter &&
@@ -94,12 +93,8 @@ String escapeSpecialCharacters(String input) {
     } else {
       if (escapeBracket) {
         buffer.write('&gt;');
-      } else if (pt == 34) {
-        buffer.write('&quot;');
-      } else if (pt == 39) {
-        buffer.write('&#039;');
       } else {
-        buffer.write('&#x${pt.toRadixString(16).toUpperCase()};');
+        buffer.write('&#x${pt.toRadixString(16)};');
       }
     }
     final checkIdx = max(0, currentValueBlock);
