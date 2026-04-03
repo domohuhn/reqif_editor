@@ -1,4 +1,4 @@
-## 0.6.6
+## 0.7.0
 
 - bugfix: Cells can now start with a list and will still be editable
 

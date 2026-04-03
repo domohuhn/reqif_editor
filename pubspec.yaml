@@ -23,7 +23,7 @@ dependencies:
   flutter_quill: ^11.4.1
   uuid: ^4.2.2
   shared_preferences: ^2.2.2
-  two_dimensional_scrollables: ^0.3.7
+  two_dimensional_scrollables: ^0.4.2
   path: ^1.8.3
   loading_animation_widget: ^1.2.1
 
