@@ -19,7 +19,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   xml: ^6.6.1
-  file_picker: ^10.3.2
+  file_picker: ^11.0.0
   flutter_quill: ^11.4.1
   uuid: ^4.2.2
   shared_preferences: ^2.2.2

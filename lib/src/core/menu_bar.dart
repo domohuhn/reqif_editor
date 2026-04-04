@@ -87,7 +87,7 @@ class _TopMenuBarState extends State<TopMenuBar> with OpenDocument<TopMenuBar> {
           MenuEntry(
             label: AppLocalizations.of(context)!.openFile,
             onPressed: () {
-              FilePicker.platform.pickFiles(
+              FilePicker.pickFiles(
                   type: FileType.custom,
                   allowedExtensions: ["reqif"]).then((value) {
                 if (value != null &&
@@ -104,6 +104,9 @@ class _TopMenuBarState extends State<TopMenuBar> with OpenDocument<TopMenuBar> {
           MenuEntry(
             label: AppLocalizations.of(context)!.save,
             onPressed: () {
+              if (!mounted || !widget.documentController.hasOpenDocuments) {
+                return;
+              }
               widget.documentController.saveCurrent();
             },
             // ignore: prefer_const_constructors
@@ -113,7 +116,10 @@ class _TopMenuBarState extends State<TopMenuBar> with OpenDocument<TopMenuBar> {
           MenuEntry(
             label: AppLocalizations.of(context)!.saveAs,
             onPressed: () {
-              FilePicker.platform.saveFile(
+              if (!mounted || !widget.documentController.hasOpenDocuments) {
+                return;
+              }
+              FilePicker.saveFile(
                   type: FileType.custom,
                   allowedExtensions: ["reqif"]).then((value) async {
                 if (value != null) {

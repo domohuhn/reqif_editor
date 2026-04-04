@@ -115,6 +115,8 @@ class DocumentController with ChangeNotifier {
   int get length => documents.length;
   bool get modified => documents.any((element) => element.modified);
 
+  bool get hasOpenDocuments => length > 0;
+
   void setComment(int idx, String comment) {
     if (documents.length <= idx) {
       return;
