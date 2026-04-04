@@ -67,21 +67,12 @@ void main() {
     test('xhtml to delta 6', () {
       final document = xml.XmlDocument.parse(xmlStringSimple5);
       final delta = deltaFromReqIfNode(document.firstChild!);
-      for (final op in delta.operations) {
-        print("${op.key} : *${op.value}*");
-      }
-      // TODO: extract text before div and after div, then reinsert to xml
       final fragment =
           deltaToXhtml(delta, xhtmlHasParagraphs(document.firstChild!));
 
       final compare = xmlStringSimple5.substring(
           xmlStringSimple5.indexOf("<THE-VALUE>") + 11,
           xmlStringSimple5.indexOf("</THE-VALUE>"));
-      print("========= expected:");
-      print(compare);
-      print("========= actual:");
-      print(fragment.toXmlString());
-      print("=========");
       expect(fragment.toXmlString(), compare);
     });
   });
