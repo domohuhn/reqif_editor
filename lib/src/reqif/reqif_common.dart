@@ -312,6 +312,21 @@ enum LineEndings {
   any,
 }
 
+/// The line endings to use in the file when saving
+enum ExportCompatibility {
+  /// Determine what export mode to use via code
+  automatic,
+
+  /// Use the "code" style
+  code,
+
+  /// Use the ptc style
+  ptc,
+
+  /// use whatever
+  none,
+}
+
 class ReqIfHierarchicalPosition {
   /// The positions to reach the current element.
   /// E.g. repeating children[position[i]] for every

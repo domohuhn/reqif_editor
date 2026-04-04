@@ -20,6 +20,7 @@ class SettingsController with ChangeNotifier {
   late ThemeMode _themeMode;
 
   late LineEndings _lineEndings;
+  late ExportCompatibility _exportCompatibility;
   late bool _updateDocumentUUID;
   late bool _updateTool;
   late bool _updateCreationTime;
@@ -27,6 +28,7 @@ class SettingsController with ChangeNotifier {
 
   ThemeMode get themeMode => _themeMode;
   LineEndings get lineEndings => _lineEndings;
+  ExportCompatibility get exportCompatibility => _exportCompatibility;
   bool get updateDocumentUUID => _updateDocumentUUID;
   bool get updateTool => _updateTool;
   bool get updateCreationTime => _updateCreationTime;
@@ -41,6 +43,7 @@ class SettingsController with ChangeNotifier {
     _updateCreationTime = await _settingsService.updateCreationTime();
     _lineEndings = await _settingsService.lineEndings();
     _files = await _settingsService.lastOpenedFiles();
+    _exportCompatibility = await _settingsService.exportCompatibility();
     notifyListeners();
   }
 
@@ -60,6 +63,16 @@ class SettingsController with ChangeNotifier {
     _lineEndings = newLineEndings;
     notifyListeners();
     await _settingsService.setLineEndings(newLineEndings);
+  }
+
+  /// Update and persist the ExportCompatibility based on the user's selection.
+  Future<void> updateExportCompatibility(
+      ExportCompatibility? newExportCompat) async {
+    if (newExportCompat == null) return;
+    if (newExportCompat == _exportCompatibility) return;
+    _exportCompatibility = newExportCompat;
+    notifyListeners();
+    await _settingsService.setExportCompatibility(newExportCompat);
   }
 
   /// Update and persist the file save settings based on the user's selection.

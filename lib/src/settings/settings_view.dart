@@ -51,7 +51,8 @@ class SettingsView extends StatelessWidget {
                   AppLocalizations.of(context)!.settingsSaveUpdateTool,
                   controller.updateTool,
                   controller.updateUpdateTool),
-              _buildLineEndingsComboBox(context)
+              _buildLineEndingsComboBox(context),
+              _buildExportComboBox(context)
             ],
           )),
     );
@@ -97,6 +98,38 @@ class SettingsView extends StatelessWidget {
             value: ThemeMode.dark,
             child: Text(AppLocalizations.of(context)!.darkTheme),
           )
+        ],
+      ),
+    ]);
+  }
+
+  Row _buildExportComboBox(BuildContext context) {
+    return Row(children: [
+      _buildBodyText(
+        context,
+        AppLocalizations.of(context)!.settingsExport,
+      ),
+      const SizedBox(width: 20),
+      DropdownButton<ExportCompatibility>(
+        value: controller.exportCompatibility,
+        onChanged: controller.updateExportCompatibility,
+        items: [
+          DropdownMenuItem(
+            value: ExportCompatibility.automatic,
+            child: Text(AppLocalizations.of(context)!.automatic),
+          ),
+          DropdownMenuItem(
+            value: ExportCompatibility.code,
+            child: Text("Code"),
+          ),
+          DropdownMenuItem(
+            value: ExportCompatibility.ptc,
+            child: Text("PTC"),
+          ),
+          DropdownMenuItem(
+            value: ExportCompatibility.none,
+            child: Text(AppLocalizations.of(context)!.none),
+          ),
         ],
       ),
     ]);

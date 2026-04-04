@@ -176,6 +176,18 @@ abstract class AppLocalizations {
   /// **'System Theme'**
   String get systemTheme;
 
+  /// The string automatic
+  ///
+  /// In en, this message translates to:
+  /// **'automatic'**
+  String get automatic;
+
+  /// The string none
+  ///
+  /// In en, this message translates to:
+  /// **'none'**
+  String get none;
+
   /// Text for a menu entry to select the theme
   ///
   /// In en, this message translates to:
@@ -223,6 +235,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Select the line endings to use:'**
   String get settingsLineEndings;
+
+  /// Description for a settings combobox that selects the compatibility mode
+  ///
+  /// In en, this message translates to:
+  /// **'Export compatibility mode:'**
+  String get settingsExport;
 
   /// Text for a cancel button
   ///

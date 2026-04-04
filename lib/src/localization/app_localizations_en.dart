@@ -48,6 +48,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get systemTheme => 'System Theme';
 
   @override
+  String get automatic => 'automatic';
+
+  @override
+  String get none => 'none';
+
+  @override
   String get themeSelection => 'Theme:';
 
   @override
@@ -72,6 +78,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsLineEndings => 'Select the line endings to use:';
+
+  @override
+  String get settingsExport => 'Export compatibility mode:';
 
   @override
   String get cancel => 'Cancel';

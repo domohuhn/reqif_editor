@@ -15,6 +15,10 @@ class MockSettingsService extends SettingsService {
   Future<LineEndings> lineEndings() async => LineEndings.linefeed;
 
   @override
+  Future<ExportCompatibility> exportCompatibility() async =>
+      ExportCompatibility.ptc;
+
+  @override
   Future<bool> updateTool() async => true;
 
   @override
@@ -37,6 +41,10 @@ class MockSettingsService extends SettingsService {
 
   @override
   Future<void> setLineEndings(LineEndings selected) async => true;
+
+  @override
+  Future<void> setExportCompatibility(ExportCompatibility selected) async =>
+      true;
 
   @override
   Future<LastOpenedFiles> lastOpenedFiles() async {

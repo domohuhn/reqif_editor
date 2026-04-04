@@ -52,6 +52,14 @@
   "@systemTheme": {
     "description": "Text for a menu entry to select the automatic theme"
   },
+  "automatic": "automatic",
+  "@automatic": {
+    "description": "The string automatic"
+  },
+  "none": "none",
+  "@none": {
+    "description": "The string none"
+  },
   "themeSelection": "Theme:",
   "@themeSelection": {
     "description": "Text for a menu entry to select the theme"
@@ -83,6 +91,10 @@
   "settingsLineEndings": "Select the line endings to use:",
   "@settingsLineEndings": {
     "description": "Description for a settings combobox"
+  },
+  "settingsExport": "Export compatibility mode:",
+  "@settingsExport": {
+    "description": "Description for a settings combobox that selects the compatibility mode"
   },
   "cancel": "Cancel",
   "@cancel": {

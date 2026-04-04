@@ -48,6 +48,12 @@ class AppLocalizationsDe extends AppLocalizations {
   String get systemTheme => 'Automatisch';
 
   @override
+  String get automatic => 'Automatisch';
+
+  @override
+  String get none => 'Keine';
+
+  @override
   String get themeSelection => 'Farbschema:';
 
   @override
@@ -74,6 +80,9 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get settingsLineEndings =>
       'Wählen Sie die Zeilenumbrüche, die bei dem Speichern genutzt werden:';
+
+  @override
+  String get settingsExport => 'Kompatibilitätsmodus beim Exportieren:';
 
   @override
   String get cancel => 'Abbrechen';

@@ -19,6 +19,10 @@ abstract class SettingsService {
   /// from local or remote storage.
   Future<LineEndings> lineEndings();
 
+  /// Loads the User's preferred export compatibility when saving files
+  /// from local or remote storage.
+  Future<ExportCompatibility> exportCompatibility();
+
   /// Loads the User's preferred update configuration when saving files
   /// from local or remote storage.
   Future<bool> updateTool();
@@ -33,6 +37,9 @@ abstract class SettingsService {
 
   /// Persists the user's preferred ThemeMode to local or remote storage.
   Future<void> setThemeMode(ThemeMode theme);
+
+  /// Persists the user's preferred ExportCompatibility to local or remote storage.
+  Future<void> setExportCompatibility(ExportCompatibility compat);
 
   /// Persists the user's preferred update settings to local or remote storage.
   Future<void> setUpdateTool(bool tool);
@@ -68,6 +75,7 @@ class LocalSettingsService extends SettingsService {
   }
 
   static const String _keyTheme = 'theme';
+  static const String _keyExport = 'export';
   static const String _keyLineEndings = 'lineEndings';
   static const String _keyUpdateDocumentUUID = 'updateUUID';
   static const String _keyUpdateTool = 'updateTool';
@@ -92,6 +100,17 @@ class LocalSettingsService extends SettingsService {
       return LineEndings.values[value];
     }
     return LineEndings.carriageReturnLinefeed;
+  }
+
+  /// Loads the User's preferred export compatibility when saving files
+  /// from local or remote storage.
+  @override
+  Future<ExportCompatibility> exportCompatibility() async {
+    final int? value = _preferences.getInt(_keyExport);
+    if (value != null && value < ExportCompatibility.values.length) {
+      return ExportCompatibility.values[value];
+    }
+    return ExportCompatibility.automatic;
   }
 
   /// Loads the User's preferred update configuration when saving files
@@ -122,6 +141,12 @@ class LocalSettingsService extends SettingsService {
   @override
   Future<void> setThemeMode(ThemeMode theme) async {
     await _preferences.setInt(_keyTheme, theme.index);
+  }
+
+  /// Persists the user's preferred ExportCompatibility to local or remote storage.
+  @override
+  Future<void> setExportCompatibility(ExportCompatibility compat) async {
+    await _preferences.setInt(_keyExport, compat.index);
   }
 
   /// Persists the user's preferred update settings to local or remote storage.
