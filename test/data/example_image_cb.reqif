@@ -198,7 +198,7 @@
 </ATTRIBUTE-VALUE-XHTML>
 </VALUES>
 </SPEC-OBJECT>
-<SPEC-OBJECT LAST-CHANGE="2026-04-04T16:04:26+02:00" IDENTIFIER="_b5646204-bf5d-44eb-966a-0d449f16c436" LONG-NAME="REQ_2">
+<SPEC-OBJECT LAST-CHANGE="2026-04-04T18:35:49+02:00" IDENTIFIER="_b5646204-bf5d-44eb-966a-0d449f16c436" LONG-NAME="REQ_2">
 <TYPE>
 <SPEC-OBJECT-TYPE-REF>_46a5309c-0e37-4175-a897-641c546ed4bd</SPEC-OBJECT-TYPE-REF>
 </TYPE>
@@ -254,7 +254,7 @@
 </reqif-xhtml:p>
 <reqif-xhtml:p>Here is a second line2.
 </reqif-xhtml:p>
-<reqif-xhtml:p>[04.04.2026, eso] bla
+<reqif-xhtml:p>[04.04.2026, meow] bla
 </reqif-xhtml:p>
 </reqif-xhtml:div>
     </THE-VALUE>
