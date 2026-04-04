@@ -283,9 +283,11 @@ class ReqIfDocument {
     header.updateDocumentCreationTime();
   }
 
-  void write(String path) {
-    writeXMLToFile(path, _document, DocumentService());
+  void write(String path, ExportCompatibility mode) {
+    writeXMLToFile(path, _document, DocumentService(), mode);
   }
+
+  String get toolId => header.toolId;
 
   set toolId(String value) {
     header.toolId = value;
@@ -295,7 +297,8 @@ class ReqIfDocument {
     header.sourceToolId = value;
   }
 
-  String get xmlString => convertXMLToString(_document);
+  String xmlString(ExportCompatibility mode) =>
+      convertXMLToString(_document, mode);
 
   ReqIfElement? find(String id) {
     if (id.isEmpty) {

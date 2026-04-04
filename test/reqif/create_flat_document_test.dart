@@ -4,6 +4,7 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:reqif_editor/src/document/document_service.dart';
+import 'package:reqif_editor/src/reqif/reqif_common.dart';
 import 'package:reqif_editor/src/reqif/reqif_document.dart';
 import 'package:reqif_editor/src/reqif/reqif_io.dart';
 import 'package:reqif_editor/src/reqif/flat_document.dart';
@@ -183,7 +184,8 @@ void main() {
 
     test('string escape', () {
       final str = escapeSpecialCharacters(
-          '<SPEC-OBJECT LAST-CHANGE="2023-11-22T11:42:13+01:00" IDENTIFIER="_3f12b85a-a5c3-4749-b586-7dd7db436a8b" LONG-NAME="REQ_7  &lt;tag>">');
+          '<SPEC-OBJECT LAST-CHANGE="2023-11-22T11:42:13+01:00" IDENTIFIER="_3f12b85a-a5c3-4749-b586-7dd7db436a8b" LONG-NAME="REQ_7  &lt;tag>">',
+          ExportCompatibility.ptc);
       expect(str,
           '<SPEC-OBJECT LAST-CHANGE="2023-11-22T11:42:13+01:00" IDENTIFIER="_3f12b85a-a5c3-4749-b586-7dd7db436a8b" LONG-NAME="REQ_7  &lt;tag&gt;">');
     });

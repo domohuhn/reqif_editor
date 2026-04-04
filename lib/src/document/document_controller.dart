@@ -127,6 +127,18 @@ class DocumentController with ChangeNotifier {
       return;
     }
     final toSave = documents[idx];
+
+    var mode = _settings.exportCompatibility;
+    if (mode == ExportCompatibility.automatic) {
+      final originalId = toSave.document.toolId;
+      if (originalId.contains("Code")) {
+        mode = ExportCompatibility.code;
+      } else if (originalId.contains("PTC")) {
+        mode = ExportCompatibility.ptc;
+      } else {
+        mode = ExportCompatibility.none;
+      }
+    }
     if (_settings.updateCreationTime) {
       toSave.document.updateDocumentCreationTime();
     }
@@ -137,7 +149,7 @@ class DocumentController with ChangeNotifier {
       toSave.document.toolId = "ReqIF Editor Version 1.0";
       toSave.document.sourceToolId = "com.github.reqif_editor.reqif_editor";
     }
-    var contents = toSave.document.xmlString;
+    var contents = toSave.document.xmlString(mode);
     if (_settings.lineEndings == LineEndings.carriageReturnLinefeed) {
       contents = contents.replaceAll(RegExp('\r\n|\n'), '\r\n');
     }

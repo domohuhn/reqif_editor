@@ -16,14 +16,24 @@ void main() {
   final system = DocumentService();
   const inputFile = 'test/data/example1.reqif';
   const inputFile2 = 'test/data/example4.reqif';
+  const inputFile3 = 'test/data/example_image_cb.reqif';
   const outputFile = 'test/data/example1_testoutput.reqif';
+  const outputFile2 = 'test/data/example_image_cb_testoutput.reqif';
   final contents = system.readFileSync(inputFile);
   group('Roundtrip', () {
-    test('Read and write raw XML', () {
+    test('Read and write raw XML PTC', () {
       final doc = readReqIFToXML(inputFile, system);
-      writeXMLToFile(outputFile, doc, system);
+      writeXMLToFile(outputFile, doc, system, ExportCompatibility.ptc);
       final compare = system.readFileSync(outputFile);
       expect(compare, contents);
+    });
+
+    test('Read and write raw XML Code', () {
+      final contents2 = system.readFileSync(inputFile3);
+      final doc = readReqIFToXML(inputFile3, system);
+      writeXMLToFile(outputFile2, doc, system, ExportCompatibility.code);
+      final compare = system.readFileSync(outputFile2);
+      expect(compare, contents2);
     });
   });
 
@@ -312,7 +322,7 @@ void main() {
           '</ATTRIBUTE-VALUE-XHTML>');
       expect(val.value.toString(),
           "<reqif-xhtml:p>BLLLLLAAAA<reqif-xhtml:br/></reqif-xhtml:p>");
-      writeXMLToFile(outputFile, doc, system);
+      writeXMLToFile(outputFile, doc, system, ExportCompatibility.code);
     });
   });
 
