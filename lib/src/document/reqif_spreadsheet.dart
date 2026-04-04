@@ -207,10 +207,10 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
   }
 
   static const double defaultColumnWidth = 120;
-  static const double defaultLetterWidth = 8.5;
+  static const double defaultLetterWidth = 9;
   static const double defaultTextPadding = 10;
-  static const double comboBoxLetterWidth = 7.5;
-  static const double comboBoxPadding = 54;
+  static const double comboBoxLetterWidth = 9;
+  static const double comboBoxPadding = 58;
 
   static const double maxTextLineWidth = 600;
 
@@ -251,9 +251,10 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
                     text.length * comboBoxLetterWidth + comboBoxPadding);
                 rowHeight = max(rowHeight, attr.length * defaultComboBoxHeight);
               } else {
-                columnWidth =
-                    max(columnWidth, text.length * defaultLetterWidth);
-                rowHeight = max(rowHeight, attr.length * defaultLineHeight);
+                columnWidth = max(columnWidth,
+                    text.length * defaultLetterWidth + defaultTextPadding);
+                rowHeight = max(rowHeight,
+                    attr.length * defaultLineHeight + defaultTextPadding);
               }
             }
           case ReqIfElementTypes.attributeValueXhtml:
