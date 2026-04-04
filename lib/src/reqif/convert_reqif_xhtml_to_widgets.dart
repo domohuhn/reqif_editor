@@ -87,11 +87,7 @@ class XHtmlToWidgetsConverter extends StatelessWidget {
       // drop all text segments that are only whitespace before any text was added.
       int countToDrop = 0;
       for (final t in currentTextSpan) {
-        if (t
-            .toPlainText(
-                includePlaceholders: false, includeSemanticsLabels: false)
-            .trim()
-            .isEmpty) {
+        if (t.toPlainText().trim().isEmpty) {
           countToDrop += 1;
         } else {
           break;
@@ -99,7 +95,8 @@ class XHtmlToWidgetsConverter extends StatelessWidget {
       }
       currentTextSpan.removeRange(0, countToDrop);
     }
-    if (lastLineEndsWithNewline(currentTextSpan)) {
+    while (lastLineEndsWithNewline(currentTextSpan) ||
+        lastLineIsOnlyWhiteSpace(currentTextSpan)) {
       currentTextSpan.removeLast();
     }
     if (currentTextSpan.isNotEmpty) {
@@ -181,9 +178,18 @@ class XHtmlToWidgetsConverter extends StatelessWidget {
     for (final node in node.nodes) {
       _recurseThroughDOM(widgets, node, nextAttributes, ctx, currentTextSpan);
     }
-    if (isHtmlDomElement(node, 'p')) {
+    if (isHtmlDomElement(node, 'p') &&
+        !lastLineEndsWithNewline(currentTextSpan)) {
       currentTextSpan.add(TextSpan(text: '\n', style: attributes.apply(ctx)));
     }
+  }
+
+  bool lastLineIsOnlyWhiteSpace(List<InlineSpan> spans) {
+    if (spans.isEmpty) {
+      return false;
+    }
+    final text = spans.last.toPlainText().trim();
+    return text.isEmpty;
   }
 
   bool lastLineEndsWithNewline(List<InlineSpan> spans) {

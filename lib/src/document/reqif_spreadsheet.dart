@@ -208,7 +208,7 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
 
   static const double defaultColumnWidth = 120;
   static const double defaultLetterWidth = 9;
-  static const double defaultTextPadding = 10;
+  static const double defaultTextPadding = 14;
   static const double comboBoxLetterWidth = 9;
   static const double comboBoxPadding = 58;
 
@@ -291,8 +291,9 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
                     textDirection: TextDirection.ltr)
                   ..layout(maxWidth: maxTextLineWidth))
                 .size;
-            columnWidth = max(columnWidth, size.width + defaultTextPadding);
-            rowHeight = max(rowHeight, size.height + defaultTextPadding);
+            columnWidth =
+                max(columnWidth, size.width * 1.05 + defaultTextPadding);
+            rowHeight = max(rowHeight, size.height * 1.05 + defaultTextPadding);
         }
         columnWidths[i] = columnWidth;
       }

@@ -168,7 +168,7 @@
 </DEFINITION>
     <THE-VALUE>
         <reqif-xhtml:div>Introduction</reqif-xhtml:div>
-	</THE-VALUE>
+    </THE-VALUE>
 </ATTRIBUTE-VALUE-XHTML>
 <ATTRIBUTE-VALUE-ENUMERATION>
 <DEFINITION>
@@ -194,11 +194,11 @@
 </DEFINITION>
     <THE-VALUE>
         <reqif-xhtml:div>Initial revision</reqif-xhtml:div>
-	</THE-VALUE>
+    </THE-VALUE>
 </ATTRIBUTE-VALUE-XHTML>
 </VALUES>
 </SPEC-OBJECT>
-<SPEC-OBJECT LAST-CHANGE="2023-11-22T11:42:13+01:00" IDENTIFIER="_b5646204-bf5d-44eb-966a-0d449f16c436" LONG-NAME="REQ_2">
+<SPEC-OBJECT LAST-CHANGE="2026-04-04T16:04:26+02:00" IDENTIFIER="_b5646204-bf5d-44eb-966a-0d449f16c436" LONG-NAME="REQ_2">
 <TYPE>
 <SPEC-OBJECT-TYPE-REF>_46a5309c-0e37-4175-a897-641c546ed4bd</SPEC-OBJECT-TYPE-REF>
 </TYPE>
@@ -225,7 +225,7 @@
 </DEFINITION>
     <THE-VALUE>
         <reqif-xhtml:div>This document serves as a test input for the ReqIF-editor.</reqif-xhtml:div>
-	</THE-VALUE>
+    </THE-VALUE>
 </ATTRIBUTE-VALUE-XHTML>
 <ATTRIBUTE-VALUE-ENUMERATION>
 <DEFINITION>
@@ -250,8 +250,14 @@
 <ATTRIBUTE-DEFINITION-XHTML-REF>_07ea936e-7565-4e8b-9192-cfe3a09fa4d4</ATTRIBUTE-DEFINITION-XHTML-REF>
 </DEFINITION>
     <THE-VALUE>
-        <reqif-xhtml:div>Initial revision</reqif-xhtml:div>
-	</THE-VALUE>
+        <reqif-xhtml:div><reqif-xhtml:p>This comment uses paragraphs as newlines.
+</reqif-xhtml:p>
+<reqif-xhtml:p>Here is a second line2.
+</reqif-xhtml:p>
+<reqif-xhtml:p>[04.04.2026, eso] bla
+</reqif-xhtml:p>
+</reqif-xhtml:div>
+    </THE-VALUE>
 </ATTRIBUTE-VALUE-XHTML>
 </VALUES>
 </SPEC-OBJECT>
@@ -282,7 +288,7 @@
 </DEFINITION>
     <THE-VALUE>
         <reqif-xhtml:div>The application must work on the windows operating system.</reqif-xhtml:div>
-	</THE-VALUE>
+    </THE-VALUE>
 </ATTRIBUTE-VALUE-XHTML>
 <ATTRIBUTE-VALUE-ENUMERATION>
 <DEFINITION>
@@ -306,7 +312,7 @@
 </DEFINITION>
     <THE-VALUE>
         <reqif-xhtml:div>Initial revision</reqif-xhtml:div>
-	</THE-VALUE>
+    </THE-VALUE>
 </ATTRIBUTE-VALUE-XHTML>
 </VALUES>
 </SPEC-OBJECT>
@@ -337,7 +343,7 @@
 </DEFINITION>
     <THE-VALUE>
         <reqif-xhtml:div>The application must work on the linux operating system.</reqif-xhtml:div>
-	</THE-VALUE>
+    </THE-VALUE>
 </ATTRIBUTE-VALUE-XHTML>
 <ATTRIBUTE-VALUE-ENUMERATION>
 <DEFINITION>
@@ -361,7 +367,7 @@
 </DEFINITION>
     <THE-VALUE>
         <reqif-xhtml:div>Initial revision</reqif-xhtml:div>
-	</THE-VALUE>
+    </THE-VALUE>
 </ATTRIBUTE-VALUE-XHTML>
 </VALUES>
 </SPEC-OBJECT>
@@ -392,7 +398,7 @@
 </DEFINITION>
     <THE-VALUE>
         <reqif-xhtml:div>The application must work on the MAC OS operating system.</reqif-xhtml:div>
-	</THE-VALUE>
+    </THE-VALUE>
 </ATTRIBUTE-VALUE-XHTML>
 <ATTRIBUTE-VALUE-ENUMERATION>
 <DEFINITION>
@@ -416,7 +422,7 @@
 </DEFINITION>
     <THE-VALUE>
         <reqif-xhtml:div>Initial revision</reqif-xhtml:div>
-	</THE-VALUE>
+    </THE-VALUE>
 </ATTRIBUTE-VALUE-XHTML>
 </VALUES>
 </SPEC-OBJECT>
@@ -447,7 +453,7 @@
 </DEFINITION>
     <THE-VALUE>
         <reqif-xhtml:div>Functionality</reqif-xhtml:div>
-	</THE-VALUE>
+    </THE-VALUE>
 </ATTRIBUTE-VALUE-XHTML>
 <ATTRIBUTE-VALUE-ENUMERATION>
 <DEFINITION>
@@ -473,7 +479,7 @@
 </DEFINITION>
     <THE-VALUE>
         <reqif-xhtml:div><reqif-xhtml:cite style="text-decoration:line-through">Initial</reqif-xhtml:cite> revision</reqif-xhtml:div>
-	</THE-VALUE>
+    </THE-VALUE>
 </ATTRIBUTE-VALUE-XHTML>
 </VALUES>
 </SPEC-OBJECT>
@@ -504,7 +510,7 @@
 </DEFINITION>
     <THE-VALUE>
         <reqif-xhtml:div>The program must be able to load files conforming to ReqIf version 1.0.</reqif-xhtml:div>
-	</THE-VALUE>
+    </THE-VALUE>
 </ATTRIBUTE-VALUE-XHTML>
 <ATTRIBUTE-VALUE-ENUMERATION>
 <DEFINITION>
@@ -530,7 +536,7 @@
 </DEFINITION>
     <THE-VALUE>
         <reqif-xhtml:div><reqif-xhtml:strong>Initial revisio</reqif-xhtml:strong>n</reqif-xhtml:div>
-	</THE-VALUE>
+    </THE-VALUE>
 </ATTRIBUTE-VALUE-XHTML>
 </VALUES>
 </SPEC-OBJECT>
@@ -560,8 +566,8 @@
 <ATTRIBUTE-DEFINITION-XHTML-REF>_0db30098-9450-4a8a-bdcb-9be6bd8ddf40</ATTRIBUTE-DEFINITION-XHTML-REF>
 </DEFINITION>
     <THE-VALUE>
-        <reqif-xhtml:div>The program must be able to save files conforming to ReqIf version 1.0.<reqif-xhtml:br/>Some characters may need to be escaped: [brackets]&#x9;Some non ascii characters: &#xE4;&#xF6;<reqif-xhtml:br/><reqif-xhtml:div style="margin-left:24px">This text should be indented.</reqif-xhtml:div></reqif-xhtml:div>
-	</THE-VALUE>
+        <reqif-xhtml:div>The program must be able to save files conforming to ReqIf version 1.0.<reqif-xhtml:br/>Some characters may need to be escaped: [brackets]    Some non ascii characters: &#xe4;&#xf6;<reqif-xhtml:br/><reqif-xhtml:div style="margin-left:24px">This text should be indented.</reqif-xhtml:div></reqif-xhtml:div>
+    </THE-VALUE>
 </ATTRIBUTE-VALUE-XHTML>
 <ATTRIBUTE-VALUE-ENUMERATION>
 <DEFINITION>
@@ -587,7 +593,7 @@
 </DEFINITION>
     <THE-VALUE>
         <reqif-xhtml:div><reqif-xhtml:i>Initial</reqif-xhtml:i> revision</reqif-xhtml:div>
-	</THE-VALUE>
+    </THE-VALUE>
 </ATTRIBUTE-VALUE-XHTML>
 </VALUES>
 </SPEC-OBJECT>
@@ -642,7 +648,7 @@
 </DEFINITION>
     <THE-VALUE>
         <reqif-xhtml:div>Initial revision</reqif-xhtml:div>
-	</THE-VALUE>
+    </THE-VALUE>
 </ATTRIBUTE-VALUE-XHTML>
 </VALUES>
 </SPEC-OBJECT>
@@ -774,7 +780,7 @@
 </DEFINITION>
     <THE-VALUE>
         <reqif-xhtml:div>Initial revision</reqif-xhtml:div>
-	</THE-VALUE>
+    </THE-VALUE>
 </ATTRIBUTE-VALUE-XHTML>
 </VALUES>
 </SPEC-OBJECT>
@@ -805,7 +811,7 @@
 </DEFINITION>
     <THE-VALUE>
         <reqif-xhtml:div>Import and export</reqif-xhtml:div>
-	</THE-VALUE>
+    </THE-VALUE>
 </ATTRIBUTE-VALUE-XHTML>
 <ATTRIBUTE-VALUE-ENUMERATION>
 <DEFINITION>
@@ -831,7 +837,7 @@
 </DEFINITION>
     <THE-VALUE>
         <reqif-xhtml:div><reqif-xhtml:cite style="text-decoration:underline">Initi</reqif-xhtml:cite>al revision</reqif-xhtml:div>
-	</THE-VALUE>
+    </THE-VALUE>
 </ATTRIBUTE-VALUE-XHTML>
 </VALUES>
 </SPEC-OBJECT>
@@ -862,7 +868,7 @@
 </DEFINITION>
     <THE-VALUE>
         <reqif-xhtml:div>Edit</reqif-xhtml:div>
-	</THE-VALUE>
+    </THE-VALUE>
 </ATTRIBUTE-VALUE-XHTML>
 <ATTRIBUTE-VALUE-ENUMERATION>
 <DEFINITION>
@@ -888,7 +894,7 @@
 </DEFINITION>
     <THE-VALUE>
         <reqif-xhtml:div>Initial revision</reqif-xhtml:div>
-	</THE-VALUE>
+    </THE-VALUE>
 </ATTRIBUTE-VALUE-XHTML>
 </VALUES>
 </SPEC-OBJECT>
@@ -919,7 +925,7 @@
 </DEFINITION>
     <THE-VALUE>
         <reqif-xhtml:div>A typical use case might look like this:<reqif-xhtml:br/><reqif-xhtml:object type="application/rtf" data="images/use-case-exchange.ole"><reqif-xhtml:object type="image/png" data="images/use-case-exchange.png">Usecase document exchange</reqif-xhtml:object></reqif-xhtml:object><reqif-xhtml:br/></reqif-xhtml:div>
-	</THE-VALUE>
+    </THE-VALUE>
 </ATTRIBUTE-VALUE-XHTML>
 <ATTRIBUTE-VALUE-ENUMERATION>
 <DEFINITION>

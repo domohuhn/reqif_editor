@@ -50,7 +50,9 @@ class _ReqIfDocumentViewState extends State<ReqIfDocumentView> {
         final delta = deltaFromReqIfNode(value.node);
         _controller.document = Document.fromDelta(delta);
         _controller.addListener(() {
-          final fragment = deltaToXhtml(_controller.document.toDelta());
+          final hasParagraphs = xhtmlHasParagraphs(value.node);
+          final fragment =
+              deltaToXhtml(_controller.document.toDelta(), hasParagraphs);
           if (value.value.toString() != fragment.toString()) {
             value.value = fragment;
             widget.documentController.documentWasModified(

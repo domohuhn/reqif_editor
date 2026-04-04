@@ -14,14 +14,13 @@ class XHtmlToDeltaConverter {
   }
 
   quill.Delta xhtmlToDelta(xml.XmlNode node) {
+    queuedSpaceInsertion = false;
     var delta = quill.Delta();
-
     for (final node in node.findAllElements("THE-VALUE")) {
       Map<String, dynamic> attributes = {};
       recurseThroughDOM(delta, node, attributes);
     }
     _insertNewLineIfMissing(delta);
-
     return delta;
   }
 
@@ -32,9 +31,13 @@ class XHtmlToDeltaConverter {
     for (final node in xml.nodes) {
       recurseThroughDOM(delta, node, nextAttributes);
     }
+    if (isParagraphItem(xml)) {
+      // new line after contents of paragraph
+      _insertNewLineIfMissing(delta, nextAttributes);
+    }
     if (isListItem(xml)) {
       nextAttributes['list'] = _listType;
-      _insertWithAttributes(delta, nextAttributes, '\n');
+      _insertNewLine(delta, nextAttributes);
     }
   }
 
@@ -96,16 +99,19 @@ class XHtmlToDeltaConverter {
         final copy = Map<String, dynamic>.from(attributes);
         copy.remove("list");
         _insertWithAttributes(delta, copy, element.value);
-        _insertWithAttributes(delta, attributes, '\n');
+        _insertNewLine(delta, attributes);
       } else {
         _insertWithAttributes(delta, attributes, element.value);
       }
     }
     if (element is xml.XmlElement) {
       if (element.localName == "br") {
-        _insertWithAttributes(delta, {}, "\n");
+        _insertNewLine(delta);
       }
-      if (element.localName == "ul" || element.localName == "ol") {
+      // new line before contents of paragraph if missing
+      if (element.localName == "p" ||
+          element.localName == "ul" ||
+          element.localName == "ol") {
         _insertNewLineIfMissing(delta, attributes);
       }
       // TODO type object for images / videos / sound files
@@ -118,11 +124,47 @@ class XHtmlToDeltaConverter {
       return;
     }
     if (!delta.last.value.toString().endsWith("\n")) {
-      delta.insert('\n', attributes);
+      _insertNewLine(delta, attributes);
     }
   }
 
+  void _insertNewLine(quill.Delta delta,
+      [Map<String, dynamic> attributes = const {}]) {
+    queuedSpaceInsertion = false;
+    if (attributes.isNotEmpty) {
+      delta.insert('\n', attributes);
+    } else {
+      delta.insert('\n');
+    }
+  }
+
+  final _whitespaceRE = RegExp(r"[ \n\r]+");
+  bool queuedSpaceInsertion = false;
+  Map<String, dynamic> savedAttributes = {};
+
   void _insertWithAttributes(
+      quill.Delta delta, Map<String, dynamic> attributes, String text) {
+    var textToInsert = text.replaceAll(_whitespaceRE, ' ');
+    final needSpaceBefore = queuedSpaceInsertion;
+    final startsWithSpace = textToInsert.startsWith(' ');
+    if (!needSpaceBefore && startsWithSpace) {
+      textToInsert = textToInsert.trimLeft();
+    } else if (needSpaceBefore && !startsWithSpace) {
+      _insertWithAttributes2(delta, savedAttributes, ' ');
+    }
+    if (textToInsert.isEmpty) {
+      return;
+    }
+    final endsWithSpace = textToInsert.endsWith(' ');
+    if (endsWithSpace) {
+      queuedSpaceInsertion = true;
+      savedAttributes = attributes;
+      textToInsert = textToInsert.trimRight();
+    }
+    _insertWithAttributes2(delta, attributes, textToInsert);
+  }
+
+  void _insertWithAttributes2(
       quill.Delta delta, Map<String, dynamic> attributes, String text) {
     if (attributes.isNotEmpty) {
       delta.insert(text, attributes);

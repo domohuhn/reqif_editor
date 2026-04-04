@@ -60,3 +60,7 @@ bool isHtmlDomElement(xml.XmlNode element, String localName) {
 bool isListItem(xml.XmlNode element) {
   return isHtmlDomElement(element, 'li');
 }
+
+bool isParagraphItem(xml.XmlNode element) {
+  return isHtmlDomElement(element, 'p');
+}

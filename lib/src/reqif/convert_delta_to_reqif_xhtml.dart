@@ -59,54 +59,64 @@ class TextSegment {
     return false;
   }
 
-  void build(xml.XmlBuilder lineBuilder) {
+  void build(xml.XmlBuilder lineBuilder, bool useParagraphs) {
     switch (type) {
       case TextSegmentType.text:
         lineBuilder.text(text);
       case TextSegmentType.bold:
         lineBuilder.element("strong", namespace: _uri, nest: () {
-          _buildChildren(lineBuilder);
+          _buildChildren(lineBuilder, useParagraphs);
         });
       case TextSegmentType.italic:
         lineBuilder.element("i", namespace: _uri, nest: () {
-          _buildChildren(lineBuilder);
+          _buildChildren(lineBuilder, useParagraphs);
         });
       case TextSegmentType.strike:
         lineBuilder.element("cite",
             namespace: _uri,
             attributes: {"style": "text-decoration:line-through"}, nest: () {
-          _buildChildren(lineBuilder);
+          _buildChildren(lineBuilder, useParagraphs);
         });
       case TextSegmentType.underline:
         lineBuilder.element("cite",
             namespace: _uri,
             attributes: {"style": "text-decoration:underline"}, nest: () {
-          _buildChildren(lineBuilder);
+          _buildChildren(lineBuilder, useParagraphs);
         });
       case TextSegmentType.line:
-        _buildChildren(lineBuilder);
-        lineBuilder.element('br', namespace: _uri);
+        if (useParagraphs) {
+          lineBuilder.element('p', namespace: _uri, nest: () {
+            _buildChildren(lineBuilder, useParagraphs);
+            lineBuilder.text('\n');
+          });
+          lineBuilder.text('\n');
+        } else {
+          _buildChildren(lineBuilder, useParagraphs);
+          lineBuilder.element('br', namespace: _uri);
+        }
       case TextSegmentType.bulletListItem:
         lineBuilder.element("li", namespace: _uri, nest: () {
-          _buildChildren(lineBuilder);
+          _buildChildren(lineBuilder, useParagraphs);
         });
       case TextSegmentType.bulletList:
         lineBuilder.element("ul", namespace: _uri, nest: () {
-          _buildChildren(lineBuilder);
+          _buildChildren(lineBuilder, useParagraphs);
         });
       case TextSegmentType.root:
         lineBuilder.element("div", namespace: _uri, nest: () {
-          _buildChildren(lineBuilder);
+          _buildChildren(lineBuilder, useParagraphs);
         });
     }
   }
 
-  void _buildChildren(xml.XmlBuilder lineBuilder) {
+  void _buildChildren(xml.XmlBuilder lineBuilder, bool useParagraphs) {
     assert(text == "");
     for (var element in children) {
-      element.build(lineBuilder);
+      element.build(lineBuilder, useParagraphs);
     }
   }
+
+  bool get isEmpty => text == "" && children.isEmpty;
 
   // Pushes a text node as child.
   void pushText(String text) {
@@ -143,10 +153,10 @@ class XhtmlTree {
   TextSegment root;
   XhtmlTree() : root = TextSegment(type: TextSegmentType.root);
 
-  xml.XmlNode build() {
+  xml.XmlNode build(bool useParagraphs) {
     xml.XmlBuilder builder = xml.XmlBuilder();
     builder.namespace(_uri, 'reqif-xhtml');
-    root.build(builder);
+    root.build(builder, useParagraphs);
     return builder.buildDocument().firstElementChild!;
   }
 
@@ -187,8 +197,9 @@ class DeltaToXhtmlConverter {
   XhtmlTree tree;
   TextSegment currentLine;
   late TextSegment current;
+  bool useParagraphs;
 
-  DeltaToXhtmlConverter()
+  DeltaToXhtmlConverter(this.useParagraphs)
       : tree = XhtmlTree(),
         currentLine = TextSegment(type: TextSegmentType.line) {
     current = currentLine;
@@ -249,7 +260,8 @@ class DeltaToXhtmlConverter {
           String text = operation.value;
           if (text.contains('\n')) {
             final lines = text.split('\n');
-            final bool startNewLineOnLast = text.endsWith('\n');
+            final bool startNewLineOnLast =
+                text.endsWith('\n') && lines.last.trim() == "";
             if (startNewLineOnLast) {
               lines.removeLast();
             }
@@ -266,7 +278,10 @@ class DeltaToXhtmlConverter {
       }
       // TODO images
     }
-    return tree.build();
+    if (!current.isEmpty) {
+      _startNextLine();
+    }
+    return tree.build(useParagraphs);
   }
 
   void _changeAttributesAndPushText(

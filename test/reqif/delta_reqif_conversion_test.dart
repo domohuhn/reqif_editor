@@ -11,7 +11,8 @@ void main() {
     test('xhtml to delta 1', () {
       final document = xml.XmlDocument.parse(xmlStringSimple1);
       final delta = deltaFromReqIfNode(document.firstChild!);
-      final fragment = deltaToXhtml(delta);
+      final fragment =
+          deltaToXhtml(delta, xhtmlHasParagraphs(document.firstChild!));
 
       final compare = xmlStringSimple1.substring(
           xmlStringSimple1.indexOf("<reqif-xhtml:div>"),
@@ -22,7 +23,8 @@ void main() {
     test('xhtml to delta 2', () {
       final document = xml.XmlDocument.parse(xmlStringSimple2);
       final delta = deltaFromReqIfNode(document.firstChild!);
-      final fragment = deltaToXhtml(delta);
+      final fragment =
+          deltaToXhtml(delta, xhtmlHasParagraphs(document.firstChild!));
       final compare = xmlStringSimple2.substring(
           xmlStringSimple2.indexOf("<reqif-xhtml:div>"),
           xmlStringSimple2.indexOf("</THE-VALUE>"));
@@ -32,7 +34,8 @@ void main() {
     test('xhtml to delta 3', () {
       final document = xml.XmlDocument.parse(xmlStringSimple3);
       final delta = deltaFromReqIfNode(document.firstChild!);
-      final fragment = deltaToXhtml(delta);
+      final fragment =
+          deltaToXhtml(delta, xhtmlHasParagraphs(document.firstChild!));
       final compare = xmlStringSimple3.substring(
           xmlStringSimple3.indexOf("<reqif-xhtml:div>"),
           xmlStringSimple3.indexOf("</THE-VALUE>"));
@@ -42,7 +45,8 @@ void main() {
     test('xhtml to delta 4', () {
       final document = xml.XmlDocument.parse(xmlString);
       final delta = deltaFromReqIfNode(document.firstChild!);
-      final fragment = deltaToXhtml(delta);
+      final fragment =
+          deltaToXhtml(delta, xhtmlHasParagraphs(document.firstChild!));
       final compare = xmlString.substring(
           xmlString.indexOf("<reqif-xhtml:div>"),
           xmlString.indexOf("</THE-VALUE>"));
@@ -52,10 +56,32 @@ void main() {
     test('xhtml to delta 5', () {
       final document = xml.XmlDocument.parse(xmlString2);
       final delta = deltaFromReqIfNode(document.firstChild!);
-      final fragment = deltaToXhtml(delta);
+      final fragment =
+          deltaToXhtml(delta, xhtmlHasParagraphs(document.firstChild!));
       final compare = xmlString2.substring(
           xmlString2.indexOf("<reqif-xhtml:div>"),
           xmlString2.indexOf("</THE-VALUE>"));
+      expect(fragment.toXmlString(), compare);
+    });
+
+    test('xhtml to delta 6', () {
+      final document = xml.XmlDocument.parse(xmlStringSimple5);
+      final delta = deltaFromReqIfNode(document.firstChild!);
+      for (final op in delta.operations) {
+        print("${op.key} : *${op.value}*");
+      }
+      // TODO: extract text before div and after div, then reinsert to xml
+      final fragment =
+          deltaToXhtml(delta, xhtmlHasParagraphs(document.firstChild!));
+
+      final compare = xmlStringSimple5.substring(
+          xmlStringSimple5.indexOf("<THE-VALUE>") + 11,
+          xmlStringSimple5.indexOf("</THE-VALUE>"));
+      print("========= expected:");
+      print(compare);
+      print("========= actual:");
+      print(fragment.toXmlString());
+      print("=========");
       expect(fragment.toXmlString(), compare);
     });
   });
@@ -68,8 +94,8 @@ void main() {
       int i = 0;
       expect(delta.operations[i].key, "insert");
       expect(delta.operations[i].value,
-          "A round trip \nmust produce equivalent output.\n");
-      expect(delta.operations[i++].attributes, null);
+          "A round trip\nmust produce equivalent output.\n");
+      expect(delta.operations[i].attributes, null);
     });
     test('xhtml to delta', () {
       final document = xml.XmlDocument.parse(xmlString);
@@ -184,6 +210,18 @@ void main() {
           "[brackets]\tSome non ascii characters: äö\n");
       expect(delta.operations[i++].attributes, null);
     });
+
+    test('xhtml to delta 4', () {
+      final document = xml.XmlDocument.parse(xmlStringSimple5);
+      final delta = deltaFromReqIfNode(document.firstChild!);
+
+      expect(delta.operations.length, 1);
+      int i = 0;
+      expect(delta.operations[i].key, "insert");
+      expect(delta.operations[i].value,
+          "Initial revision\nsome text on a new line\nnext line\nfinal line\n");
+      expect(delta.operations[i++].attributes, null);
+    });
   });
 }
 
@@ -205,7 +243,7 @@ const String xmlStringSimple1 = """<ATTRIBUTE-VALUE-XHTML>
 <DEFINITION>
 <ATTRIBUTE-DEFINITION-XHTML-REF>_0db30098-9450-4a8a-bdcb-9be6bd8ddf40</ATTRIBUTE-DEFINITION-XHTML-REF>
 </DEFINITION>
-<THE-VALUE><reqif-xhtml:div>A round trip <reqif-xhtml:br/>must produce equivalent output.<reqif-xhtml:br/></reqif-xhtml:div></THE-VALUE>
+<THE-VALUE><reqif-xhtml:div>A round trip<reqif-xhtml:br/>must produce equivalent output.<reqif-xhtml:br/></reqif-xhtml:div></THE-VALUE>
 </ATTRIBUTE-VALUE-XHTML>""";
 
 const String xmlStringSimple2 = """<ATTRIBUTE-VALUE-XHTML>
@@ -227,4 +265,19 @@ const String xmlStringSimple4 = """<ATTRIBUTE-VALUE-XHTML>
 <ATTRIBUTE-DEFINITION-XHTML-REF>_0db30098-9450-4a8a-bdcb-9be6bd8ddf40</ATTRIBUTE-DEFINITION-XHTML-REF>
 </DEFINITION>
 <THE-VALUE><reqif-xhtml:div>&#91;brackets&#93;&#9;Some non ascii characters: &#228;&#246;<reqif-xhtml:br/></reqif-xhtml:div></THE-VALUE>
+</ATTRIBUTE-VALUE-XHTML>""";
+
+const String xmlStringSimple5 = """<ATTRIBUTE-VALUE-XHTML>
+<DEFINITION>
+<ATTRIBUTE-DEFINITION-XHTML-REF>_0db30098-9450-4a8a-bdcb-9be6bd8ddf40</ATTRIBUTE-DEFINITION-XHTML-REF>
+</DEFINITION>
+              <THE-VALUE><reqif-xhtml:div><reqif-xhtml:p>Initial revision
+</reqif-xhtml:p>
+<reqif-xhtml:p>some text on a new line
+</reqif-xhtml:p>
+<reqif-xhtml:p>next line
+</reqif-xhtml:p>
+<reqif-xhtml:p>final line
+</reqif-xhtml:p>
+</reqif-xhtml:div></THE-VALUE>
 </ATTRIBUTE-VALUE-XHTML>""";
