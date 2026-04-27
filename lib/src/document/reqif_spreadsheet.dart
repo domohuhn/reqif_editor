@@ -280,6 +280,9 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
               currentHeight *= 1.02;
             }
             if (Platform.isLinux) {
+              if (attr.hasList) {
+                currentHeight += 8;
+              }
               currentHeight *= 1.15;
             }
             columnWidth = max(columnWidth, size.width + defaultTextPadding);

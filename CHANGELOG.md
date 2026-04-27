@@ -1,3 +1,7 @@
+## 0.7.1
+
+- bugfix: added small width margin below xhtml lists
+
 ## 0.7.0
 
 - added a selection for different export compatibilities
