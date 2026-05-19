@@ -5,7 +5,6 @@
 import 'package:flutter/material.dart';
 import 'package:collection/collection.dart';
 
-
 class WidgetList extends StatelessWidget {
   final List<Widget> children;
   final bool isOrdered;
@@ -19,13 +18,11 @@ class WidgetList extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: children.mapIndexed((idx,widget) {
+        children: children.mapIndexed((idx, widget) {
           return Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                getLeadingText(idx,widget)
-              ),
+              Text(getLeadingText(idx, widget)),
               const SizedBox(
                 width: 5,
               ),
@@ -43,8 +40,8 @@ class WidgetList extends StatelessWidget {
     if (widget is WidgetList) {
       return '';
     }
-    if(isOrdered) {
-      return '${index+1}.';
+    if (isOrdered) {
+      return '${index + 1}.';
     }
     return '\u2022';
   }
