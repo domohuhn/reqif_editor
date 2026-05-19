@@ -50,8 +50,7 @@ class XHtmlToDeltaConverter {
       copy.addAll(attributes);
 
       if (element.localName == 'ol') {
-        // TODO numbered lists! _listType = 'ordered';
-        _listType = 'bullet';
+        _listType = 'ordered';
       }
       if (element.localName == 'ul') {
         _listType = 'bullet';

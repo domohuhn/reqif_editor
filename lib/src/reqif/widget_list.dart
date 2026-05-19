@@ -3,11 +3,14 @@
 // See LICENSE for the full text of the license
 
 import 'package:flutter/material.dart';
+import 'package:collection/collection.dart';
 
-class BulletList extends StatelessWidget {
+
+class WidgetList extends StatelessWidget {
   final List<Widget> children;
+  final bool isOrdered;
 
-  const BulletList(this.children, {super.key});
+  const WidgetList(this.children, {super.key, this.isOrdered = false});
 
   @override
   Widget build(BuildContext context) {
@@ -16,16 +19,12 @@ class BulletList extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: children.map((widget) {
+        children: children.mapIndexed((idx,widget) {
           return Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                widget is BulletList ? '' : '\u2022',
-                style: const TextStyle(
-                  fontSize: 16,
-                  height: 1.55,
-                ),
+                getLeadingText(idx,widget)
               ),
               const SizedBox(
                 width: 5,
@@ -38,5 +37,15 @@ class BulletList extends StatelessWidget {
         }).toList(),
       ),
     );
+  }
+
+  String getLeadingText(int index, dynamic widget) {
+    if (widget is WidgetList) {
+      return '';
+    }
+    if(isOrdered) {
+      return '${index+1}.';
+    }
+    return '\u2022';
   }
 }

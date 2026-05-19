@@ -16,6 +16,8 @@ enum TextSegmentType {
   root,
   bulletListItem,
   bulletList,
+  orderedListItem,
+  orderedList,
   text
 }
 
@@ -102,6 +104,14 @@ class TextSegment {
         lineBuilder.element("ul", namespace: _uri, nest: () {
           _buildChildren(lineBuilder, useParagraphs);
         });
+      case TextSegmentType.orderedListItem:
+        lineBuilder.element("li", namespace: _uri, nest: () {
+          _buildChildren(lineBuilder, useParagraphs);
+        });
+      case TextSegmentType.orderedList:
+        lineBuilder.element("ol", namespace: _uri, nest: () {
+          _buildChildren(lineBuilder, useParagraphs);
+        });
       case TextSegmentType.root:
         lineBuilder.element("div", namespace: _uri, nest: () {
           _buildChildren(lineBuilder, useParagraphs);
@@ -172,8 +182,16 @@ class XhtmlTree {
       }
       line.parent = root.children.last;
       root.children.last.children.add(line);
+    } else if (line.type == TextSegmentType.orderedListItem) {
+      if (root.children.isEmpty ||
+          root.children.last.type != TextSegmentType.orderedList) {
+        root.children
+            .add(TextSegment(type: TextSegmentType.orderedList, parent: root));
+      }
+      line.parent = root.children.last;
+      root.children.last.children.add(line);
     } else {
-      throw "Internal error: You can only push line and bulletListItem to the root node!";
+      throw "Internal error: You can only push line and bullet/orderedListItem to the root node!";
     }
   }
 }
@@ -237,6 +255,9 @@ class DeltaToXhtmlConverter {
     if (attributes != null) {
       if (attributes.containsKey("list") && attributes["list"] == "bullet") {
         currentLine.type = TextSegmentType.bulletListItem;
+      }
+      if (attributes.containsKey("list") && attributes["list"] == "ordered") {
+        currentLine.type = TextSegmentType.orderedListItem;
       }
     }
     _startNextLine();

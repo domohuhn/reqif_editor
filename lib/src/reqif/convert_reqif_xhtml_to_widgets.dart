@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:reqif_editor/src/document/document_data.dart';
 import 'package:xml/xml.dart' as xml;
 import 'package:reqif_editor/src/reqif/convert_common.dart';
-import 'package:reqif_editor/src/reqif/bullet_list.dart';
+import 'package:reqif_editor/src/reqif/widget_list.dart';
 
 typedef ConversionError = Exception;
 
@@ -114,7 +114,9 @@ class XHtmlToWidgetsConverter extends StatelessWidget {
       TextStyle ctx,
       List<InlineSpan> currentTextSpan) {
     var nextAttributes = _pushStyles(node, attributes);
-    if (isHtmlDomElement(node, 'ul')) {
+    final isUnorderedList = isHtmlDomElement(node, 'ul');
+    final isOrderedList = isHtmlDomElement(node, 'ol');
+    if (isUnorderedList || isOrderedList) {
       _pushCollectedTextsToList(widgets, currentTextSpan);
       List<Widget> listItems = [];
       // collect new list from children - must be li items according to html spec
@@ -122,7 +124,7 @@ class XHtmlToWidgetsConverter extends StatelessWidget {
         List<Widget> subItems = [];
         if (!isListItem(node)) {
           throw ConversionError(
-              "Invalid Reqif HTML: Direct children of a 'ul' node must be 'li' nodes!");
+              "Invalid Reqif HTML: Direct children of a 'ul' or 'ol' node must be 'li' nodes!");
         }
         _recurseThroughDOM(
             subItems, node, nextAttributes, ctx, currentTextSpan);
@@ -131,7 +133,10 @@ class XHtmlToWidgetsConverter extends StatelessWidget {
           listItems.addAll(subItems);
         }
       }
-      widgets.add(BulletList(listItems));
+      widgets.add(WidgetList(
+        listItems,
+        isOrdered: isOrderedList,
+      ));
       return;
     }
     if (isHtmlDomElement(node, 'object')) {

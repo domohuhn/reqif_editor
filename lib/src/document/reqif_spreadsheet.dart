@@ -269,10 +269,8 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
             if (embeddedObjectCount > 0) {
               columnWidth = maxTextLineWidth;
             }
-            var currentHeight = size.height +
-                defaultTextPadding +
-                attr.listItemCount * 4 +
-                attr.newLineCount;
+            var currentHeight =
+                size.height + defaultTextPadding + attr.newLineCount;
             if (embeddedObjectCount > 0) {
               currentHeight += columnWidth * embeddedObjectCount;
             }

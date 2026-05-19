@@ -1,5 +1,6 @@
 ## 0.7.1
 
+- added ordered lists to xhtml display
 - bugfix: added small width margin below xhtml lists
 
 ## 0.7.0

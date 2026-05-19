@@ -26,6 +26,7 @@ dependencies:
   two_dimensional_scrollables: ^0.4.2
   path: ^1.8.3
   loading_animation_widget: ^1.2.1
+  collection: ^1.19.1
 
 dev_dependencies:
   flutter_test:

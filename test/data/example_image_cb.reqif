@@ -949,7 +949,7 @@
 <DEFINITION>
 <ATTRIBUTE-DEFINITION-XHTML-REF>_07ea936e-7565-4e8b-9192-cfe3a09fa4d4</ATTRIBUTE-DEFINITION-XHTML-REF>
 </DEFINITION>
-<THE-VALUE><reqif-xhtml:div><reqif-xhtml:ul><reqif-xhtml:li>Initial revision</reqif-xhtml:li></reqif-xhtml:ul></reqif-xhtml:div></THE-VALUE>
+<THE-VALUE><reqif-xhtml:div><reqif-xhtml:ol><reqif-xhtml:li>Initial revision</reqif-xhtml:li><reqif-xhtml:li>Added ordered list</reqif-xhtml:li><reqif-xhtml:li>Third line</reqif-xhtml:li></reqif-xhtml:ol></reqif-xhtml:div></THE-VALUE>
 </ATTRIBUTE-VALUE-XHTML>
 </VALUES>
 </SPEC-OBJECT>
