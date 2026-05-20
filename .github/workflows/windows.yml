@@ -5,6 +5,8 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+  release:
+    types: [created]
 
 jobs:
   build:
@@ -32,8 +34,16 @@ jobs:
           powershell Compress-Archive ../build/windows/x64/runner/Release/* reqif-editor-windows-x64.zip
           popd
      - name: Archive production artifacts
-       uses: actions/upload-artifact@v4
+       uses: actions/upload-artifact@v6
        with:
           name: reqif-editor-windows-x64.zip
           path: release/reqif-editor-*
           retention-days: 30
+     - name: Upload artifacts to release
+       if: ${{ github.event_name == 'release' }}
+       uses: svenstaro/upload-release-action@v2
+       with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: release/reqif-editor-*
+          tag: ${{ github.ref }}
+          file_glob: true
