@@ -36,6 +36,7 @@ class _ReqIfDocumentViewState extends State<ReqIfDocumentView> {
   bool navbarIsVisible = true;
   bool filterIsActive = false;
   bool searchIsVisible = false;
+  bool editingAllowed = false;
   int filterCounter = 0;
 
   QuillController _controller = QuillController.basic();
@@ -165,6 +166,12 @@ class _ReqIfDocumentViewState extends State<ReqIfDocumentView> {
     });
   }
 
+  void _toggleEditingState() {
+    setState(() {
+      editingAllowed = !editingAllowed;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     List<Widget> centerRow = [];
@@ -200,6 +207,8 @@ class _ReqIfDocumentViewState extends State<ReqIfDocumentView> {
             onFilterPressed: _toggleFilterState,
             searchIsVisible: searchIsVisible,
             onSearchPressed: _toggleSearchState,
+            editingAllowed: editingAllowed,
+            onToggleEditingPressed: _toggleEditingState,
           )),
       Expanded(
           child: Row(
@@ -291,7 +300,8 @@ class _ReqIfDocumentViewState extends State<ReqIfDocumentView> {
               onNewQuillEditor: _exchangeControllerAndText,
               filterIsEnabled: filterIsActive,
               onNewFilterValue: _applyFilter,
-              searchIsEnabled: searchIsVisible))
+              searchIsEnabled: searchIsVisible,
+              isEditable: editingAllowed))
     ]));
   }
 }

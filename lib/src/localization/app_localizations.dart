@@ -374,6 +374,12 @@ abstract class AppLocalizations {
   /// **'Toggle search'**
   String get toggleSearch;
 
+  /// Tooltip for enable editing button
+  ///
+  /// In en, this message translates to:
+  /// **'Toggle editing mode'**
+  String get toggleEditing;
+
   /// Word of
   ///
   /// In en, this message translates to:

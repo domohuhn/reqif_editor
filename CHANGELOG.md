@@ -2,6 +2,7 @@
 
 - added ordered lists to xhtml display
 - added basic support for xhtml tables
+- added a button to enable and disable editing globally
 - bugfix: added small width margin below xhtml lists
 - bugfix: empty xhtml text sections can be edited
 

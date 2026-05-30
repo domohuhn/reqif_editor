@@ -11,9 +11,11 @@ class DocumentTopBar extends StatelessWidget {
   final bool navbarIsVisible;
   final bool filterIsVisible;
   final bool searchIsVisible;
+  final bool editingAllowed;
   final void Function() onNavBarPressed;
   final void Function() onFilterPressed;
   final void Function() onSearchPressed;
+  final void Function() onToggleEditingPressed;
 
   const DocumentTopBar({
     super.key,
@@ -21,9 +23,11 @@ class DocumentTopBar extends StatelessWidget {
     required this.navbarIsVisible,
     required this.filterIsVisible,
     required this.searchIsVisible,
+    required this.editingAllowed,
     required this.onNavBarPressed,
     required this.onFilterPressed,
     required this.onSearchPressed,
+    required this.onToggleEditingPressed,
   });
 
   @override
@@ -53,6 +57,14 @@ class DocumentTopBar extends StatelessWidget {
             onPressed: onSearchPressed,
             icon: Icon(searchIsVisible ? Icons.search : Icons.search_off),
             tooltip: AppLocalizations.of(context)!.toggleSearch,
+          ),
+          IconButton(
+            onPressed: onToggleEditingPressed,
+            icon: Icon(editingAllowed ? Icons.edit : Icons.edit_off),
+            tooltip: AppLocalizations.of(context)!.toggleEditing,
+            color: editingAllowed
+                ? Color.fromARGB(255, 0, 255, 0)
+                : Color.fromARGB(255, 255, 0, 0),
           ),
           VerticalDivider(
               thickness: 3.0,

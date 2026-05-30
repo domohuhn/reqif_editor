@@ -153,6 +153,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get toggleSearch => 'Suche umschalten';
 
   @override
+  String get toggleEditing =>
+      'Zwischen \'nur lesen\' und \'editieren\' umschalten';
+
+  @override
   String get ofSearchBox => 'von';
 
   @override

@@ -150,6 +150,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get toggleSearch => 'Toggle search';
 
   @override
+  String get toggleEditing => 'Toggle editing mode';
+
+  @override
   String get ofSearchBox => 'of';
 
   @override

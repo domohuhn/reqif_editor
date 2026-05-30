@@ -50,6 +50,7 @@
   "searchPage": "Seite durchsuchen",
   "toggleFilter": "Filter umschalten",
   "toggleSearch": "Suche umschalten",
+  "toggleEditing": "Zwischen 'nur lesen' und 'editieren' umschalten",
   "lastUsed": "Zuletzt geöffnet",
   "columnOrder": "Reihenfolge der Spalten:",
   "resetColumnOrder": "Reihenfolge der Spalten zurücksetzen",

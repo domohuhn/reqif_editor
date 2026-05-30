@@ -184,6 +184,10 @@
   "@toggleSearch": {
     "description": "Tooltip for search button"
   },
+  "toggleEditing": "Toggle editing mode",
+  "@toggleEditing": {
+    "description": "Tooltip for enable editing button"
+  },
   "ofSearchBox": "of",
   "@ofSearchBox": {
     "description": "Word of"
