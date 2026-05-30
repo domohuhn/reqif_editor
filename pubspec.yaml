@@ -18,7 +18,7 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
-  xml: ^6.6.1
+  xml: ^7.0.1
   file_picker: ^11.0.0
   flutter_quill: ^11.4.1
   uuid: ^4.2.2

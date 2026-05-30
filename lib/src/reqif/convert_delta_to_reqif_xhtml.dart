@@ -6,6 +6,8 @@ import 'package:xml/xml.dart' as xml;
 import 'package:flutter_quill/quill_delta.dart' as quill;
 
 const String _uri = 'http://www.w3.org/1999/xhtml';
+const String _prefix = 'reqif-xhtml';
+const Map<String?, String?> _namespaceUris = {_prefix: _uri};
 
 enum TextSegmentType {
   bold,
@@ -66,54 +68,54 @@ class TextSegment {
       case TextSegmentType.text:
         lineBuilder.text(text);
       case TextSegmentType.bold:
-        lineBuilder.element("strong", namespace: _uri, nest: () {
+        lineBuilder.element("strong", namespacePrefix: _prefix, nest: () {
           _buildChildren(lineBuilder, useParagraphs);
         });
       case TextSegmentType.italic:
-        lineBuilder.element("i", namespace: _uri, nest: () {
+        lineBuilder.element("i", namespacePrefix: _prefix, nest: () {
           _buildChildren(lineBuilder, useParagraphs);
         });
       case TextSegmentType.strike:
         lineBuilder.element("cite",
-            namespace: _uri,
+            namespacePrefix: _prefix,
             attributes: {"style": "text-decoration:line-through"}, nest: () {
           _buildChildren(lineBuilder, useParagraphs);
         });
       case TextSegmentType.underline:
         lineBuilder.element("cite",
-            namespace: _uri,
+            namespacePrefix: _prefix,
             attributes: {"style": "text-decoration:underline"}, nest: () {
           _buildChildren(lineBuilder, useParagraphs);
         });
       case TextSegmentType.line:
         if (useParagraphs) {
-          lineBuilder.element('p', namespace: _uri, nest: () {
+          lineBuilder.element('p', namespacePrefix: _prefix, nest: () {
             _buildChildren(lineBuilder, useParagraphs);
             lineBuilder.text('\n');
           });
           lineBuilder.text('\n');
         } else {
           _buildChildren(lineBuilder, useParagraphs);
-          lineBuilder.element('br', namespace: _uri);
+          lineBuilder.element('br', namespacePrefix: _prefix);
         }
       case TextSegmentType.bulletListItem:
-        lineBuilder.element("li", namespace: _uri, nest: () {
+        lineBuilder.element("li", namespacePrefix: _prefix, nest: () {
           _buildChildren(lineBuilder, useParagraphs);
         });
       case TextSegmentType.bulletList:
-        lineBuilder.element("ul", namespace: _uri, nest: () {
+        lineBuilder.element("ul", namespacePrefix: _prefix, nest: () {
           _buildChildren(lineBuilder, useParagraphs);
         });
       case TextSegmentType.orderedListItem:
-        lineBuilder.element("li", namespace: _uri, nest: () {
+        lineBuilder.element("li", namespacePrefix: _prefix, nest: () {
           _buildChildren(lineBuilder, useParagraphs);
         });
       case TextSegmentType.orderedList:
-        lineBuilder.element("ol", namespace: _uri, nest: () {
+        lineBuilder.element("ol", namespacePrefix: _prefix, nest: () {
           _buildChildren(lineBuilder, useParagraphs);
         });
       case TextSegmentType.root:
-        lineBuilder.element("div", namespace: _uri, nest: () {
+        lineBuilder.element("div", namespacePrefix: _prefix, nest: () {
           _buildChildren(lineBuilder, useParagraphs);
         });
     }
@@ -165,9 +167,14 @@ class XhtmlTree {
 
   xml.XmlNode build(bool useParagraphs) {
     xml.XmlBuilder builder = xml.XmlBuilder();
-    builder.namespace(_uri, 'reqif-xhtml');
-    root.build(builder, useParagraphs);
-    return builder.buildDocument().firstElementChild!;
+    // this is so dumb - the new version of the xml lib forces you to declare a node
+    // to bind namespaces. It throws an exception if the namespace is bound to the builder/document.
+    builder.element('drop',
+        namespacePrefix: _prefix, namespaceUris: _namespaceUris, nest: () {
+      root.build(builder, useParagraphs);
+    });
+    // we must drop the element we added.
+    return builder.buildDocument().firstElementChild!.firstElementChild!;
   }
 
   void pushLine(TextSegment line) {
