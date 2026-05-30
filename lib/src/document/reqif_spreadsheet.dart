@@ -277,6 +277,10 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
             if (attr.hasList) {
               currentHeight *= 1.02;
             }
+            if (attr.hasTable) {
+              currentHeight *= 1.15; // add some safety margin ...
+              currentHeight += 64; // add padding before/after table
+            }
             if (Platform.isLinux) {
               if (attr.hasList) {
                 currentHeight += 8;
@@ -584,7 +588,8 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
                 widget.forceEditable) &&
             cellContent.content.length == 1 &&
             cellContent.content.first is ReqIfAttributeValue &&
-            cellContent.content.first.embeddedObjectCount == 0;
+            cellContent.content.first.embeddedObjectCount == 0 &&
+            cellContent.content.first.hasTable == false;
 
     if (isEditable) {
       return _buildEditableCell(cellContent, model, vicinity, context,

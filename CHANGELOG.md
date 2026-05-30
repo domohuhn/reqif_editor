@@ -1,6 +1,7 @@
 ## 0.7.1
 
 - added ordered lists to xhtml display
+- added basic support for xhtml tables
 - bugfix: added small width margin below xhtml lists
 - bugfix: empty xhtml text sections can be edited
 

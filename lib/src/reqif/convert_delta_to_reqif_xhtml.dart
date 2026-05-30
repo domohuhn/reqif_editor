@@ -39,7 +39,7 @@ class XHtmlAttribute {
   void insertAttributeToXML(xml.XmlBuilder builder, void Function() nested) {
     isActive = true;
     builder.element(tag,
-        namespace: _uri, attributes: tagAttributes, nest: nested);
+        namespacePrefix: _prefix, attributes: tagAttributes, nest: nested);
     isActive = false;
   }
 }

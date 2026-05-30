@@ -58,7 +58,7 @@ class ReqIfAttributeValue extends ReqIfElement {
   ReqIfAttributeDefinition get definition => _definition;
 
   bool get isEditable => definition.isEditable;
-
+  bool get hasTable => false;
   int get column => _definition.index;
 
   int get embeddedObjectCount => 0;
@@ -333,9 +333,10 @@ class ReqIfAttributeValueXhtml extends ReqIfAttributeValue {
   @override
   int get embeddedObjectCount {
     int countPng = 0;
-    for (final child in node.findAllElements(_xmlValueName, namespace: "*")) {
+    for (final child
+        in node.findAllElements(_xmlValueName, namespaceUri: "*")) {
       for (final object
-          in child.findAllElements(_xmlObjectName, namespace: "*")) {
+          in child.findAllElements(_xmlObjectName, namespaceUri: "*")) {
         final parent = object.parentElement;
         final isFirstObject =
             parent != null && parent.name.local != _xmlObjectName;
@@ -347,9 +348,13 @@ class ReqIfAttributeValueXhtml extends ReqIfAttributeValue {
     return countPng;
   }
 
+  @override
+  bool get hasTable => _hasTable;
+
   int get listItemCount {
     int count = 0;
-    for (final child in node.findAllElements(_xmlValueName, namespace: "*")) {
+    for (final child
+        in node.findAllElements(_xmlValueName, namespaceUri: "*")) {
       for (final xhtml in child.descendants) {
         if (xhtml is xml.XmlElement && xhtml.name.local == "li") {
           count += 1;
@@ -361,7 +366,8 @@ class ReqIfAttributeValueXhtml extends ReqIfAttributeValue {
 
   int get newLineCount {
     int count = 0;
-    for (final child in node.findAllElements(_xmlValueName, namespace: "*")) {
+    for (final child
+        in node.findAllElements(_xmlValueName, namespaceUri: "*")) {
       for (final xhtml in child.descendants) {
         if (xhtml is xml.XmlElement && xhtml.name.local == "br") {
           count += 1;
@@ -374,7 +380,8 @@ class ReqIfAttributeValueXhtml extends ReqIfAttributeValue {
   /// Returns the unformatted text of the node.
   String _toString() {
     final buffer = StringBuffer();
-    for (final child in node.findAllElements(_xmlValueName, namespace: "*")) {
+    for (final child
+        in node.findAllElements(_xmlValueName, namespaceUri: "*")) {
       buffer.write(child.innerText);
     }
     return buffer.toString();
@@ -383,7 +390,8 @@ class ReqIfAttributeValueXhtml extends ReqIfAttributeValue {
   String _toStringWithNewlines() {
     final buffer = StringBuffer();
     bool lastHadNewline = true;
-    for (final child in node.findAllElements(_xmlValueName, namespace: "*")) {
+    for (final child
+        in node.findAllElements(_xmlValueName, namespaceUri: "*")) {
       for (final xhtml in child.descendants) {
         if (xhtml is xml.XmlElement &&
             (xhtml.name.local == "br" ||
@@ -396,6 +404,24 @@ class ReqIfAttributeValueXhtml extends ReqIfAttributeValue {
             buffer.write('\n');
             lastHadNewline = true;
           } else {
+            buffer.write('\n');
+            lastHadNewline = true;
+          }
+        }
+        if (xhtml is xml.XmlElement) {
+          if (xhtml.name.local == "table") {
+            _hasTable = true;
+            buffer.write('\n');
+            lastHadNewline = true;
+          }
+          if (xhtml.name.local == "td" || xhtml.name.local == "th") {
+            if (lastHadNewline) {
+              buffer.write('| ');
+            } else {
+              buffer.write(' | ');
+            }
+          }
+          if (xhtml.name.local == "tr") {
             buffer.write('\n');
             lastHadNewline = true;
           }
@@ -417,4 +443,5 @@ class ReqIfAttributeValueXhtml extends ReqIfAttributeValue {
   }
 
   bool hasList = false;
+  bool _hasTable = false;
 }

@@ -753,7 +753,9 @@
 </reqif-xhtml:p>
 <reqif-xhtml:p>dummy line   
 </reqif-xhtml:p>
-<reqif-xhtml:p>dummy line</reqif-xhtml:p></reqif-xhtml:div>
+<reqif-xhtml:p>dummy line</reqif-xhtml:p><reqif-xhtml:br/><reqif-xhtml:br/>
+<reqif-xhtml:table border="1" style="font-style:normal;width:700pt;"><reqif-xhtml:caption>This is a caption for the table that follows.</reqif-xhtml:caption><reqif-xhtml:tbody><reqif-xhtml:tr><reqif-xhtml:th>Column 1</reqif-xhtml:th><reqif-xhtml:th>Column 2</reqif-xhtml:th><reqif-xhtml:th>3</reqif-xhtml:th><reqif-xhtml:th>More columns</reqif-xhtml:th><reqif-xhtml:th>this is a very long table header</reqif-xhtml:th></reqif-xhtml:tr><reqif-xhtml:tr><reqif-xhtml:td>text in cell 1</reqif-xhtml:td><reqif-xhtml:td>text in cell 2</reqif-xhtml:td><reqif-xhtml:td>3</reqif-xhtml:td><reqif-xhtml:td>text in cell 4</reqif-xhtml:td><reqif-xhtml:td>text in cell 5</reqif-xhtml:td></reqif-xhtml:tr><reqif-xhtml:tr><reqif-xhtml:td>text in cell 6</reqif-xhtml:td><reqif-xhtml:td>text in cell 7</reqif-xhtml:td><reqif-xhtml:td>8</reqif-xhtml:td><reqif-xhtml:td>text in cell 9</reqif-xhtml:td><reqif-xhtml:td>text in cell 10</reqif-xhtml:td></reqif-xhtml:tr></reqif-xhtml:tbody></reqif-xhtml:table> 
+</reqif-xhtml:div>
 </THE-VALUE>
 </ATTRIBUTE-VALUE-XHTML>
 <ATTRIBUTE-VALUE-ENUMERATION>
