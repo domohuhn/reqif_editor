@@ -2,6 +2,7 @@
 
 - added ordered lists to xhtml display
 - bugfix: added small width margin below xhtml lists
+- bugfix: empty xhtml text sections can be edited
 
 ## 0.7.0
 

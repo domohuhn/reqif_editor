@@ -120,6 +120,7 @@ class XHtmlToDeltaConverter {
   void _insertNewLineIfMissing(quill.Delta delta,
       [Map<String, dynamic> attributes = const {}]) {
     if (delta.isEmpty) {
+      _insertNewLine(delta, attributes);
       return;
     }
     if (!delta.last.value.toString().endsWith("\n")) {
