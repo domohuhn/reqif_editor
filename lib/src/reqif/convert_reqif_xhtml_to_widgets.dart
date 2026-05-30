@@ -60,11 +60,9 @@ class XHtmlToWidgetsConverter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final converted = xhtmlToWidgetList(node, context);
-    if (converted.length > 1) {
+    if (converted.isNotEmpty) {
       return Padding(
           padding: const EdgeInsets.all(5), child: Column(children: converted));
-    } else if (converted.length == 1) {
-      return Padding(padding: const EdgeInsets.all(5), child: converted.first);
     } else {
       return Padding(padding: const EdgeInsets.all(5));
     }

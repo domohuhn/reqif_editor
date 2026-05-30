@@ -540,9 +540,12 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
           children: [
             Container(
                 alignment: Alignment.topLeft,
-                padding: const EdgeInsets.fromLTRB(5, 5, 8, 0),
+                padding: const EdgeInsets.fromLTRB(5, 10, 5, 0),
                 child: Text(prefix)),
-            child
+            Container(
+                alignment: Alignment.topLeft,
+                padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
+                child: child)
           ],
         ));
   }
