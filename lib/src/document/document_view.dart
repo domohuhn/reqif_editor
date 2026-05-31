@@ -15,6 +15,9 @@ import 'package:reqif_editor/src/document/document_top_bar.dart';
 import 'package:reqif_editor/src/document/reqif_spreadsheet.dart';
 import 'package:reqif_editor/src/localization/app_localizations.dart';
 import 'package:reqif_editor/src/reqif/conversions.dart';
+import 'package:reqif_editor/src/reqif/reqif_attribute_values.dart';
+import 'package:reqif_editor/src/reqif/reqif_common.dart'
+    show ReqIfElementTypes;
 
 class ReqIfDocumentView extends StatefulWidget {
   static const routeName = '/reqif_editor';
@@ -38,10 +41,15 @@ class _ReqIfDocumentViewState extends State<ReqIfDocumentView> {
   bool searchIsVisible = false;
   bool editingAllowed = false;
   int filterCounter = 0;
+  dynamic _lastSelectedValue = null;
 
   QuillController _controller = QuillController.basic();
   // ignore: unused_field
   late AppLifecycleListener _appLifecycleListener;
+
+  void _storeSelectedValue(dynamic value) {
+    _lastSelectedValue = value;
+  }
 
   void _exchangeControllerAndText(dynamic value) {
     setState(() {
@@ -169,6 +177,15 @@ class _ReqIfDocumentViewState extends State<ReqIfDocumentView> {
   void _toggleEditingState() {
     setState(() {
       editingAllowed = !editingAllowed;
+      dynamic argToUse;
+      if (editingAllowed &&
+          _lastSelectedValue != null &&
+          (_lastSelectedValue is ReqIfAttributeValue &&
+              _lastSelectedValue.type ==
+                  ReqIfElementTypes.attributeValueXhtml)) {
+        argToUse = _lastSelectedValue;
+      }
+      _exchangeControllerAndText(argToUse);
     });
   }
 
@@ -295,13 +312,15 @@ class _ReqIfDocumentViewState extends State<ReqIfDocumentView> {
       ),
       Expanded(
           child: ReqIfSpreadSheet(
-              controller: widget.documentController,
-              editorController: _controller,
-              onNewQuillEditor: _exchangeControllerAndText,
-              filterIsEnabled: filterIsActive,
-              onNewFilterValue: _applyFilter,
-              searchIsEnabled: searchIsVisible,
-              isEditable: editingAllowed))
+        controller: widget.documentController,
+        editorController: _controller,
+        onNewQuillEditor: _exchangeControllerAndText,
+        filterIsEnabled: filterIsActive,
+        onNewFilterValue: _applyFilter,
+        searchIsEnabled: searchIsVisible,
+        isEditable: editingAllowed,
+        onNewSelection: _storeSelectedValue,
+      ))
     ]));
   }
 }

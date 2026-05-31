@@ -84,7 +84,7 @@ class DocumentTopBar extends StatelessWidget {
                 showSuperscript: false,
                 showHeaderStyle: false,
                 showListCheck: false,
-                showListNumbers: false,
+                showListNumbers: true,
                 showIndent: false,
                 showLink: false,
                 showQuote: false,

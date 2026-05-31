@@ -32,6 +32,7 @@ import 'package:two_dimensional_scrollables/two_dimensional_scrollables.dart';
 class ReqIfSpreadSheet extends StatefulWidget {
   final DocumentController controller;
   final QuillController editorController;
+  final void Function(dynamic) onNewSelection;
   final void Function(dynamic) onNewQuillEditor;
   final void Function() onNewFilterValue;
   final bool isEditable;
@@ -67,6 +68,7 @@ class ReqIfSpreadSheet extends StatefulWidget {
       {required this.controller,
       required this.editorController,
       required this.onNewQuillEditor,
+      required this.onNewSelection,
       required this.filterIsEnabled,
       required this.onNewFilterValue,
       required this.searchIsEnabled,
@@ -111,6 +113,7 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
   final FocusNode editorFocusNode = FocusNode();
   bool quillSelected = false;
   bool textSelected = false;
+  bool lastIsEditableState = false;
 
   Widget _buildQuillEditor() {
     return QuillEditor.basic(
@@ -371,7 +374,7 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
   }
 
   void _onSelectionChanged(TableVicinity position, CellState state) {
-    if (!widget.hasData || !widget.hasPart) {
+    if (!mounted || !widget.hasData || !widget.hasPart) {
       return;
     }
     widget.controller.setRestoreScrollPositions(false);
@@ -393,6 +396,7 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
     final int rowIndex = position.row - 1;
     final element = widget.part[rowIndex];
     var value = element.object[columnIndex];
+    widget.onNewSelection(value);
     final datatype = widget.part.type[columnIndex];
     final bool isEditable =
         ((datatype.isEditable && element.isEditable && widget.isEditable) ||
