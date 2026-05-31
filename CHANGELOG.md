@@ -1,5 +1,6 @@
 ## 0.7.1
 
+- added support for reqifz files
 - added ordered lists to xhtml display
 - added basic support for xhtml tables
 - added a button to enable and disable editing globally

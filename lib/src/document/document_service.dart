@@ -3,6 +3,7 @@
 // See LICENSE for the full text of the license
 
 import 'dart:io';
+import 'dart:typed_data' show Uint8List;
 
 /// DocumentService serves as an abstraction of the interaction with the system. It can
 /// be injected to other functions to e.g. write to the file system, while
@@ -35,6 +36,11 @@ class DocumentService {
   /// Asynchronously reads the entire file in [path]
   Future<String> read(String path) async {
     return File(path).readAsString();
+  }
+
+  /// Asynchronously reads the entire file in [path] as bytes
+  Future<Uint8List> readAsBytes(String path) async {
+    return File(path).readAsBytes();
   }
 
   /// Asynchronously writes the entire [text] to a file called [path]

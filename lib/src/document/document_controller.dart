@@ -13,6 +13,7 @@ import 'package:reqif_editor/src/document/document_service.dart';
 import 'package:reqif_editor/src/reqif/flat_document.dart';
 import 'package:reqif_editor/src/reqif/reqif_common.dart';
 import 'package:reqif_editor/src/reqif/reqif_document.dart';
+import 'package:archive/archive.dart';
 import 'package:reqif_editor/src/reqif/reqif_io.dart';
 import 'package:reqif_editor/src/settings/settings_controller.dart';
 import 'package:two_dimensional_scrollables/two_dimensional_scrollables.dart';
@@ -37,18 +38,44 @@ class DocumentController with ChangeNotifier {
       }
       return false;
     }
-    final contents = await _service
-        .read(path)
-        .timeout(const Duration(seconds: 30))
-        .onError((error, stackTrace) {
-      if (onError != null) {
-        onError(error, stackTrace);
+    try {
+      String contents;
+      Map<String, ImageProvider<Object>> imageCache = {};
+      if (_isCompressedReqif(path)) {
+        contents = await _loadReqifz(path, imageCache, onError);
+      } else {
+        contents = await _service
+            .read(path)
+            .timeout(const Duration(seconds: 30))
+            .onError((error, stackTrace) {
+          if (onError != null) {
+            onError(error, stackTrace);
+          }
+          return "";
+        });
       }
-      return "";
-    });
-    if (contents == "") {
+      if (contents == "") {
+        if (onError != null) {
+          onError("File is empty", path);
+        }
+        return false;
+      }
+      final output = await _parseReqifFromString(path, contents);
+      output.extendImageCache(imageCache);
+      documents.add(output);
+      _settings.addOpenedFile(path, output.flatDocument.title);
+      notifyListeners();
+      return true;
+    } catch (e) {
+      if (onError != null) {
+        onError(e, path);
+      }
       return false;
     }
+  }
+
+  Future<DocumentData> _parseReqifFromString(String path, String contents,
+      [void Function(dynamic, dynamic)? onError]) async {
     final doc =
         await compute(_parseAsync, contents).onError((error, stackTrace) {
       if (onError != null) {
@@ -57,7 +84,7 @@ class DocumentController with ChangeNotifier {
       return null;
     });
     if (doc == null) {
-      return false;
+      return Future.error("Failed to parse");
     }
     final flat = ReqIfFlatDocument.buildFlatDocument(doc);
     final columnOrder = _settings.fileColumnOrder(path);
@@ -67,10 +94,49 @@ class DocumentController with ChangeNotifier {
         columnOrder: columnOrder,
         columnVisibility: columnVisibility,
         mergeData: columnMergeOptions);
-    documents.add(output);
-    _settings.addOpenedFile(path, flat.title);
-    notifyListeners();
-    return true;
+    return output;
+  }
+
+  bool _isCompressedReqif(String path) {
+    return path.endsWith(".reqifz");
+  }
+
+  Future<String> _loadReqifz(
+      String path, Map<String, ImageProvider<Object>> images,
+      [void Function(dynamic, dynamic)? onError]) async {
+    final bytes = await _service
+        .readAsBytes(path)
+        .timeout(const Duration(seconds: 30))
+        .onError((error, stackTrace) {
+      if (onError != null) {
+        onError(error, stackTrace);
+      }
+      return Uint8List(0);
+    });
+
+    final archive = ZipDecoder().decodeBytes(bytes);
+    String rawReqif = "";
+    int countReqif = 0;
+    for (final entry in archive) {
+      if (entry.isFile && entry.name.endsWith(".png")) {
+        final fileBytes = entry.readBytes();
+        if (fileBytes != null && fileBytes.isNotEmpty) {
+          images[entry.name] = MemoryImage(fileBytes);
+        }
+      }
+      if (entry.isFile && entry.name.endsWith(".reqif")) {
+        final fileBytes = entry.readBytes();
+        if (fileBytes != null && fileBytes.isNotEmpty) {
+          rawReqif = String.fromCharCodes(fileBytes);
+          countReqif += 1;
+        }
+      }
+    }
+    // if we want to support more than one reqif document per file, we must rework the persistence data.
+    if (countReqif != 1) {
+      return Future.error("Only one reqif per reqifz file is supported!");
+    }
+    return rawReqif;
   }
 
   void forceRedraw() {

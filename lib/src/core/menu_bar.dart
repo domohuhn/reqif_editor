@@ -89,7 +89,7 @@ class _TopMenuBarState extends State<TopMenuBar> with OpenDocument<TopMenuBar> {
             onPressed: () {
               FilePicker.pickFiles(
                   type: FileType.custom,
-                  allowedExtensions: ["reqif"]).then((value) {
+                  allowedExtensions: ["reqif", "reqifz"]).then((value) {
                 if (value != null &&
                     value.files.single.path != null &&
                     value.files.single.path!.isNotEmpty) {

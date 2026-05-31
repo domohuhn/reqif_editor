@@ -392,6 +392,10 @@ class DocumentData {
     }
   }
 
+  void extendImageCache(Map<String, ImageProvider<Object>> cache) {
+    objectCache.addEntries(cache.entries);
+  }
+
   void dispose() {
     for (final inner in partFilterControllers) {
       for (final control in inner) {
