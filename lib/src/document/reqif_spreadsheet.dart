@@ -307,6 +307,10 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
       }
       rowHeights.add(rowHeight * 1.1);
     }
+    if (rowHeights.length > 1) {
+      // increase length of last since it cannot be resized:
+      rowHeights[rowHeights.length - 1] += 120;
+    }
     columnWidths.insert(0, _rowNumberIndicatorWidth);
     final int columnWithPrefix = widget.controller.headingsColumn + 1;
     if (columnWithPrefix < columnWidths.length) {
