@@ -144,6 +144,12 @@ class AppLocalizationsDe extends AppLocalizations {
   String get failedToLoadBody => 'Während des imports kam es zu einem Fehler:';
 
   @override
+  String get failedToSave => 'Exportieren der Datei fehlgeschlagen';
+
+  @override
+  String get failedToSaveBody => 'Während des exports kam es zu einem Fehler:';
+
+  @override
   String get contains => 'Enthält';
 
   @override

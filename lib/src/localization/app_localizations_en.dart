@@ -141,6 +141,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get failedToLoadBody => 'An exception was thrown during import:';
 
   @override
+  String get failedToSave => 'Failed to save file';
+
+  @override
+  String get failedToSaveBody =>
+      'An exception was thrown while exporting the file:';
+
+  @override
   String get contains => 'Contains';
 
   @override

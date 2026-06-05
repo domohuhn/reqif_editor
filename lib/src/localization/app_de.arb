@@ -44,6 +44,8 @@
   "contains": "Enthält",
   "failedToLoad": "Importieren der Datei fehlgeschlagen",
   "failedToLoadBody": "Während des imports kam es zu einem Fehler:",
+  "failedToSave": "Exportieren der Datei fehlgeschlagen",
+  "failedToSaveBody": "Während des exports kam es zu einem Fehler:",
   "ofSearchBox": "von",
   "matches": "Übereinstimmungen",
   "caseSensitive": "Groß-/Kleinschreibung",

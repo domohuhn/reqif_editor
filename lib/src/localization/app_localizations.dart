@@ -356,6 +356,18 @@ abstract class AppLocalizations {
   /// **'An exception was thrown during import:'**
   String get failedToLoadBody;
 
+  /// Title for failed to save dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save file'**
+  String get failedToSave;
+
+  /// Body for failed to save dialog
+  ///
+  /// In en, this message translates to:
+  /// **'An exception was thrown while exporting the file:'**
+  String get failedToSaveBody;
+
   /// Hint for filter text
   ///
   /// In en, this message translates to:

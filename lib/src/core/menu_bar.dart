@@ -6,6 +6,7 @@ import 'dart:ui';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:reqif_editor/src/core/save_document.dart';
 import 'package:reqif_editor/src/localization/app_localizations.dart';
 import 'dart:io';
 import 'package:flutter/services.dart';
@@ -31,7 +32,8 @@ class TopMenuBar extends StatefulWidget {
   State<TopMenuBar> createState() => _TopMenuBarState();
 }
 
-class _TopMenuBarState extends State<TopMenuBar> with OpenDocument<TopMenuBar> {
+class _TopMenuBarState extends State<TopMenuBar>
+    with OpenDocument<TopMenuBar>, SaveDocument<TopMenuBar> {
   ShortcutRegistryEntry? _shortcutsEntry;
 
   @override
@@ -103,11 +105,11 @@ class _TopMenuBarState extends State<TopMenuBar> with OpenDocument<TopMenuBar> {
               menuChildren: lastUsed),
           MenuEntry(
             label: AppLocalizations.of(context)!.save,
-            onPressed: () {
+            onPressed: () async {
               if (!mounted || !widget.documentController.hasOpenDocuments) {
                 return;
               }
-              widget.documentController.saveCurrent();
+              await saveCurrent(widget.documentController);
             },
             // ignore: prefer_const_constructors
             shortcut: SingleActivator(LogicalKeyboardKey.keyS,
@@ -115,15 +117,16 @@ class _TopMenuBarState extends State<TopMenuBar> with OpenDocument<TopMenuBar> {
           ),
           MenuEntry(
             label: AppLocalizations.of(context)!.saveAs,
-            onPressed: () {
+            onPressed: () async {
               if (!mounted || !widget.documentController.hasOpenDocuments) {
                 return;
               }
               FilePicker.saveFile(
                   type: FileType.custom,
-                  allowedExtensions: ["reqif"]).then((value) async {
+                  allowedExtensions: ["reqif", "reqifz"]).then((value) async {
                 if (value != null) {
-                  widget.documentController.saveCurrent(outputPath: value);
+                  await saveCurrent(widget.documentController,
+                      outputPath: value);
                 }
               });
             },

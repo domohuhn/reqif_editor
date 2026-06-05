@@ -8,6 +8,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:reqif_editor/src/core/resizable_box.dart';
+import 'package:reqif_editor/src/core/save_document.dart';
 import 'package:reqif_editor/src/document/document_bottom_bar.dart';
 import 'package:reqif_editor/src/document/document_controller.dart';
 import 'package:reqif_editor/src/document/document_navigation.dart';
@@ -29,7 +30,8 @@ class ReqIfDocumentView extends StatefulWidget {
   State<ReqIfDocumentView> createState() => _ReqIfDocumentViewState();
 }
 
-class _ReqIfDocumentViewState extends State<ReqIfDocumentView> {
+class _ReqIfDocumentViewState extends State<ReqIfDocumentView>
+    with SaveDocument<ReqIfDocumentView> {
   static const double minWidthNavBar = 150;
   double widthNavBar = 350;
   double heightEditor = 350;
@@ -41,7 +43,7 @@ class _ReqIfDocumentViewState extends State<ReqIfDocumentView> {
   bool searchIsVisible = false;
   bool editingAllowed = false;
   int filterCounter = 0;
-  dynamic _lastSelectedValue = null;
+  dynamic _lastSelectedValue;
 
   QuillController _controller = QuillController.basic();
   // ignore: unused_field
@@ -88,8 +90,8 @@ class _ReqIfDocumentViewState extends State<ReqIfDocumentView> {
   }
 
   Future<AppExitResponse> _askUnsavedChanges(int? idx) async {
-    bool save = false;
-    bool cancel = false;
+    bool saveClicked = false;
+    bool cancelClicked = false;
 
     Widget quitWithoutSavingButton = TextButton(
       child: Text(AppLocalizations.of(context)!.quitWithoutSaving),
@@ -101,8 +103,8 @@ class _ReqIfDocumentViewState extends State<ReqIfDocumentView> {
     Widget saveExitButton = TextButton(
       child: Text(AppLocalizations.of(context)!.saveAndExit),
       onPressed: () {
-        save = true;
-        cancel = false;
+        saveClicked = true;
+        cancelClicked = false;
         Navigator.of(context).pop();
       },
     );
@@ -110,7 +112,7 @@ class _ReqIfDocumentViewState extends State<ReqIfDocumentView> {
     Widget cancelButton = TextButton(
       child: Text(AppLocalizations.of(context)!.cancel),
       onPressed: () {
-        cancel = true;
+        cancelClicked = true;
         Navigator.of(context).pop();
       },
     );
@@ -128,14 +130,14 @@ class _ReqIfDocumentViewState extends State<ReqIfDocumentView> {
       },
     );
 
-    if (cancel) {
+    if (cancelClicked) {
       return AppExitResponse.cancel;
     }
-    if (save) {
+    if (saveClicked) {
       if (idx != null) {
-        await widget.documentController.save(idx);
+        await save(widget.documentController, idx);
       } else {
-        await widget.documentController.saveAllModified();
+        await saveAllModified(widget.documentController);
       }
     }
     return AppExitResponse.exit;

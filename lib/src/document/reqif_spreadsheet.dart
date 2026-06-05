@@ -211,6 +211,7 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
 
   static const double defaultColumnWidth = 120;
   static const double defaultLetterWidth = 9;
+  static const double defaultSidePadding = 16;
   static const double defaultTextPadding = 14;
   static const double comboBoxLetterWidth = 9;
   static const double comboBoxPadding = 58;
@@ -250,12 +251,18 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
             attr as ReqIfAttributeValueEnum;
             for (final text in attr.validValues) {
               if ((rowEditable && columnEditable) || widget.forceEditable) {
-                columnWidth = max(columnWidth,
-                    text.length * comboBoxLetterWidth + comboBoxPadding);
+                columnWidth = max(
+                    columnWidth,
+                    text.length * comboBoxLetterWidth +
+                        comboBoxPadding +
+                        defaultSidePadding);
                 rowHeight = max(rowHeight, attr.length * defaultComboBoxHeight);
               } else {
-                columnWidth = max(columnWidth,
-                    text.length * defaultLetterWidth + defaultTextPadding);
+                columnWidth = max(
+                    columnWidth,
+                    text.length * defaultLetterWidth +
+                        defaultTextPadding +
+                        defaultSidePadding);
                 rowHeight = max(rowHeight,
                     attr.length * defaultLineHeight + defaultTextPadding);
               }
@@ -290,7 +297,8 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
               }
               currentHeight *= 1.15;
             }
-            columnWidth = max(columnWidth, size.width + defaultTextPadding);
+            columnWidth = max(columnWidth,
+                size.width + defaultTextPadding + defaultSidePadding);
             rowHeight = max(rowHeight, currentHeight);
           default:
             final text = attr.toStringWithNewlines();
@@ -299,8 +307,8 @@ class _ReqIfSpreadSheetState extends State<ReqIfSpreadSheet> {
                     textDirection: TextDirection.ltr)
                   ..layout(maxWidth: maxTextLineWidth))
                 .size;
-            columnWidth =
-                max(columnWidth, size.width * 1.05 + defaultTextPadding);
+            columnWidth = max(columnWidth,
+                size.width * 1.05 + defaultTextPadding + defaultSidePadding);
             rowHeight = max(rowHeight, size.height * 1.05 + defaultTextPadding);
         }
         columnWidths[i] = columnWidth;

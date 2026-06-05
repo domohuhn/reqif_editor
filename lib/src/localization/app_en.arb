@@ -172,6 +172,14 @@
   "@failedToLoadBody": {
     "description": "Body for failed load dialog"
   },
+  "failedToSave": "Failed to save file",
+  "@failedToSave": {
+    "description": "Title for failed to save dialog"
+  },
+  "failedToSaveBody": "An exception was thrown while exporting the file:",
+  "@failedToSaveBody": {
+    "description": "Body for failed to save dialog"
+  },
   "contains": "Contains",
   "@contains": {
     "description": "Hint for filter text"

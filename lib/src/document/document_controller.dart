@@ -2,18 +2,20 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // See LICENSE for the full text of the license
 
+import 'dart:convert';
 import 'dart:io';
 
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:path/path.dart';
 import 'package:reqif_editor/src/document/document_data.dart';
 import 'package:reqif_editor/src/document/document_service.dart';
 import 'package:reqif_editor/src/reqif/flat_document.dart';
 import 'package:reqif_editor/src/reqif/reqif_common.dart';
 import 'package:reqif_editor/src/reqif/reqif_document.dart';
-import 'package:archive/archive.dart';
+import 'package:reqif_editor/src/reqif/reqif_error.dart';
 import 'package:reqif_editor/src/reqif/reqif_io.dart';
 import 'package:reqif_editor/src/settings/settings_controller.dart';
 import 'package:two_dimensional_scrollables/two_dimensional_scrollables.dart';
@@ -104,39 +106,58 @@ class DocumentController with ChangeNotifier {
   Future<String> _loadReqifz(
       String path, Map<String, ImageProvider<Object>> images,
       [void Function(dynamic, dynamic)? onError]) async {
-    final bytes = await _service
-        .readAsBytes(path)
+    final zipContents = await _service
+        .loadZipArchive(path)
         .timeout(const Duration(seconds: 30))
         .onError((error, stackTrace) {
       if (onError != null) {
         onError(error, stackTrace);
       }
-      return Uint8List(0);
+      return {};
     });
 
-    final archive = ZipDecoder().decodeBytes(bytes);
     String rawReqif = "";
     int countReqif = 0;
-    for (final entry in archive) {
-      if (entry.isFile && entry.name.endsWith(".png")) {
-        final fileBytes = entry.readBytes();
-        if (fileBytes != null && fileBytes.isNotEmpty) {
-          images[entry.name] = MemoryImage(fileBytes);
+    for (final entry in zipContents.entries) {
+      if (entry.key.endsWith(".png")) {
+        final fileBytes = entry.value;
+        if (fileBytes.isNotEmpty) {
+          images[entry.key] = MemoryImage(fileBytes);
         }
       }
-      if (entry.isFile && entry.name.endsWith(".reqif")) {
-        final fileBytes = entry.readBytes();
-        if (fileBytes != null && fileBytes.isNotEmpty) {
+      if (entry.key.endsWith(".reqif")) {
+        final fileBytes = entry.value;
+        if (fileBytes.isNotEmpty) {
           rawReqif = String.fromCharCodes(fileBytes);
           countReqif += 1;
         }
       }
     }
-    // if we want to support more than one reqif document per file, we must rework the persistence data.
+    // TODO: if we want to support more than one reqif document per file, we must rework the persistence data.
     if (countReqif != 1) {
       return Future.error("Only one reqif per reqifz file is supported!");
     }
     return rawReqif;
+  }
+
+  Future<void> _saveReqifz(String archivePath, String contents,
+      Map<String, ImageProvider> embeddedObjects) async {
+    assert(archivePath.endsWith(".reqifz"));
+    final archiveBaseName = basename(archivePath);
+    final reqifFileName =
+        archiveBaseName.substring(0, archiveBaseName.length - 1);
+    Map<String, Uint8List> files = {};
+    final encoded = utf8.encode(contents);
+    files[reqifFileName] = encoded;
+
+    for (final img in embeddedObjects.entries) {
+      final data = img.value;
+      if (data is MemoryImage) {
+        files[img.key] = data.bytes;
+      }
+    }
+
+    await _service.saveAsZipArchive(archivePath, files);
   }
 
   void forceRedraw() {
@@ -229,10 +250,18 @@ class DocumentController with ChangeNotifier {
       contents = contents.replaceAll('\r\n', '\n');
     }
     if (outputPath != null) {
+      if (outputPath.endsWith(".reqifz") && !toSave.path.endsWith(".reqifz")) {
+        throw ReqIfError(
+            "Converting a '.reqif' file to '.reqifz' is currently not supported");
+      }
       toSave.path = outputPath;
       await _settings.addOpenedFile(toSave.path, toSave.title);
     }
-    await _service.write(toSave.path, contents);
+    if (_isCompressedReqif(toSave.path)) {
+      await _saveReqifz(toSave.path, contents, toSave.objectCache);
+    } else {
+      await _service.write(toSave.path, contents);
+    }
     await _settings.updateFileColumnOrder(
         toSave.path, toSave.columnOrderToJson());
     await _settings.updateFileColumnVisibility(
