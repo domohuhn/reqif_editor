@@ -390,25 +390,32 @@ class ReqIfAttributeValueXhtml extends ReqIfAttributeValue {
   String _toStringWithNewlines() {
     final buffer = StringBuffer();
     bool lastHadNewline = true;
+    bool firstElement = true;
     for (final child
         in node.findAllElements(_xmlValueName, namespaceUri: "*")) {
+      bool lastElementWasParagraph = false;
       for (final xhtml in child.descendants) {
         if (xhtml is xml.XmlElement &&
             (xhtml.name.local == "br" ||
                 xhtml.name.local == "li" ||
-                xhtml.name.local == "p")) {
+                xhtml.name.local == "p" ||
+                xhtml.name.local == "div")) {
           if (xhtml.name.local == "li") {
             hasList = true;
             buffer.write('\n - ');
-          } else if (xhtml.name.local == "p" && !lastHadNewline) {
-            buffer.write('\n');
-            lastHadNewline = true;
+          } else if (xhtml.name.local == "p" || xhtml.name.local == "div") {
+            if (!lastHadNewline && !firstElement) {
+              buffer.write('\n');
+              lastHadNewline = true;
+            }
           } else {
             buffer.write('\n');
             lastHadNewline = true;
           }
         }
         if (xhtml is xml.XmlElement) {
+          firstElement = false;
+          lastElementWasParagraph = xhtml.name.local == "p";
           if (xhtml.name.local == "table") {
             _hasTable = true;
             buffer.write('\n');
@@ -437,6 +444,9 @@ class ReqIfAttributeValueXhtml extends ReqIfAttributeValue {
             }
           }
         }
+      }
+      if (lastElementWasParagraph) {
+        buffer.write('\n');
       }
     }
     return buffer.toString();

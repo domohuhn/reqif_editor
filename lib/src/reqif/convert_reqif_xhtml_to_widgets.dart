@@ -294,7 +294,7 @@ class XHtmlToWidgetsConverter extends StatelessWidget {
       _recurseThroughDOM(widgets, node, nextAttributes, textStyle,
           currentTextSpan, buildContext);
     }
-    if (isHtmlDomElement(node, 'p') &&
+    if ((isHtmlDomElement(node, 'p') || isHtmlDomElement(node, 'div')) &&
         !lastLineEndsWithNewline(currentTextSpan)) {
       currentTextSpan
           .add(TextSpan(text: '\n', style: attributes.apply(textStyle)));

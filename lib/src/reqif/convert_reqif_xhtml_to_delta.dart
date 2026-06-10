@@ -113,7 +113,8 @@ class XHtmlToDeltaConverter {
       // new line before contents of paragraph if missing
       if (element.localName == "p" ||
           element.localName == "ul" ||
-          element.localName == "ol") {
+          element.localName == "ol" ||
+          element.localName == "div") {
         _insertNewLineIfMissing(delta, attributes);
       }
       // TODO type object for images / videos / sound files
