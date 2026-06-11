@@ -65,7 +65,7 @@ class DocumentController with ChangeNotifier {
       final output = await _parseReqifFromString(path, contents);
       output.extendImageCache(imageCache);
       documents.add(output);
-      _settings.addOpenedFile(path, output.flatDocument.title);
+      _addOpenedFile(output);
       notifyListeners();
       return true;
     } catch (e) {
@@ -255,7 +255,7 @@ class DocumentController with ChangeNotifier {
             "Converting a '.reqif' file to '.reqifz' is currently not supported");
       }
       toSave.path = outputPath;
-      await _settings.addOpenedFile(toSave.path, toSave.title);
+      _addOpenedFile(toSave);
     }
     if (_isCompressedReqif(toSave.path)) {
       await _saveReqifz(toSave.path, contents, toSave.objectCache);
@@ -271,9 +271,26 @@ class DocumentController with ChangeNotifier {
     toSave.modified = false;
   }
 
+  void _addOpenedFile(DocumentData data) async {
+    try {
+      String title = data.title;
+      for (final part in data.flatDocument.parts) {
+        final name = part.name;
+        if (name != null) {
+          title += " | $name";
+        }
+      }
+      await _settings.addOpenedFile(data.path, title);
+    } catch (e) {
+      return;
+    }
+  }
+
   Future<void> saveAllModified() async {
     for (int i = 0; i < documents.length; ++i) {
-      await save(i);
+      if (documents[i].modified) {
+        await save(i);
+      }
     }
   }
 

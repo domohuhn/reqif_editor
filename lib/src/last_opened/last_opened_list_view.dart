@@ -48,7 +48,6 @@ class _LastOpenedListViewState extends State<LastOpenedListView>
         itemCount: widget.controller.lastOpenedFiles.length,
         itemBuilder: (BuildContext context, int index) {
           final item = widget.controller.lastOpenedFiles.toList()[index];
-
           return ListTile(
               title: Text(item.title),
               subtitle: Text("${item.path}\n${item.lastUsed}"),

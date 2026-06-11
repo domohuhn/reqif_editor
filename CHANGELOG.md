@@ -7,6 +7,7 @@
 - bugfix: added small width margin below xhtml lists
 - bugfix: empty xhtml text sections can be edited
 - bugfix: divs now correctly have a new line inserted after when rendered
+- The name of specification is now also displayed in the "last used" view
 
 ## 0.7.0
 
