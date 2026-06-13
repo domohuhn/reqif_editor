@@ -48,6 +48,14 @@ class _TopMenuBarState extends State<TopMenuBar>
       return const ContinuousRectangleBorder();
     }
 
+    final queued = widget.documentController.queuedLoadPath;
+    if (queued != null) {
+      if (queued.isNotEmpty) {
+        openPath(widget.documentController, queued);
+      }
+      widget.documentController.enqueueFileLoad(null);
+    }
+
     return Material(
         child: SafeArea(
             child: Column(

@@ -21,6 +21,10 @@ void main(List<String> args) async {
 
   await settingsController.loadSettings();
 
+  if (args.isNotEmpty) {
+    documentController.enqueueFileLoad(args[0]);
+  }
+
   final app = ReqIfEditorApp(
       settingsController: settingsController,
       documentController: documentController);

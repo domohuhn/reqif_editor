@@ -31,6 +31,14 @@ class DocumentController with ChangeNotifier {
   final SettingsController _settings;
   final DocumentService _service;
 
+  String? _queuedLoadPath;
+
+  void enqueueFileLoad(String? path) {
+    _queuedLoadPath = path;
+  }
+
+  String? get queuedLoadPath => _queuedLoadPath;
+
   Future<bool> loadDocument(String path,
       [void Function(dynamic, dynamic)? onError, String? doesNotExist]) async {
     final exists = await _service.fileExists(path);
