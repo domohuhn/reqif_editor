@@ -25,11 +25,18 @@ xml.XmlDocument parseXMLString(String contents) {
 
 String convertXMLToString(xml.XmlDocument doc, ExportCompatibility mode) {
   final text = doc.toXmlString(pretty: false);
-  if (mode == ExportCompatibility.code || mode == ExportCompatibility.ptc) {
-    return escapeSpecialCharacters(text, mode);
+  if (mode == ExportCompatibility.code) {
+    return _convertNewlineToLowercaseEscape(text);
+  } else if (mode == ExportCompatibility.ptc) {
+    return escapeSpecialCharacters(text);
   } else {
     return text;
   }
+}
+
+/// Converts &#xA; in [text] to &#xa;
+String _convertNewlineToLowercaseEscape(String text) {
+  return text.replaceAll('&#xA;', '&#xa;');
 }
 
 /// Converts the XML tree in [doc] to a string and writes the contents to the file [outputPath].
@@ -56,21 +63,17 @@ bool _isInValueRange(int idx, int block, List<int> starts, List<int> ends) {
   return false;
 }
 
-bool _characterIsRelevant(int pt, ExportCompatibility mode) {
-  if (mode == ExportCompatibility.ptc) {
-    // 9 tab
-    // 34 "
-    // 39 '
-    // 37 %
-    // 94 hat
-    return (pt == 34 || pt == 39 || pt == 9 || pt == 37 || pt == 94);
-  } else {
-    return false;
-  }
+bool _characterIsRelevant(int pt) {
+  // 9 tab
+  // 34 "
+  // 39 '
+  // 37 %
+  // 94 hat
+  return (pt == 34 || pt == 39 || pt == 9 || pt == 37 || pt == 94);
 }
 
 /// escapes the same characters as the PTC requirements connector seems to escape.
-String escapeSpecialCharacters(String input, ExportCompatibility mode) {
+String escapeSpecialCharacters(String input) {
   final starts = _findAllSubstrings(input, "<THE-VALUE");
   final ends = _findAllSubstrings(input, "</THE-VALUE");
   StringBuffer buffer = StringBuffer();
@@ -95,12 +98,10 @@ String escapeSpecialCharacters(String input, ExportCompatibility mode) {
     // escape closing tags >(62) in text sections:
     final bool escapeBracket = (bracketCount < 0 || inAttribute) && pt == 62;
     // escape tabs, ', " in the-value blocks:
-    final bool relevantCharacter = _characterIsRelevant(pt, mode);
+    final bool relevantCharacter = _characterIsRelevant(pt);
     // 37=%,39='
-    final bool escapeInAttribute = inAttribute &&
-        pt != attributeStart &&
-        mode == ExportCompatibility.ptc &&
-        (pt == 37 || pt == 39);
+    final bool escapeInAttribute =
+        inAttribute && pt != attributeStart && (pt == 37 || pt == 39);
     final bool escapeInValue = relevantCharacter &&
         !inAttribute &&
         !wasAttribute &&
@@ -120,11 +121,7 @@ String escapeSpecialCharacters(String input, ExportCompatibility mode) {
       } else if (pt == 39) {
         buffer.write('&#039;');
       } else {
-        if (mode == ExportCompatibility.code) {
-          buffer.write('&#x${pt.toRadixString(16)};');
-        } else {
-          buffer.write('&#x${pt.toRadixString(16).toUpperCase()};');
-        }
+        buffer.write('&#x${pt.toRadixString(16).toUpperCase()};');
       }
     }
     final checkIdx = max(0, currentValueBlock);
