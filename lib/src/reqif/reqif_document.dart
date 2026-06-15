@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // See LICENSE for the full text of the license
 
+import 'dart:convert';
+
 import 'package:reqif_editor/src/document/document_service.dart';
 import 'package:reqif_editor/src/reqif/reqif_io.dart';
 import 'package:reqif_editor/src/reqif/reqif_spec_objects.dart';
@@ -173,6 +175,14 @@ class ReqIfDocument {
   static const String xHtmlNamespaceUri = "http://www.w3.org/1999/xhtml";
   static const String reqIfNamespaceUri =
       "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd";
+
+  Encoding? get encoding {
+    final declaration = _document.declaration;
+    if (declaration == null) {
+      return null;
+    }
+    return Encoding.getByName(declaration.encoding);
+  }
 
   void _parseNamespaces(xml.XmlElement reqIf) {
     for (final attr in reqIf.attributes) {

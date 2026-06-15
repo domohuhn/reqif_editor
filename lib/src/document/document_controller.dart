@@ -111,6 +111,70 @@ class DocumentController with ChangeNotifier {
     return path.endsWith(".reqifz");
   }
 
+  bool _isUTF8(Uint8List data) {
+    final len = min(data.length, 100);
+    final encodingSequence = [0x65, 0x6E, 0x63, 0x6F, 0x64, 0x69, 0x6E, 0x67];
+    final utf8Sequence = [0x55, 0x54, 0x46, 0x2D, 0x38];
+    final openBrace = 0x3C;
+    final closeBrace = 0x3E;
+    final questionMark = 0x3F;
+    final equals = 0x3D;
+
+    int lastCodePoint = 0;
+    bool inProcessingInstruction = false;
+    bool encodingFound = false;
+    bool equalsFound = false;
+
+    int indexInSequence = 0;
+
+    for (int i = 0; i < len; ++i) {
+      final current = data[i];
+      if (lastCodePoint == openBrace && current == questionMark) {
+        inProcessingInstruction = true;
+      }
+      if (inProcessingInstruction) {
+        if (lastCodePoint == questionMark && current == closeBrace) {
+          inProcessingInstruction = false;
+          encodingFound = false;
+        } else if (!encodingFound) {
+          if (current == encodingSequence[indexInSequence]) {
+            indexInSequence++;
+          } else {
+            indexInSequence = 0;
+          }
+          encodingFound = indexInSequence == encodingSequence.length;
+          if (encodingFound) {
+            indexInSequence = 0;
+          }
+        } else {
+          if (current == equals) {
+            if (equalsFound) {
+              equalsFound = false;
+              encodingFound = false;
+            } else {
+              equalsFound = true;
+            }
+          }
+          if (equalsFound) {
+            if (current == utf8Sequence[indexInSequence]) {
+              indexInSequence++;
+            } else {
+              indexInSequence = 0;
+            }
+            if (indexInSequence == utf8Sequence.length) {
+              return true;
+            }
+          }
+        }
+      } else {
+        indexInSequence = 0;
+        encodingFound = false;
+      }
+      lastCodePoint = data[i];
+    }
+    return false;
+  }
+
   Future<String> _loadReqifz(
       String path, Map<String, ImageProvider<Object>> images,
       [void Function(dynamic, dynamic)? onError]) async {
@@ -136,7 +200,15 @@ class DocumentController with ChangeNotifier {
       if (entry.key.endsWith(".reqif")) {
         final fileBytes = entry.value;
         if (fileBytes.isNotEmpty) {
-          rawReqif = String.fromCharCodes(fileBytes);
+          if (_isUTF8(fileBytes)) {
+            rawReqif = Utf8Decoder(allowMalformed: true).convert(fileBytes);
+          } else {
+            try {
+              rawReqif = Utf8Decoder().convert(fileBytes);
+            } catch (e) {
+              rawReqif = Latin1Decoder(allowInvalid: true).convert(fileBytes);
+            }
+          }
           countReqif += 1;
         }
       }
@@ -149,14 +221,16 @@ class DocumentController with ChangeNotifier {
   }
 
   Future<void> _saveReqifz(String archivePath, String contents,
-      Map<String, ImageProvider> embeddedObjects) async {
+      Map<String, ImageProvider> embeddedObjects,
+      [Encoding? encoding]) async {
     assert(archivePath.endsWith(".reqifz"));
     final archiveBaseName = basename(archivePath);
     final reqifFileName =
         archiveBaseName.substring(0, archiveBaseName.length - 1);
     Map<String, Uint8List> files = {};
-    final encoded = utf8.encode(contents);
-    files[reqifFileName] = encoded;
+    encoding ??= utf8;
+    final encoded = encoding.encode(contents);
+    files[reqifFileName] = Uint8List.fromList(encoded);
 
     for (final img in embeddedObjects.entries) {
       final data = img.value;
@@ -266,9 +340,10 @@ class DocumentController with ChangeNotifier {
       _addOpenedFile(toSave);
     }
     if (_isCompressedReqif(toSave.path)) {
-      await _saveReqifz(toSave.path, contents, toSave.objectCache);
+      await _saveReqifz(
+          toSave.path, contents, toSave.objectCache, toSave.document.encoding);
     } else {
-      await _service.write(toSave.path, contents);
+      await _service.write(toSave.path, contents, toSave.document.encoding);
     }
     await _settings.updateFileColumnOrder(
         toSave.path, toSave.columnOrderToJson());

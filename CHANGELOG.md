@@ -1,3 +1,7 @@
+## 0.7.2
+
+- bugfix: detect encoding of reqifz files
+
 ## 0.7.1
 
 - added basic support for reqifz files

@@ -168,7 +168,7 @@ class _TopMenuBarState extends State<TopMenuBar>
           showAboutDialog(
             context: context,
             applicationName: AppLocalizations.of(context)!.appTitle,
-            applicationVersion: '0.7.1',
+            applicationVersion: '0.7.2',
           );
         },
       ),

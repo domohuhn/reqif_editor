@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // See LICENSE for the full text of the license
 
+import 'dart:convert' show Encoding, utf8;
 import 'dart:io';
 import 'dart:typed_data' show Uint8List;
 
@@ -82,8 +83,9 @@ class DocumentService {
   }
 
   /// Asynchronously writes the entire [text] to a file called [path]
-  Future<void> write(String path, String text) async {
-    await File(path).writeAsString(text, flush: true);
+  Future<void> write(String path, String text, [Encoding? encoding]) async {
+    await File(path)
+        .writeAsString(text, flush: true, encoding: encoding ?? utf8);
     return;
   }
 }
