@@ -382,6 +382,19 @@ class DocumentController with ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> saveAsMarkdown(int idx, String outputPath) async {
+    if (documents.length <= idx) {
+      return;
+    }
+    final toSave = documents[idx];
+    await _service.write(outputPath, toSave.flatDocument.toString());
+  }
+
+  Future<void> saveCurrentAsMarkdown(String outputPath) async {
+    await saveAsMarkdown(visibleDocumentNumber, outputPath);
+    notifyListeners();
+  }
+
   int _visibleDocumentNumber = 0;
   set visibleDocumentNumber(int i) {
     if (i == _visibleDocumentNumber || documents.length <= i) {

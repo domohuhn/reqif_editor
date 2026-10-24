@@ -76,6 +76,10 @@
   "@settingsSave": {
     "description": "Heading for the save section"
   },
+  "exportMarkdown": "Export Markdown as...",
+  "@exportMarkdown": {
+    "description": "Text for the menu entry to export as markdown"
+  },
   "settingsSaveUpdateUUID": "Update the document's UUID when saving",
   "@settingsSaveUpdateUUID": {
     "description": "Description for a settings checkbox"

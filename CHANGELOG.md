@@ -1,3 +1,7 @@
+## 0.7.3
+
+- Added export to markdown
+
 ## 0.7.2
 
 - bugfix: detect encoding of reqifz files

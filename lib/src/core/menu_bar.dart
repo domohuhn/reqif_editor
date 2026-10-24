@@ -100,10 +100,13 @@ class _TopMenuBarState extends State<TopMenuBar>
               FilePicker.pickFiles(
                   type: FileType.custom,
                   allowedExtensions: ["reqif", "reqifz"]).then((value) {
-                if (value != null &&
-                    value.files.single.path != null &&
-                    value.files.single.path!.isNotEmpty) {
-                  openPath(widget.documentController, value.files.single.path!);
+                if (value == null) {
+                  return;
+                }
+                for (final f in value.files) {
+                  if (f.path != null) {
+                    openPath(widget.documentController, f.path!);
+                  }
                 }
               });
             },
@@ -140,6 +143,22 @@ class _TopMenuBarState extends State<TopMenuBar>
             },
           ),
           MenuEntry(
+            label: AppLocalizations.of(context)!.exportMarkdown,
+            onPressed: () async {
+              if (!mounted || !widget.documentController.hasOpenDocuments) {
+                return;
+              }
+              FilePicker.saveFile(
+                  type: FileType.custom,
+                  allowedExtensions: ["md"]).then((value) async {
+                if (value != null) {
+                  final path = value.endsWith(".md") ? value : "$value.md";
+                  await saveCurrentAsMarkdown(widget.documentController, path);
+                }
+              });
+            },
+          ),
+          MenuEntry(
             label: AppLocalizations.of(context)!.exit,
             onPressed: () async {
               if (Platform.isAndroid) {
@@ -168,7 +187,7 @@ class _TopMenuBarState extends State<TopMenuBar>
           showAboutDialog(
             context: context,
             applicationName: AppLocalizations.of(context)!.appTitle,
-            applicationVersion: '0.7.2',
+            applicationVersion: '0.7.3',
           );
         },
       ),

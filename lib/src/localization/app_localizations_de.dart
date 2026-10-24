@@ -66,6 +66,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settingsSave => 'Speichern';
 
   @override
+  String get exportMarkdown => 'Als Markdown exportieren...';
+
+  @override
   String get settingsSaveUpdateUUID =>
       'Die UUID des Dokuments beim Speichern aktualisieren';
 

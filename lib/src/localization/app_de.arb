@@ -9,6 +9,7 @@
   "openFile": "Datei öffnen...",
   "save": "Speichern",
   "saveAs": "Speichern unter...",
+  "exportMarkdown": "Als Markdown exportieren...",
   "exit": "Beenden",
   "settings": "Einstellungen",
   "lightTheme": "Hell",

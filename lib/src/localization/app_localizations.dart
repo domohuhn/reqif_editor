@@ -212,6 +212,12 @@ abstract class AppLocalizations {
   /// **'Save'**
   String get settingsSave;
 
+  /// Text for the menu entry to export as markdown
+  ///
+  /// In en, this message translates to:
+  /// **'Export Markdown as...'**
+  String get exportMarkdown;
+
   /// Description for a settings checkbox
   ///
   /// In en, this message translates to:

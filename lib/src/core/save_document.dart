@@ -21,6 +21,13 @@ mixin SaveDocument<T extends StatefulWidget> on State<T> {
         .onError(_showSaveError);
   }
 
+  Future<void> saveCurrentAsMarkdown(
+      DocumentController documentController, String outputPath) async {
+    await documentController
+        .saveCurrentAsMarkdown(outputPath)
+        .onError(_showSaveError);
+  }
+
   Future<void> saveAllModified(DocumentController documentController) async {
     await documentController.saveAllModified().onError(_showSaveError);
   }
